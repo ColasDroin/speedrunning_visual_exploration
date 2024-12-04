@@ -13,6 +13,11 @@ export default {
         foreground: "var(--foreground)",
       },
     },
+    fontFamily: {
+      sans: ["ui-sans-serif", "system-ui"],
+      serif: ["ui-serif", "Georgia"],
+      mono: ["ui-monospace", "SFMono-Regular"],
+    },
   },
   plugins: [],
 } satisfies Config;

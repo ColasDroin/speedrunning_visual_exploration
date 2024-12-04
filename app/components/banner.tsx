@@ -23,7 +23,7 @@ const Banner = () => {
             SPEEDRUN<span className={styles.spark}></span>
           </div>
           <div className={`${styles.outrun} ${styles.glow}`}>
-            A DATA VIZ STORY
+            A DATA VIZ SHORT STORY
           </div>
         </div>
       </div>
