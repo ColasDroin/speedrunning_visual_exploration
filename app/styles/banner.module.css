@@ -1,32 +1,23 @@
-@import url(https://fonts.googleapis.com/css?family=Montserrat:700,900|Dancing+Script);
-
-@font-face {
-  font-family: "RoadRage";
-  font-style: normal;
-  font-weight: normal;
-  src: local("RoadRage"),
-    url("http://coding-dude.com/wp/wp-content/uploads/Road_Rage.woff")
-      format("woff");
-}
+@import url("https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap");
 
 .grid {
   --grid-size: 30px;
-  --grid-color: rgba(115, 59, 139, 0.7);
+  --grid-color: rgb(164, 164, 164);
   --grid-blur: 1px;
   position: absolute;
   bottom: -30%;
   left: 0;
   margin-left: -50%;
   width: 200%;
-  height: 100%;
-  background-position-y: 0px;
+  height: 90%;
+  background-position: 0 0;
   background-image: repeating-linear-gradient(
       90deg,
       var(--grid-color, black) 0%,
       transparent calc(1px + var(--grid-blur, 0px)),
       transparent var(--grid-size),
       var(--grid-color, black)
-        calc(var(--grid-size) + 1px + var(--grid-blur, 0px))
+        calc(var(--grid-size) + 0px + var(--grid-blur, 0px))
     ),
     repeating-linear-gradient(
       180deg,
@@ -34,98 +25,105 @@
       transparent calc(1px + var(--grid-blur, 0px)),
       transparent var(--grid-size),
       var(--grid-color, black)
-        calc(var(--grid-size) + 1px + var(--grid-blur, 0px))
+        calc(var(--grid-size) + 0px + var(--grid-blur, 0px))
     );
   transform: perspective(50vh) rotateX(60deg) translateZ(10px);
-  animation: moving-grid 0.5s infinite linear;
+  animation: moving-grid-diagonal 1s infinite linear;
   z-index: -1;
 }
 
-@keyframes moving-grid {
+@keyframes moving-grid-diagonal {
   0% {
-    transform: perspective(50vh) rotateX(60deg) translateZ(10px)
-      translateY(-var(--grid-size));
+    background-position: var(--grid-size) var(--grid-size);
   }
   100% {
-    transform: perspective(50vh) rotateX(60deg) translateZ(10px)
-      translateY(var(--grid-size));
+    background-position: 0 0;
   }
 }
 
-.sun {
-  width: 200px;
-  height: 200px;
-  border-radius: 100%;
+.progressLine {
   position: absolute;
-  background-color: yellow;
-  left: calc(50%);
-  bottom: 40%;
-  transform: translateX(-50%);
-  background-image: linear-gradient(red, yellow), linear-gradient(black, white);
+  top: 70%;
+  width: 100vw;
+  height: 100px;
+  background-image: linear-gradient(#fff, #fff), linear-gradient(#fff, #fff),
+    linear-gradient(#fff, #fff);
+  background-size: 0% 5px, 5px 0%, 0% 5px;
+  background-position: top left, top center, 150px 100%;
+  background-repeat: no-repeat;
+  animation: increase-line 3s;
+  animation-fill-mode: forwards;
+}
+
+.starWrap {
+  filter: drop-shadow(0px 0 20px rgba(0, 255, 0, 0.7));
+  position: absolute;
+  right: calc(27%);
+  top: 20%;
+}
+
+.star {
+  width: 100px;
+  height: 100px;
+  background-color: gold;
+  background-image: radial-gradient(circle, gold, darkgoldenrod);
+  border-radius: 50%;
   clip-path: polygon(
-    -50% 0px,
-    150% -50%,
-    150% 55%,
-    -50% 55%,
-    -50% 62%,
-    150% 62%,
-    150% 70%,
-    0 70%,
-    -50% 75%,
-    150% 75%,
-    150% 80%,
-    0 80%,
-    -50% 82%,
-    150% 82%,
-    150% 85%,
-    0 85%,
-    -50% 87%,
-    150% 87%,
-    150% 90%,
-    0 90%,
-    -50% 92%,
-    150% 92%,
-    150% 95%,
-    0 95%,
-    -50% 96%,
-    150% 96%,
-    150% 150%,
-    0 150%
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
   );
-  box-shadow: rgba(255, 128, 0, 0.7) 0px 0 20px;
+  animation: rotate-star 2s infinite linear;
 }
 
-.mountain {
-  --mountain-base: 10vw;
-  --mountain-height: 5vw;
-  --mountain-color1: #a684cb;
-  --mountain-color2: #b533b3;
-  --mountain-tilt: 10vw;
-  --mountain-offset: -20deg;
-  position: absolute;
-  content: "";
-  bottom: 35%;
-  left: calc(50% + var(--mountain-offset, 0px));
-  border-left: calc(var(--mountain-base) / 2) solid transparent;
-  border-bottom: var(--mountain-height, 100px) solid
-    var(--mountain-color1, white);
-  border-top: 0px solid transparent;
-  border-right: calc(var(--mountain-base, 100px) / 2) solid transparent;
-  transform-origin: bottom;
-  transform: skewX(var(--mountain-tilt, 0deg));
+@keyframes rotate-star {
+  0% {
+    transform: translateX(-50%) rotateY(0deg);
+  }
+  100% {
+    transform: translateX(-50%) rotateY(360deg);
+  }
 }
 
-.mountain:after {
-  content: "";
-  border-left: calc(var(--mountain-base) / 2) solid transparent;
-  border-bottom: var(--mountain-height, 100px) solid
-    var(--mountain-color2, black);
-  border-top: 0px solid transparent;
-  border-right: calc(var(--mountain-base, 100px) / 2) solid transparent;
-  transform: translate(-50%) scale(0.98);
+.coin {
+  width: 100px;
+  height: 100px;
   position: absolute;
-  left: 0;
-  top: 0;
+  background-color: gold;
+  left: calc(30%);
+  top: 30%;
+  background-image: radial-gradient(circle, gold, darkgoldenrod);
+  border-radius: 50%;
+  box-shadow: rgba(255, 215, 0, 0.7) 0px 0 20px;
+  animation: rotate-coin 2s infinite linear;
+}
+
+.coin::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 15px;
+  height: 60px;
+  background-color: darkgoldenrod;
+  transform: translate(-50%, -50%);
+  border-radius: 5px;
+}
+
+@keyframes rotate-coin {
+  0% {
+    transform: translate(-50%, -50%) rotateY(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotateY(360deg);
+  }
 }
 
 .overlay {
@@ -144,41 +142,42 @@
   pointer-events: none;
 }
 
-.background-80s {
+.background80s {
   background: linear-gradient(
       to bottom,
-      #010310 0,
-      #0c1142 24%,
-      #45125e 45%,
-      #d53567 60%,
-      #f0c3d9 65%,
-      #0c1142 65%
+      #001f3f 0,
+      #0074d9 24%,
+      #7fdbff 45%,
+      #39cccc 60%,
+      #0074d9 70%,
+      #000000 95%
     )
     fixed;
-  background-size: 100% var(--background-height, 100vh);
+  background-size: 100% var(--background-height, 30vh);
   overflow: hidden;
   position: absolute;
   left: 0;
   top: 0;
   width: 100vw;
-  height: var(--background-height, 100vh);
+  height: var(--background-height, 30vh);
   z-index: -2;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
 }
 
-.animated-clouds:before {
+.animatedclouds:before {
   filter: url(#filter);
 }
 
-.background-80s:before {
+.background80s:before {
   content: "";
   background: linear-gradient(
       to bottom,
-      #010310 0,
-      #0c1142 24%,
-      #45125e 45%,
-      #d53567 60%,
-      #f0c3d9 65%,
-      #0c1142 65%
+      #001f3f 0,
+      #0074d9 24%,
+      #7fdbff 45%,
+      #39cccc 60%,
+      #3d9970 65%
     )
     fixed;
   width: 100%;
@@ -207,9 +206,8 @@
     33vw 35vh 2px white, 12vw 38vh 2px white, 24vw 10vh 0px white,
     33vw 5vh 2px white, 20vw 10vh 0px white, 80vw 10vh 2px white,
     62vw 20vh 0px white, 60vw 15vh 2px white, 70vw 7vh 0px white,
-    62vw 50vh 0px white, 65vw 35vh 2px white, 64vw 10vh 0px white,
-    85vw 2vh 0px white, 92vw 40vh 0px white, 75vw 35vh 2px white,
-    90vw 10vh 0px white;
+    65vw 35vh 2px white, 64vw 10vh 0px white, 85vw 2vh 0px white,
+    92vw 40vh 0px white, 75vw 35vh 2px white, 90vw 10vh 0px white;
   opacity: 0.3;
   animation: glitter 2s infinite;
 }
@@ -230,7 +228,7 @@
 .text {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 45%;
   text-align: center;
   transform: translate(-50%, -50%);
   white-space: nowrap;
@@ -239,6 +237,7 @@
   font-family: "Road Rage";
   font-weight: normal;
   font-size: 50px;
+  margin-top: 2rem;
 }
 
 .glow {
@@ -251,30 +250,34 @@
 
 @-webkit-keyframes glow {
   from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073,
-      0 0 40px #e60073, 0 0 50px #e60073, 0 0 60px #e60073, 0 0 70px #e60073;
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0074d9,
+      0 0 40px #0074d9, 0 0 50px #0074d9, 0 0 60px #0074d9, 0 0 70px #0074d9;
   }
   to {
-    text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6,
-      0 0 50px #ff4da6, 0 0 60px #ff4da6, 0 0 70px #ff4da6, 0 0 80px #ff4da6;
+    text-shadow: 0 0 20px #fff, 0 0 30px #7fdbff, 0 0 40px #7fdbff,
+      0 0 50px #7fdbff, 0 0 60px #7fdbff, 0 0 70px #7fdbff, 0 0 80px #7fdbff;
+  }
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0074d9,
+      0 0 40px #0074d9, 0 0 50px #0074d9, 0 0 60px #0074d9, 0 0 70px #0074d9;
+  }
+  to {
+    text-shadow: 0 0 20px #fff, 0 0 30px #7fdbff, 0 0 40px #7fdbff,
+      0 0 50px #7fdbff, 0 0 60px #7fdbff, 0 0 70px #7fdbff, 0 0 80px #7fdbff;
   }
 }
 
 .chrome {
-  font-family: "Montserrat";
+  font-family: "Doto";
   font-weight: 900;
   font-size: calc(30px + 10vh);
-  background-image: linear-gradient(
-    #2989cc 0%,
-    #d3e5ec 50%,
-    #592451 51%,
-    #b3628d 55%,
-    #592451 59%,
-    #b3628d 65%,
-    #ac86a6 75%,
-    #b3628d 100%
-  );
+  background-image: linear-gradient(#2989cc 0%, #d3e5ec 50%, #b3628d 100%);
   -webkit-background-clip: text;
+  background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: rgba(255, 255, 255, 0.4);
@@ -289,116 +292,4 @@
   opacity: 1;
   position: absolute;
   z-index: -1;
-}
-
-.shine:after {
-  content: attr(data-text);
-  background-image: linear-gradient(
-    225deg,
-    transparent 53%,
-    white 55%,
-    transparent 58%
-  );
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  -webkit-background-clip: text;
-  z-index: 999;
-  background-size: 400% 400%;
-  animation: shine 10s ease infinite;
-  animation-delay: var(--shine-delay, 0s);
-}
-
-@keyframes shine {
-  0% {
-    background-position: 0% 51%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 51%;
-  }
-}
-
-.spark {
-  margin-top: calc(4vh);
-  margin-left: -0.3em;
-  line-height: 0;
-  position: absolute;
-  width: 37px;
-  height: 45px;
-  z-index: 999;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='120 250 1700 1200' width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3C!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ --%3E%3Cg%3E%3Ctitle%3Ebackground%3C/title%3E%3Crect fill='none' id='canvas_background' height='402' width='182' y='-1' x='-1'/%3E%3Cg display='none' overflow='visible' y='0' x='0' height='100%25' width='100%25' id='canvasGrid'%3E%3Crect fill='url(%23gridpattern)' stroke-width='0' y='0' x='0' height='100%25' width='100%25'/%3E%3C/g%3E%3C/g%3E%3Cg%3E%3Ctitle%3ELayer 1%3C/title%3E%3Cellipse ry='183' rx='5' id='svg_2' cy='197.0375' cx='274.5' stroke-width='0' stroke='%23000' fill='%23fff'/%3E%3Cellipse transform='rotate(90 274.50000000000006,197.03750610351565) ' ry='183' rx='5' id='svg_3' cy='197.0375' cx='274.5' stroke-width='0' stroke='%23000' fill='%23fff'/%3E%3Cellipse stroke='%23000' transform='rotate(126.69925689697266 276.19342041015625,195.4363708496094) ' ry='90.194158' rx='3.223029' id='svg_4' cy='195.43637' cx='276.193439' stroke-width='0' fill='%23fff'/%3E%3Cellipse stroke='%23000' transform='rotate(-134.6077117919922 276.19342041015625,195.43637084960938) ' ry='90.194158' rx='3.223029' id='svg_5' cy='195.43637' cx='276.193439' stroke-width='0' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E");
-  filter: blur(0.5px);
-  transform: scale(0);
-  animation: blip 5s infinite;
-  animation-timing-function: ease-in-out;
-}
-
-.spark-offset {
-}
-
-.chrome:last-of-type .spark {
-  animation-delay: -2.5s;
-}
-
-@-webkit-keyframes blip {
-  0% {
-    transform: scale(0);
-  }
-  5% {
-    transform: scale(1.2) rotate(0deg);
-  }
-  6% {
-    transform: scale(1) rotate(0deg);
-  }
-  8% {
-    transform: scale(1) rotate(180deg);
-  }
-  100% {
-    transform: scale(1) rotate(180deg);
-  }
-}
-
-.road {
-  --grid-size: 90px;
-  --road-color: #2a025d;
-  position: absolute;
-  bottom: -30%;
-  left: 0;
-  margin-left: calc(50% - 200px / 2);
-  width: 200px;
-  height: 100%;
-  background-position-y: 0px;
-  background-image: repeating-linear-gradient(
-    90deg,
-    #a684cb 0%,
-    #a684cb 2%,
-    var(--road-color, rgba(115, 59, 139, 1)) 2%,
-    var(--road-color, rgba(115, 59, 139, 1)) 98%,
-    #a684cb 98%
-  );
-  transform: perspective(50vh) rotateX(60deg);
-  z-index: -1;
-}
-
-.road:after {
-  content: "";
-  --grid-size: 90px;
-  position: absolute;
-  margin-left: calc(50% - 10px / 2);
-  width: 10px;
-  height: 100%;
-  background-position-y: 0px;
-  background-image: repeating-linear-gradient(
-    0deg,
-    #a684cb 0%,
-    #a684cb 10%,
-    transparent 10%,
-    transparent 20%
-  );
-  animation: moving-grid 0.5s infinite linear;
 }
