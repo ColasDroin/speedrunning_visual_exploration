@@ -137,7 +137,7 @@
       #7fdbff 45%,
       #39cccc 60%,
       #0074d9 70%,
-      #000000 95%
+      #343434 95%
     )
     fixed;
   background-size: 100% var(--background-height, 30vh);
@@ -222,8 +222,8 @@
 .outrun {
   font-family: "Road Rage";
   font-weight: normal;
-  font-size: 50px;
-  margin-top: 2rem;
+  font-size: 40px;
+  margin-top: 1rem;
 }
 
 .glow {
@@ -247,13 +247,19 @@
 
 @keyframes glow {
   from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0074d9,
-      0 0 40px #0074d9, 0 0 50px #0074d9, 0 0 60px #0074d9, 0 0 70px #0074d9;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0074d9, 0 0 20px #0074d9,
+      0 0 25px #0074d9, 0 0 30px #0074d9, 0 0 35px #0074d9;
   }
   to {
-    text-shadow: 0 0 20px #fff, 0 0 30px #7fdbff, 0 0 40px #7fdbff,
-      0 0 50px #7fdbff, 0 0 60px #7fdbff, 0 0 70px #7fdbff, 0 0 80px #7fdbff;
+    text-shadow: 0 0 10px #fff, 0 0 15px #7fdbff, 0 0 20px #7fdbff,
+      0 0 25px #7fdbff, 0 0 30px #7fdbff, 0 0 35px #7fdbff, 0 0 40px #7fdbff;
   }
+}
+
+.subtleGlow {
+  color: #9ce3ff;
+  text-align: center;
+  animation: subtleGlow 1s ease-in-out infinite alternate;
 }
 
 .chrome {
@@ -278,4 +284,8 @@
   opacity: 1;
   position: absolute;
   z-index: -1;
+}
+.titleDecorated {
+  font-size: 4rem;
+  text-decoration: underline dotted #d3e5ec;
 }

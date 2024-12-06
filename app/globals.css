@@ -2,22 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  color: var(--foreground);
-  background: var(--background);
+  background: radial-gradient(
+    circle at 24.1% 68.8%,
+    rgb(50, 50, 50) 0%,
+    rgb(0, 0, 0) 99.4%
+  );
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  margin: 0;
+  font-family: "Jersey 10", sans-serif;
+  color: #d3e5ec;
+  font-size: 1.8rem;
+}
+
+html {
+  /* To make use of full height of page*/
+  min-height: 100%;
+  margin: 0;
 }
 
 @layer base {

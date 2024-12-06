@@ -18,12 +18,12 @@ const Banner = () => {
         <div className={styles.text}>
           <div
             className={`${styles.chrome} ${styles.shine}`}
-            data-text="SPEEDRUN"
+            data-text="SPEEDRUNNING"
           >
-            SPEEDRUN<span className={styles.spark}></span>
+            SPEEDRUNNING
           </div>
           <div className={`${styles.outrun} ${styles.glow}`}>
-            A DATA VIZ SHORT STORY
+            How a community has pushed the limits of what was thought possible
           </div>
         </div>
       </div>
