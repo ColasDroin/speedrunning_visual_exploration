@@ -5,6 +5,15 @@ import ReactECharts from "echarts-for-react";
 import game_counts from "../../public/data/game_counts.json";
 import submission_types from "../../public/data/submission_types.json";
 import distribution_types from "../../public/data/distribution_types.json";
+import pako from "pako";
+
+let scatter_data = [];
+fetch("/data/scatter_data.json.gz")
+  .then((response) => response.arrayBuffer())
+  .then((buffer) => {
+    const decompressed = pako.inflate(new Uint8Array(buffer), { to: "string" });
+    scatter_data = JSON.parse(decompressed);
+  });
 
 // Compute min and max for a dataset
 function computeMinMax(data) {
@@ -211,6 +220,106 @@ const Page: React.FC = () => {
   });
 
   distribution_types.forEach((data, index) => {
+    // since dataItems of each data have same groupId in this
+    // example, we can use groupId as optionId for optionStack.
+    const optionId = data[0]["identifier"];
+
+    const option = {
+      id: optionId,
+      title: {
+        text: "Distribution of speedrun times for category X of game X",
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          type: "shadow",
+        },
+        formatter: function (params: unknown) {
+          return [
+            "Bin: " + params[0].data["bin_label"],
+            "Submissions: " + params[0].data["count_all"],
+            "% of submissions in 2023: " +
+              parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+              "%",
+          ].join("<br/>");
+        },
+      },
+      grid: {
+        left: 250,
+      },
+      toolbox: {
+        show: true,
+        feature: {
+          saveAsImage: {},
+        },
+      },
+      yAxis: {
+        type: "value",
+        name: "Submission count per category",
+        axisLabel: {
+          formatter: "{value}",
+        },
+      },
+      xAxis: {
+        type: "category",
+        inverse: true,
+      },
+      visualMap: {
+        orient: "horizontal",
+        left: "center",
+        text: ["% of all submissions in 2023"],
+        // Map the score column to color
+        dimension: "percent_2023",
+        inRange: {
+          color: ["#65B581", "#FFCE34", "#FD665F"],
+        },
+        min: 0,
+        max: 100,
+      },
+      animationDurationUpdate: 500,
+      dataset: {
+        dimensions: [
+          "bin_label",
+          "count_all",
+          "identifier",
+          "child_identifier",
+          "percent_2023",
+        ],
+        source: data,
+      },
+      series: {
+        type: "bar",
+        encode: {
+          y: "count_all",
+          x: "bin_label",
+          itemGroupId: "identifier",
+          itemChildGroupId: "child_identifier",
+        },
+        universalTransition: {
+          enabled: true,
+          // divideShape: "clone",
+        },
+      },
+      graphic: [
+        {
+          type: "text",
+          left: 50,
+          top: 20,
+          style: {
+            text: "Back",
+            fontSize: 18,
+            fill: "grey",
+          },
+          onclick: function () {
+            goBack();
+          },
+        },
+      ],
+    };
+    allOptions[optionId] = option;
+  });
+
+  scatter_data.forEach((data, index) => {
     // since dataItems of each data have same groupId in this
     // example, we can use groupId as optionId for optionStack.
     const optionId = data[0]["identifier"];
