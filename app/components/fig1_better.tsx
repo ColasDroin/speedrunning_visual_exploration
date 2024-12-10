@@ -4,6 +4,16 @@ import React, { useRef } from "react";
 import ReactECharts from "echarts-for-react";
 import game_counts from "../../public/data/game_counts.json";
 import submission_types from "../../public/data/submission_types.json";
+import distribution_types from "../../public/data/distribution_types.json";
+
+// Compute min and max for a dataset
+function computeMinMax(data) {
+  const values = data.map((item) => item[1]); // Assuming the second column is the score
+  return {
+    min: Math.min(...values),
+    max: Math.max(...values),
+  };
+}
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
@@ -11,7 +21,6 @@ const Page: React.FC = () => {
   const allOptions: { [key: string]: EChartsOption } = {};
   const optionStack: string[] = []; // Stack to track navigation
   let option_1: EChartsOption;
-  console.log(game_counts);
   option_1 = {
     id: game_counts[0]["identifier"],
     title: {
@@ -26,6 +35,9 @@ const Page: React.FC = () => {
         return [
           "Game: " + params[0].data["name"],
           "Total Submissions: " + params[0].data["count"],
+          "% of all submissions in 2023: " +
+            parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+            "%",
         ].join("<br/>");
       },
     },
@@ -49,9 +61,27 @@ const Page: React.FC = () => {
       type: "category",
       inverse: true,
     },
+    visualMap: {
+      orient: "horizontal",
+      left: "center",
+      text: ["% of all submissions in 2023"],
+      // Map the score column to color
+      dimension: "percent_2023",
+      inRange: {
+        color: ["#65B581", "#FFCE34", "#FD665F"],
+      },
+      min: 0,
+      max: 100,
+    },
     animationDurationUpdate: 500,
     dataset: {
-      dimensions: ["name", "count", "identifier", "child_identifier"],
+      dimensions: [
+        "name",
+        "count",
+        "identifier",
+        "child_identifier",
+        "percent_2023",
+      ],
       source: game_counts,
     },
     series: [
@@ -65,7 +95,7 @@ const Page: React.FC = () => {
         },
         universalTransition: {
           enabled: true,
-          divideShape: "clone",
+          // divideShape: "clone",
         },
         label: {
           show: true,
@@ -98,7 +128,10 @@ const Page: React.FC = () => {
         formatter: function (params: unknown) {
           return [
             "Category: " + params[0].data["name_category"],
-            "Total Submissions: " + params[0].data["count"],
+            "Submissions: " + params[0].data["count"],
+            "% of submissions in 2023: " +
+              parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+              "%",
           ].join("<br/>");
         },
       },
@@ -122,6 +155,18 @@ const Page: React.FC = () => {
         type: "category",
         inverse: true,
       },
+      visualMap: {
+        orient: "horizontal",
+        left: "center",
+        text: ["% of all submissions in 2023"],
+        // Map the score column to color
+        dimension: "percent_2023",
+        inRange: {
+          color: ["#65B581", "#FFCE34", "#FD665F"],
+        },
+        min: 0,
+        max: 100,
+      },
       animationDurationUpdate: 500,
       dataset: {
         dimensions: [
@@ -129,6 +174,7 @@ const Page: React.FC = () => {
           "count",
           "identifier",
           "child_identifier",
+          "percent_2023",
         ],
         source: data,
       },
@@ -142,7 +188,107 @@ const Page: React.FC = () => {
         },
         universalTransition: {
           enabled: true,
-          divideShape: "clone",
+          // divideShape: "clone",
+        },
+      },
+      graphic: [
+        {
+          type: "text",
+          left: 50,
+          top: 20,
+          style: {
+            text: "Back",
+            fontSize: 18,
+            fill: "grey",
+          },
+          onclick: function () {
+            goBack();
+          },
+        },
+      ],
+    };
+    allOptions[optionId] = option;
+  });
+
+  distribution_types.forEach((data, index) => {
+    // since dataItems of each data have same groupId in this
+    // example, we can use groupId as optionId for optionStack.
+    const optionId = data[0]["identifier"];
+
+    const option = {
+      id: optionId,
+      title: {
+        text: "Distribution of speedrun times for category X of game X",
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          type: "shadow",
+        },
+        formatter: function (params: unknown) {
+          return [
+            "Bin: " + params[0].data["bin_label"],
+            "Submissions: " + params[0].data["count_all"],
+            "% of submissions in 2023: " +
+              parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+              "%",
+          ].join("<br/>");
+        },
+      },
+      grid: {
+        left: 250,
+      },
+      toolbox: {
+        show: true,
+        feature: {
+          saveAsImage: {},
+        },
+      },
+      yAxis: {
+        type: "value",
+        name: "Submission count per category",
+        axisLabel: {
+          formatter: "{value}",
+        },
+      },
+      xAxis: {
+        type: "category",
+        inverse: true,
+      },
+      visualMap: {
+        orient: "horizontal",
+        left: "center",
+        text: ["% of all submissions in 2023"],
+        // Map the score column to color
+        dimension: "percent_2023",
+        inRange: {
+          color: ["#65B581", "#FFCE34", "#FD665F"],
+        },
+        min: 0,
+        max: 100,
+      },
+      animationDurationUpdate: 500,
+      dataset: {
+        dimensions: [
+          "bin_label",
+          "count_all",
+          "identifier",
+          "child_identifier",
+          "percent_2023",
+        ],
+        source: data,
+      },
+      series: {
+        type: "bar",
+        encode: {
+          y: "count_all",
+          x: "bin_label",
+          itemGroupId: "identifier",
+          itemChildGroupId: "child_identifier",
+        },
+        universalTransition: {
+          enabled: true,
+          // divideShape: "clone",
         },
       },
       graphic: [
