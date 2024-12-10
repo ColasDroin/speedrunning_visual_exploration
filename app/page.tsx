@@ -1,5 +1,5 @@
 import Banner from "./components/banner";
-import Fig1 from "./components/fig1";
+import Fig1 from "./components/fig1_better";
 import styles from "./styles/banner.module.css";
 
 export default function Home() {
