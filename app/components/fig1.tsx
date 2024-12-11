@@ -226,6 +226,13 @@ const Page: React.FC = () => {
       // since dataItems of each data have same groupId in this
       // example, we can use groupId as optionId for optionStack.
       const optionId = data[0]["identifier"];
+
+      // Get the list of all "child_identifier_per_bin"
+      const l_child_identifiers_per_bin = data.map(
+        (item) => item["child_identifier_per_bin"]
+      );
+      console.log("l_child_identifiers_per_bin", l_child_identifiers_per_bin);
+
       const option = {
         id: optionId,
         title: {
@@ -255,14 +262,14 @@ const Page: React.FC = () => {
             saveAsImage: {},
           },
         },
-        yAxis: {
+        xAxis: {
           type: "value",
           name: "Submission count per category",
           // axisLabel: {
           //   formatter: "{value}",
           // },
         },
-        xAxis: {
+        yAxis: {
           type: "category",
           inverse: true,
         },
@@ -284,6 +291,7 @@ const Page: React.FC = () => {
             "bin_label",
             "count_all",
             "identifier",
+            "child_identifier_per_bin",
             "child_identifier",
             "percent_2023",
           ],
@@ -291,14 +299,16 @@ const Page: React.FC = () => {
         },
         series: {
           type: "bar",
+          // id: "test",
           encode: {
-            y: "count_all",
-            x: "bin_label",
-            itemGroupId: "identifier",
+            x: "count_all",
+            y: "bin_label",
+            itemGroupId: "child_identifier_per_bin",
             itemChildGroupId: "child_identifier",
           },
           universalTransition: {
             enabled: true,
+            seriesKey: l_child_identifiers_per_bin,
             // divideShape: "clone",
           },
         },
@@ -326,83 +336,99 @@ const Page: React.FC = () => {
       const dic_per_bin = data[1];
       const optionId = data[0];
       const l_series = [];
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
 
       for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
-        l_series.push({
-          type: "scatter",
-          dimensions: ["date", "time", "player", "location"],
-          data: l_runs,
-          groupId: bin_id,
-          encode: { x: "date", y: "time" },
-          universalTransition: { enabled: true },
-        });
+      l_series.push({
+        type: "scatter",
+        dimensions: ["date", "time", "player", "location"],
+        data: l_runs,
+        dataGroupId: bin_id,
+        id: bin_id,
+        encode: { x: "date", y: "time" },
+        universalTransition: { enabled: true },
+      });
+
+      // Update min and max values for x and y
+      l_runs.forEach(run => {
+        const date = new Date(run[0]).getTime();
+        const time = run[1];
+        if (date < minX) minX = date;
+        if (date > maxX) maxX = date;
+        if (time < minY) minY = time;
+        if (time > maxY) maxY = time;
+      });
       }
 
       allOptions[optionId] = {
-        id: optionId,
-        title: {
-          text: "Speedrun times for category X of game X",
+      id: optionId,
+      title: {
+        text: "Speedrun times for category X of game X",
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+        type: "shadow",
         },
-        tooltip: {
-          trigger: "axis",
-          axisPointer: {
-            type: "shadow",
-          },
-          formatter: function (params: unknown) {
-            return [
-              "Date: " + params[0].data[0],
-              "Run time: " + params[0].data[1],
-              "Player: " + params[0].data[2],
-              "Location: " + params[0].data[3],
-            ].join("<br/>");
-          },
+        formatter: function (params: unknown) {
+        return [
+          "Date: " + params[0].data[0],
+          "Run time: " + params[0].data[1],
+          "Player: " + params[0].data[2],
+          "Location: " + params[0].data[3],
+        ].join("<br/>");
         },
-        grid: {
-          left: 250,
+      },
+      grid: {
+        left: 250,
+      },
+      toolbox: {
+        show: true,
+        feature: {
+        saveAsImage: {},
         },
-        toolbox: {
-          show: true,
-          feature: {
-            saveAsImage: {},
-          },
+      },
+      yAxis: {
+        type: "value",
+        name: "Speedrun time",
+        min: minY,
+        max: maxY,
+      },
+      xAxis: {
+        type: "time",
+        name: "Date",
+        min: minX,
+        max: maxX,
+      },
+      visualMap: {
+        orient: "horizontal",
+        left: "center",
+        text: ["Test"],
+        // Map the score column to color
+        dimension: "time",
+        inRange: {
+        color: ["#65B581", "#FFCE34", "#FD665F"],
         },
-        yAxis: {
-          type: "time",
-          name: "Speedrun time",
+        min: 0,
+        max: 1000,
+      },
+      animationDurationUpdate: 500,
+      series: l_series,
+      graphic: [
+        {
+        type: "text",
+        left: 50,
+        top: 20,
+        style: {
+          text: "Back",
+          fontSize: 18,
+          fill: "grey",
         },
-        xAxis: {
-          type: "time",
-          name: "Date",
+        onclick: function () {
+          goBack();
         },
-        visualMap: {
-          orient: "horizontal",
-          left: "center",
-          text: ["Test"],
-          // Map the score column to color
-          dimension: "time",
-          inRange: {
-            color: ["#65B581", "#FFCE34", "#FD665F"],
-          },
-          min: 0,
-          max: 1000,
         },
-        animationDurationUpdate: 500,
-        series: l_series,
-        graphic: [
-          {
-            type: "text",
-            left: 50,
-            top: 20,
-            style: {
-              text: "Back",
-              fontSize: 18,
-              fill: "grey",
-            },
-            onclick: function () {
-              goBack();
-            },
-          },
-        ],
+      ],
       };
     }
   };

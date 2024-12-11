@@ -9,7 +9,7 @@ export default function Home() {
         <Banner />
       </div>
 
-      <div className="grid w-full lg:max-w-[50%] 2xl:max-w-[40%] mx-auto sm:max-w-full mt-15">
+      <div className="grid w-full lg:max-w-[70%] 2xl:max-w-[65%] mx-auto sm:max-w-full mt-15">
         <div className="grid-cols-1">
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-5`}
