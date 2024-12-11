@@ -31,6 +31,7 @@ const Page: React.FC = () => {
   const allOptions: { [key: string]: EChartsOption } = {};
   const optionStack: string[] = []; // Stack to track navigation
   let option_1: EChartsOption;
+
   option_1 = {
     id: game_counts[0]["identifier"],
     title: {
