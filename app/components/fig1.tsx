@@ -104,7 +104,215 @@ const Page: React.FC = () => {
   };
   allOptions[game_counts[0]["identifier"]] = option_1;
 
-  // Function to prepare all options
+  // Add options for submission types
+  submission_types.forEach((data, index) => {
+    // since dataItems of each data have same groupId in this
+    // example, we can use groupId as optionId for optionStack.
+    const optionId = data[0]["identifier"];
+
+    const option = {
+      id: optionId,
+      title: {
+        text: "Most speedrunned category of game X",
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          type: "shadow",
+        },
+        formatter: function (params: unknown) {
+          return [
+            "Category: " + params[0].data["name_category"],
+            "Submissions: " + params[0].data["count"],
+            "% of submissions in 2023: " +
+              parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+              "%",
+          ].join("<br/>");
+        },
+      },
+      grid: {
+        left: 250,
+      },
+      toolbox: {
+        show: true,
+        feature: {
+          saveAsImage: {},
+        },
+      },
+      xAxis: {
+        type: "value",
+        name: "Submission count per category",
+        axisLabel: {
+          formatter: "{value}",
+        },
+      },
+      yAxis: {
+        type: "category",
+        inverse: true,
+      },
+      visualMap: {
+        orient: "horizontal",
+        left: "center",
+        text: ["% of all submissions in 2023"],
+        // Map the score column to color
+        dimension: "percent_2023",
+        inRange: {
+          color: ["#65B581", "#FFCE34", "#FD665F"],
+        },
+        min: 0,
+        max: 100,
+      },
+      animationDurationUpdate: 500,
+      dataset: {
+        dimensions: [
+          "name_category",
+          "count",
+          "identifier",
+          "child_identifier",
+          "percent_2023",
+        ],
+        source: data,
+      },
+      series: {
+        type: "bar",
+        encode: {
+          x: "count",
+          y: "name_category",
+          itemGroupId: "identifier",
+          itemChildGroupId: "child_identifier",
+        },
+        universalTransition: {
+          enabled: true,
+          // divideShape: "clone",
+        },
+      },
+      graphic: [
+        {
+          type: "text",
+          left: 50,
+          top: 20,
+          style: {
+            text: "Back",
+            fontSize: 18,
+            fill: "grey",
+          },
+          onclick: function () {
+            goBack();
+          },
+        },
+      ],
+    };
+    allOptions[optionId] = option;
+  });
+
+  distribution_types.forEach((data, index) => {
+    // since dataItems of each data have same groupId in this
+    // example, we can use groupId as optionId for optionStack.
+    const optionId = data[0]["identifier"];
+
+    // Get the list of all "child_identifier_per_bin"
+    const l_child_identifiers_per_bin = data.map(
+      (item) => item["child_identifier_per_bin"]
+    );
+
+    const option = {
+      id: optionId,
+      title: {
+        text: "Distribution of speedrun times for category X of game X",
+      },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          type: "shadow",
+        },
+        formatter: function (params: unknown) {
+          return [
+            "Bin: " + params[0].data["bin_label"],
+            "Submissions: " + params[0].data["count_all"],
+            "% of submissions in 2023: " +
+              parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+              "%",
+          ].join("<br/>");
+        },
+      },
+      grid: {
+        left: 250,
+      },
+      toolbox: {
+        show: true,
+        feature: {
+          saveAsImage: {},
+        },
+      },
+      xAxis: {
+        type: "value",
+        name: "Submission count per category",
+        axisLabel: {
+          formatter: "{value}",
+        },
+      },
+      yAxis: {
+        type: "category",
+        inverse: true,
+      },
+      visualMap: {
+        orient: "horizontal",
+        left: "center",
+        text: ["% of all submissions in 2023"],
+        // Map the score column to color
+        dimension: "percent_2023",
+        inRange: {
+          color: ["#65B581", "#FFCE34", "#FD665F"],
+        },
+        min: 0,
+        max: 100,
+      },
+      animationDurationUpdate: 500,
+      dataset: {
+        dimensions: [
+          "bin_label",
+          "count_all",
+          "identifier",
+          "child_identifier",
+          "child_identifier_per_bin",
+          "percent_2023",
+        ],
+        source: data,
+      },
+      series: {
+        type: "bar",
+        // id: "test",
+        encode: {
+          x: "count_all",
+          y: "bin_label",
+          itemGroupId: "identifier", // "child_identifier_per_bin", //
+          itemChildGroupId: "child_identifier_per_bin", // "child_identifier"
+        },
+        universalTransition: {
+          enabled: true,
+          // seriesKey: l_child_identifiers_per_bin,
+        },
+      },
+      graphic: [
+        {
+          type: "text",
+          left: 50,
+          top: 20,
+          style: {
+            text: "Back",
+            fontSize: 18,
+            fill: "grey",
+          },
+          onclick: function () {
+            goBack();
+          },
+        },
+      ],
+    };
+    allOptions[optionId] = option;
+  });
+
+  // Function to prepare scatter options
   const prepareOptions = async () => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
     let scatterData: any[] = [];
@@ -121,314 +329,107 @@ const Page: React.FC = () => {
       console.error("Error fetching scatter data:", error);
     }
 
-    // Add options for submission types
-    submission_types.forEach((data, index) => {
-      // since dataItems of each data have same groupId in this
-      // example, we can use groupId as optionId for optionStack.
-      const optionId = data[0]["identifier"];
-
-      const option = {
-        id: optionId,
-        title: {
-          text: "Most speedrunned category of game X",
-        },
-        tooltip: {
-          trigger: "axis",
-          axisPointer: {
-            type: "shadow",
-          },
-          formatter: function (params: unknown) {
-            return [
-              "Category: " + params[0].data["name_category"],
-              "Submissions: " + params[0].data["count"],
-              "% of submissions in 2023: " +
-                parseFloat(params[0].data["percent_2023"]).toFixed(1) +
-                "%",
-            ].join("<br/>");
-          },
-        },
-        grid: {
-          left: 250,
-        },
-        toolbox: {
-          show: true,
-          feature: {
-            saveAsImage: {},
-          },
-        },
-        xAxis: {
-          type: "value",
-          name: "Submission count per category",
-          axisLabel: {
-            formatter: "{value}",
-          },
-        },
-        yAxis: {
-          type: "category",
-          inverse: true,
-        },
-        visualMap: {
-          orient: "horizontal",
-          left: "center",
-          text: ["% of all submissions in 2023"],
-          // Map the score column to color
-          dimension: "percent_2023",
-          inRange: {
-            color: ["#65B581", "#FFCE34", "#FD665F"],
-          },
-          min: 0,
-          max: 100,
-        },
-        animationDurationUpdate: 500,
-        dataset: {
-          dimensions: [
-            "name_category",
-            "count",
-            "identifier",
-            "child_identifier",
-            "percent_2023",
-          ],
-          source: data,
-        },
-        series: {
-          type: "bar",
-          encode: {
-            x: "count",
-            y: "name_category",
-            itemGroupId: "identifier",
-            itemChildGroupId: "child_identifier",
-          },
-          universalTransition: {
-            enabled: true,
-            // divideShape: "clone",
-          },
-        },
-        graphic: [
-          {
-            type: "text",
-            left: 50,
-            top: 20,
-            style: {
-              text: "Back",
-              fontSize: 18,
-              fill: "grey",
-            },
-            onclick: function () {
-              goBack();
-            },
-          },
-        ],
-      };
-      allOptions[optionId] = option;
-    });
-
-    distribution_types.forEach((data, index) => {
-      // since dataItems of each data have same groupId in this
-      // example, we can use groupId as optionId for optionStack.
-      const optionId = data[0]["identifier"];
-
-      // Get the list of all "child_identifier_per_bin"
-      const l_child_identifiers_per_bin = data.map(
-        (item) => item["child_identifier_per_bin"]
-      );
-      console.log("l_child_identifiers_per_bin", l_child_identifiers_per_bin);
-
-      const option = {
-        id: optionId,
-        title: {
-          text: "Distribution of speedrun times for category X of game X",
-        },
-        tooltip: {
-          trigger: "axis",
-          axisPointer: {
-            type: "shadow",
-          },
-          formatter: function (params: unknown) {
-            return [
-              "Bin: " + params[0].data["bin_label"],
-              "Submissions: " + params[0].data["count_all"],
-              "% of submissions in 2023: " +
-                parseFloat(params[0].data["percent_2023"]).toFixed(1) +
-                "%",
-            ].join("<br/>");
-          },
-        },
-        grid: {
-          left: 250,
-        },
-        toolbox: {
-          show: true,
-          feature: {
-            saveAsImage: {},
-          },
-        },
-        xAxis: {
-          type: "value",
-          name: "Submission count per category",
-          // axisLabel: {
-          //   formatter: "{value}",
-          // },
-        },
-        yAxis: {
-          type: "category",
-          inverse: true,
-        },
-        visualMap: {
-          orient: "horizontal",
-          left: "center",
-          text: ["% of all submissions in 2023"],
-          // Map the score column to color
-          dimension: "percent_2023",
-          inRange: {
-            color: ["#65B581", "#FFCE34", "#FD665F"],
-          },
-          min: 0,
-          max: 100,
-        },
-        animationDurationUpdate: 500,
-        dataset: {
-          dimensions: [
-            "bin_label",
-            "count_all",
-            "identifier",
-            "child_identifier_per_bin",
-            "child_identifier",
-            "percent_2023",
-          ],
-          source: data,
-        },
-        series: {
-          type: "bar",
-          // id: "test",
-          encode: {
-            x: "count_all",
-            y: "bin_label",
-            itemGroupId: "child_identifier_per_bin",
-            itemChildGroupId: "child_identifier",
-          },
-          universalTransition: {
-            enabled: true,
-            seriesKey: l_child_identifiers_per_bin,
-            // divideShape: "clone",
-          },
-        },
-        graphic: [
-          {
-            type: "text",
-            left: 50,
-            top: 20,
-            style: {
-              text: "Back",
-              fontSize: 18,
-              fill: "grey",
-            },
-            onclick: function () {
-              goBack();
-            },
-          },
-        ],
-      };
-      allOptions[optionId] = option;
-    });
-
     // Add scatter plot options
     for (const data of Object.entries(scatterData)) {
       const dic_per_bin = data[1];
       const optionId = data[0];
       const l_series = [];
-      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      let minX = Infinity,
+        maxX = -Infinity,
+        minY = Infinity,
+        maxY = -Infinity;
 
       for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
-      l_series.push({
-        type: "scatter",
-        dimensions: ["date", "time", "player", "location"],
-        data: l_runs,
-        dataGroupId: bin_id,
-        id: bin_id,
-        encode: { x: "date", y: "time" },
-        universalTransition: { enabled: true },
-      });
+        l_series.push({
+          type: "scatter",
+          dimensions: ["date", "time", "player", "location"],
+          data: l_runs,
+          dataGroupId: bin_id,
+          id: bin_id,
+          encode: { x: "date", y: "time" },
+          universalTransition: { enabled: true },
+        });
 
-      // Update min and max values for x and y
-      l_runs.forEach(run => {
-        const date = new Date(run[0]).getTime();
-        const time = run[1];
-        if (date < minX) minX = date;
-        if (date > maxX) maxX = date;
-        if (time < minY) minY = time;
-        if (time > maxY) maxY = time;
-      });
+        //   // Update min and max values for x and y
+        //   l_runs.forEach((run) => {
+        //     const date = new Date(run[0]).getTime();
+        //     const time = run[1];
+        //     if (date < minX) minX = date;
+        //     if (date > maxX) maxX = date;
+        //     if (time < minY) minY = time;
+        //     if (time > maxY) maxY = time;
+        //   });
       }
 
       allOptions[optionId] = {
-      id: optionId,
-      title: {
-        text: "Speedrun times for category X of game X",
-      },
-      tooltip: {
-        trigger: "axis",
-        axisPointer: {
-        type: "shadow",
+        id: optionId,
+        title: {
+          text: "Speedrun times for category X of game X",
         },
-        formatter: function (params: unknown) {
-        return [
-          "Date: " + params[0].data[0],
-          "Run time: " + params[0].data[1],
-          "Player: " + params[0].data[2],
-          "Location: " + params[0].data[3],
-        ].join("<br/>");
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow",
+          },
+          formatter: function (params: unknown) {
+            return [
+              "Date: " + params[0].data[0],
+              "Run time: " + params[0].data[1],
+              "Player: " + params[0].data[2],
+              "Location: " + params[0].data[3],
+            ].join("<br/>");
+          },
         },
-      },
-      grid: {
-        left: 250,
-      },
-      toolbox: {
-        show: true,
-        feature: {
-        saveAsImage: {},
+        grid: {
+          left: 250,
         },
-      },
-      yAxis: {
-        type: "value",
-        name: "Speedrun time",
-        min: minY,
-        max: maxY,
-      },
-      xAxis: {
-        type: "time",
-        name: "Date",
-        min: minX,
-        max: maxX,
-      },
-      visualMap: {
-        orient: "horizontal",
-        left: "center",
-        text: ["Test"],
-        // Map the score column to color
-        dimension: "time",
-        inRange: {
-        color: ["#65B581", "#FFCE34", "#FD665F"],
+        toolbox: {
+          show: true,
+          feature: {
+            saveAsImage: {},
+          },
         },
-        min: 0,
-        max: 1000,
-      },
-      animationDurationUpdate: 500,
-      series: l_series,
-      graphic: [
-        {
-        type: "text",
-        left: 50,
-        top: 20,
-        style: {
-          text: "Back",
-          fontSize: 18,
-          fill: "grey",
+        yAxis: {
+          type: "value",
+          name: "Speedrun time",
+          //min: minY,
+          //max: maxY,
         },
-        onclick: function () {
-          goBack();
+        xAxis: {
+          type: "time",
+          name: "Date",
+          //min: minX,
+          //max: maxX,
         },
+        visualMap: {
+          orient: "horizontal",
+          left: "center",
+          text: ["Test"],
+          // Map the score column to color
+          dimension: "time",
+          inRange: {
+            color: ["#65B581", "#FFCE34", "#FD665F"],
+          },
+          min: 0,
+          max: 1000,
         },
-      ],
+        animationDurationUpdate: 500,
+        series: l_series,
+        graphic: [
+          {
+            type: "text",
+            left: 50,
+            top: 20,
+            style: {
+              text: "Back",
+              fontSize: 18,
+              fill: "grey",
+            },
+            onclick: function () {
+              goBack();
+            },
+          },
+        ],
       };
     }
   };
@@ -455,7 +456,7 @@ const Page: React.FC = () => {
       const currentOption = instance.getOption();
       optionStack.push(currentOption.id as string); // Push current option ID
       console.log(`Navigating to optionId: ${optionId}`);
-      instance.setOption(allOptions[optionId]);
+      instance.setOption(allOptions[optionId], true);
     }
   };
 
@@ -463,9 +464,7 @@ const Page: React.FC = () => {
     if (chartRef.current && optionStack.length > 0) {
       const instance = chartRef.current.getEchartsInstance();
       const previousOptionId = optionStack.pop()!;
-      instance.setOption(allOptions[previousOptionId], {
-        replaceMerge: ["xAxis", "yAxis", "series"],
-      });
+      instance.setOption(allOptions[previousOptionId], true);
     } else {
       console.log("Already at root level!");
     }
