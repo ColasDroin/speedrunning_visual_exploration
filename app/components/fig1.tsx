@@ -258,9 +258,9 @@ const Page: React.FC = () => {
         yAxis: {
           type: "value",
           name: "Submission count per category",
-          axisLabel: {
-            formatter: "{value}",
-          },
+          // axisLabel: {
+          //   formatter: "{value}",
+          // },
         },
         xAxis: {
           type: "category",
@@ -350,10 +350,10 @@ const Page: React.FC = () => {
           },
           formatter: function (params: unknown) {
             return [
-              "Date: " + params[0].data["date"],
-              "Run time: " + params[0].data["time"],
-              "Player: " + params[0].data["player"],
-              "Location: " + params[0].data["location"],
+              "Date: " + params[0].data[0],
+              "Run time: " + params[0].data[1],
+              "Player: " + params[0].data[2],
+              "Location: " + params[0].data[3],
             ].join("<br/>");
           },
         },
@@ -437,7 +437,9 @@ const Page: React.FC = () => {
     if (chartRef.current && optionStack.length > 0) {
       const instance = chartRef.current.getEchartsInstance();
       const previousOptionId = optionStack.pop()!;
-      instance.setOption(allOptions[previousOptionId]);
+      instance.setOption(allOptions[previousOptionId], {
+        replaceMerge: ["xAxis", "yAxis", "series"],
+      });
     } else {
       console.log("Already at root level!");
     }
