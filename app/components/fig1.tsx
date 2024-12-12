@@ -1,6 +1,6 @@
 "use client";
 // Import necessary libraries
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import game_counts from "../../public/data/game_counts.json";
 import submission_types from "../../public/data/submission_types.json";
@@ -13,6 +13,7 @@ const Page: React.FC = () => {
   const allOptions: { [key: string]: any } = {};
   const optionStack: string[] = [];
   let option_1: EChartsOption;
+  const [currentView, setCurrentView] = useState("game_counts"); // Track current view
 
   // Initialize the first option
   option_1 = {
@@ -253,7 +254,7 @@ const Page: React.FC = () => {
       },
       yAxis: {
         type: "category",
-        inverse: true,
+        // inverse: true,
       },
       visualMap: {
         orient: "horizontal",
@@ -270,6 +271,7 @@ const Page: React.FC = () => {
       animationDurationUpdate: 500,
       dataset: {
         dimensions: [
+          "bin",
           "bin_label",
           "count_all",
           "identifier",
@@ -285,7 +287,7 @@ const Page: React.FC = () => {
         encode: {
           x: "count_all",
           y: "bin_label",
-          itemGroupId: "identifier", // "child_identifier_per_bin", //
+          itemGroupId: "identifier", //"child_identifier_per_bin", // "identifier", // "child_identifier_per_bin", //
           itemChildGroupId: "child_identifier_per_bin", // "child_identifier"
         },
         universalTransition: {
@@ -338,7 +340,6 @@ const Page: React.FC = () => {
         maxX = -Infinity,
         minY = Infinity,
         maxY = -Infinity;
-
       for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
         l_series.push({
           type: "scatter",
@@ -390,7 +391,7 @@ const Page: React.FC = () => {
           },
         },
         yAxis: {
-          type: "value",
+          type: "time",
           name: "Speedrun time",
           //min: minY,
           //max: maxY,
@@ -401,18 +402,18 @@ const Page: React.FC = () => {
           //min: minX,
           //max: maxX,
         },
-        visualMap: {
-          orient: "horizontal",
-          left: "center",
-          text: ["Test"],
-          // Map the score column to color
-          dimension: "time",
-          inRange: {
-            color: ["#65B581", "#FFCE34", "#FD665F"],
-          },
-          min: 0,
-          max: 1000,
-        },
+        // visualMap: {
+        //   orient: "horizontal",
+        //   left: "center",
+        //   text: ["Test"],
+        //   // Map the score column to color
+        //   dimension: "time",
+        //   inRange: {
+        //     color: ["#65B581", "#FFCE34", "#FD665F"],
+        //   },
+        //   min: 0,
+        //   max: 1000,
+        // },
         animationDurationUpdate: 500,
         series: l_series,
         graphic: [
@@ -471,6 +472,7 @@ const Page: React.FC = () => {
   };
 
   const onChartClick = (params: any) => {
+    console.log("Clicked on chart:", params);
     const dataItem = params.data;
     if (dataItem?.child_identifier) {
       const nextOptionId = dataItem.child_identifier;
