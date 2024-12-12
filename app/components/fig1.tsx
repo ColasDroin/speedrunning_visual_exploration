@@ -458,26 +458,25 @@ const Page: React.FC = () => {
 
       // Check if transitioning to a distribution_types chart
       if (optionId.startsWith("scat_")) {
-        // Ensure `series` is an array
-        const seriesArray = Array.isArray(currentOption.series)
-          ? currentOption.series
-          : [currentOption.series];
-
+        const clonedOption = JSON.parse(JSON.stringify(currentOption));
+        console.log("LALAAAAAAA", clonedOption);
         const l_child_identifiers_per_bin =
           currentOption.dataset[0]?.source?.map(
             (item) => item.child_identifier_per_bin
           );
 
-        seriesArray.forEach((s) => {
+        currentOption.series.forEach((s) => {
           if (l_child_identifiers_per_bin) {
             s.universalTransition = s.universalTransition || {}; // Ensure object exists
             s.universalTransition.seriesKey = l_child_identifiers_per_bin; // Set seriesKey dynamically
           }
         });
-        currentOption.series = seriesArray;
+        console.log("LAL", currentOption);
         // Update the current option with merged options
-        instance.setOption(currentOption, false); // Apply the updated option
-        allOptions[currentOption.id] = currentOption;
+        instance.setOption(currentOption, false);
+
+        console.log("ICICI", instance.getOption());
+        allOptions[currentOption.id] = instance.getOption();
       }
 
       // Move to the next
@@ -493,21 +492,21 @@ const Page: React.FC = () => {
       const previousOptionId = optionStack.pop()!;
       const option = allOptions[previousOptionId];
 
-      // Ensure `series` is an array
-      const seriesArray = Array.isArray(option.series)
-        ? option.series
-        : [option.series];
+      // // Ensure `series` is an array
+      // const seriesArray = Array.isArray(option.series)
+      //   ? option.series
+      //   : [option.series];
 
-      // Remove seriesKey if transitioning back from distribution_types
-      if (previousOptionId.endsWith("_submission")) {
-        seriesArray.forEach((s) => {
-          if (s.universalTransition) {
-            delete s.universalTransition.seriesKey; // Clear seriesKey
-          }
-        });
-      }
-      option.series = seriesArray;
-      console.log("previous option:", option);
+      // // Remove seriesKey if transitioning back from distribution_types
+      // if (previousOptionId.endsWith("_submission")) {
+      //   seriesArray.forEach((s) => {
+      //     if (s.universalTransition) {
+      //       delete s.universalTransition.seriesKey; // Clear seriesKey
+      //     }
+      //   });
+      // }
+      // option.series = seriesArray;
+      // console.log("previous option:", option);
 
       // // Check if transitioning to a distribution_types chart
       // if (previousOptionId.startsWith("dist_")) {
