@@ -304,7 +304,7 @@ const Page: React.FC = () => {
             fontSize: 18,
             fill: "grey",
           },
-          onclick: function () {
+          onclick: () => {
             goBack();
           },
         },
@@ -437,9 +437,30 @@ const Page: React.FC = () => {
       const instance = chartRef.current.getEchartsInstance();
       const currentOption = instance.getOption();
       optionStack.push(currentOption.id as string); // Push current option ID
-
       // Check if transitioning to a distribution_types chart
       if (optionId.startsWith("scat_")) {
+        // Make a safe copy of the current option (if it doesn't exist)
+        if (!allOptions[currentOption.id + "_copy"]) {
+          const safeCopy = JSON.parse(JSON.stringify(currentOption));
+          safeCopy.id = currentOption.id + "_copy";
+          // Ensure onclick event is present
+          safeCopy.graphic = [
+            {
+              type: "text",
+              left: 50,
+              top: 20,
+              style: {
+                text: "Back",
+                fontSize: 18,
+                fill: "grey",
+              },
+              onclick: () => goBack(), // Ensure this is correctly set
+            },
+          ];
+
+          allOptions[safeCopy.id] = safeCopy;
+        }
+
         const l_child_identifiers_per_bin =
           currentOption.dataset[0]?.source?.map(
             (item) => item.child_identifier_per_bin
@@ -457,18 +478,33 @@ const Page: React.FC = () => {
           allOptions[currentOption.id] = instance.getOption();
         } catch (error) {
           console.log("Prevent graph update");
+          // instance.setOption(safeCopy, true);
+          //allOptions[currentOption.id] = instance.getOption();
         }
       }
 
       // Move to the next
-      const option = allOptions[optionId];
       console.log(`Navigating to optionId: ${optionId}`);
-      instance.setOption(option, true); // Apply the updated option
+      try {
+        const option = allOptions[optionId];
+        instance.setOption(option, true); // Apply the updated option
+      } catch (error) {
+        console.log("Error updating graph");
+        console.log("Falling back to safe copy first");
+        optionId = optionId + "_copy";
+        const safeCopy = allOptions[optionId];
+        instance.setOption(safeCopy, true); // Apply the updated option
+      }
     }
   };
 
   const goBack = () => {
+    console.log("Going back...");
     if (chartRef.current && optionStack.length > 0) {
+      console.log(
+        "Current graph id:",
+        chartRef.current.getEchartsInstance().getOption().id
+      );
       const instance = chartRef.current.getEchartsInstance();
       const previousOptionId = optionStack.pop()!;
       const option = allOptions[previousOptionId];
@@ -493,6 +529,7 @@ const Page: React.FC = () => {
       }
 
       console.log(`Navigating back to optionId: ${previousOptionId}`);
+      console.log("current option:", option);
 
       instance.setOption(option, true); // Apply the updated option
     } else {
