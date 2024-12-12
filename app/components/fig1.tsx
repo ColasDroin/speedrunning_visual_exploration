@@ -1,6 +1,6 @@
 "use client";
 // Import necessary libraries
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
 import game_counts from "../../public/data/game_counts.json";
 import submission_types from "../../public/data/submission_types.json";
@@ -13,7 +13,6 @@ const Page: React.FC = () => {
   const allOptions: { [key: string]: any } = {};
   const optionStack: string[] = [];
   let option_1: EChartsOption;
-  const [currentView, setCurrentView] = useState("game_counts"); // Track current view
 
   // Initialize the first option
   option_1 = {
@@ -456,8 +455,35 @@ const Page: React.FC = () => {
       const instance = chartRef.current.getEchartsInstance();
       const currentOption = instance.getOption();
       optionStack.push(currentOption.id as string); // Push current option ID
+
+      // Check if transitioning to a distribution_types chart
+      if (optionId.startsWith("scat_")) {
+        // Ensure `series` is an array
+        const seriesArray = Array.isArray(currentOption.series)
+          ? currentOption.series
+          : [currentOption.series];
+
+        const l_child_identifiers_per_bin =
+          currentOption.dataset[0]?.source?.map(
+            (item) => item.child_identifier_per_bin
+          );
+
+        seriesArray.forEach((s) => {
+          if (l_child_identifiers_per_bin) {
+            s.universalTransition = s.universalTransition || {}; // Ensure object exists
+            s.universalTransition.seriesKey = l_child_identifiers_per_bin; // Set seriesKey dynamically
+          }
+        });
+        currentOption.series = seriesArray;
+        // Update the current option with merged options
+        instance.setOption(currentOption, false); // Apply the updated option
+        allOptions[currentOption.id] = currentOption;
+      }
+
+      // Move to the next
+      const option = allOptions[optionId];
       console.log(`Navigating to optionId: ${optionId}`);
-      instance.setOption(allOptions[optionId], true);
+      instance.setOption(option, true); // Apply the updated option
     }
   };
 
@@ -465,14 +491,55 @@ const Page: React.FC = () => {
     if (chartRef.current && optionStack.length > 0) {
       const instance = chartRef.current.getEchartsInstance();
       const previousOptionId = optionStack.pop()!;
-      instance.setOption(allOptions[previousOptionId], true);
+      const option = allOptions[previousOptionId];
+
+      // Ensure `series` is an array
+      const seriesArray = Array.isArray(option.series)
+        ? option.series
+        : [option.series];
+
+      // Remove seriesKey if transitioning back from distribution_types
+      if (previousOptionId.endsWith("_submission")) {
+        seriesArray.forEach((s) => {
+          if (s.universalTransition) {
+            delete s.universalTransition.seriesKey; // Clear seriesKey
+          }
+        });
+      }
+      option.series = seriesArray;
+      console.log("previous option:", option);
+
+      // // Check if transitioning to a distribution_types chart
+      // if (previousOptionId.startsWith("dist_")) {
+      //   // Ensure `series` is an array
+      //   const seriesArray = Array.isArray(option.series)
+      //     ? option.series
+      //     : [option.series];
+
+      //   const l_child_identifiers_per_bin = option.dataset[0]?.source?.map(
+      //     (item) => item.child_identifier_per_bin
+      //   );
+
+      //   seriesArray.forEach((s) => {
+      //     if (l_child_identifiers_per_bin) {
+      //       s.universalTransition = s.universalTransition || {}; // Ensure object exists
+      //       s.universalTransition.seriesKey = l_child_identifiers_per_bin; // Set seriesKey dynamically
+      //     }
+      //   });
+      //   option.series = seriesArray;
+      //   console.log(l_child_identifiers_per_bin);
+      //   console.log("updated option:", option);
+      // }
+
+      console.log(`Navigating back to optionId: ${previousOptionId}`);
+
+      instance.setOption(option, true); // Apply the updated option
     } else {
       console.log("Already at root level!");
     }
   };
 
   const onChartClick = (params: any) => {
-    console.log("Clicked on chart:", params);
     const dataItem = params.data;
     if (dataItem?.child_identifier) {
       const nextOptionId = dataItem.child_identifier;
