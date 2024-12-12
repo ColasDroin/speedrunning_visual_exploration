@@ -221,16 +221,16 @@ const Page: React.FC = () => {
         text: "Distribution of speedrun times for category X of game X",
       },
       tooltip: {
-        trigger: "axis",
+        trigger: "item",
         axisPointer: {
           type: "shadow",
         },
         formatter: function (params: unknown) {
           return [
-            "Bin: " + params[0].data["bin_label"],
-            "Submissions: " + params[0].data["count_all"],
+            "Bin: " + params.data["bin_label"],
+            "Submissions: " + params.data["count_all"],
             "% of submissions in 2023: " +
-              parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+              parseFloat(params.data["percent_2023"]).toFixed(1) +
               "%",
           ].join("<br/>");
         },
@@ -335,10 +335,6 @@ const Page: React.FC = () => {
       const dic_per_bin = data[1];
       const optionId = data[0];
       const l_series = [];
-      let minX = Infinity,
-        maxX = -Infinity,
-        minY = Infinity,
-        maxY = -Infinity;
       for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
         l_series.push({
           type: "scatter",
@@ -349,16 +345,6 @@ const Page: React.FC = () => {
           encode: { x: "date", y: "time" },
           universalTransition: { enabled: true },
         });
-
-        //   // Update min and max values for x and y
-        //   l_runs.forEach((run) => {
-        //     const date = new Date(run[0]).getTime();
-        //     const time = run[1];
-        //     if (date < minX) minX = date;
-        //     if (date > maxX) maxX = date;
-        //     if (time < minY) minY = time;
-        //     if (time > maxY) maxY = time;
-        //   });
       }
 
       allOptions[optionId] = {
@@ -367,16 +353,16 @@ const Page: React.FC = () => {
           text: "Speedrun times for category X of game X",
         },
         tooltip: {
-          trigger: "axis",
+          trigger: "item",
           axisPointer: {
             type: "shadow",
           },
           formatter: function (params: unknown) {
             return [
-              "Date: " + params[0].data[0],
-              "Run time: " + params[0].data[1],
-              "Player: " + params[0].data[2],
-              "Location: " + params[0].data[3],
+              "Date: " + params.data[0],
+              "Run time: " + params.data[1],
+              "Player: " + params.data[2],
+              "Location: " + params.data[3],
             ].join("<br/>");
           },
         },
@@ -392,14 +378,10 @@ const Page: React.FC = () => {
         yAxis: {
           type: "time",
           name: "Speedrun time",
-          //min: minY,
-          //max: maxY,
         },
         xAxis: {
           type: "time",
           name: "Date",
-          //min: minX,
-          //max: maxX,
         },
         // visualMap: {
         //   orient: "horizontal",
@@ -458,8 +440,6 @@ const Page: React.FC = () => {
 
       // Check if transitioning to a distribution_types chart
       if (optionId.startsWith("scat_")) {
-        const clonedOption = JSON.parse(JSON.stringify(currentOption));
-        console.log("LALAAAAAAA", clonedOption);
         const l_child_identifiers_per_bin =
           currentOption.dataset[0]?.source?.map(
             (item) => item.child_identifier_per_bin
@@ -471,12 +451,13 @@ const Page: React.FC = () => {
             s.universalTransition.seriesKey = l_child_identifiers_per_bin; // Set seriesKey dynamically
           }
         });
-        console.log("LAL", currentOption);
         // Update the current option with merged options
-        instance.setOption(currentOption, false);
-
-        console.log("ICICI", instance.getOption());
-        allOptions[currentOption.id] = instance.getOption();
+        try {
+          instance.setOption(currentOption, { notMerge: false, silent: true });
+          allOptions[currentOption.id] = instance.getOption();
+        } catch (error) {
+          console.log("Prevent graph update");
+        }
       }
 
       // Move to the next
@@ -491,44 +472,25 @@ const Page: React.FC = () => {
       const instance = chartRef.current.getEchartsInstance();
       const previousOptionId = optionStack.pop()!;
       const option = allOptions[previousOptionId];
+      const currentOption = instance.getOption();
 
-      // // Ensure `series` is an array
-      // const seriesArray = Array.isArray(option.series)
-      //   ? option.series
-      //   : [option.series];
+      // Remove seriesKey if transitioning back from distribution_types
+      if (previousOptionId.endsWith("_submission")) {
+        // Ensure `series` is an array
+        const seriesArray = Array.isArray(currentOption.series)
+          ? currentOption.series
+          : [currentOption.series];
 
-      // // Remove seriesKey if transitioning back from distribution_types
-      // if (previousOptionId.endsWith("_submission")) {
-      //   seriesArray.forEach((s) => {
-      //     if (s.universalTransition) {
-      //       delete s.universalTransition.seriesKey; // Clear seriesKey
-      //     }
-      //   });
-      // }
-      // option.series = seriesArray;
-      // console.log("previous option:", option);
-
-      // // Check if transitioning to a distribution_types chart
-      // if (previousOptionId.startsWith("dist_")) {
-      //   // Ensure `series` is an array
-      //   const seriesArray = Array.isArray(option.series)
-      //     ? option.series
-      //     : [option.series];
-
-      //   const l_child_identifiers_per_bin = option.dataset[0]?.source?.map(
-      //     (item) => item.child_identifier_per_bin
-      //   );
-
-      //   seriesArray.forEach((s) => {
-      //     if (l_child_identifiers_per_bin) {
-      //       s.universalTransition = s.universalTransition || {}; // Ensure object exists
-      //       s.universalTransition.seriesKey = l_child_identifiers_per_bin; // Set seriesKey dynamically
-      //     }
-      //   });
-      //   option.series = seriesArray;
-      //   console.log(l_child_identifiers_per_bin);
-      //   console.log("updated option:", option);
-      // }
+        seriesArray.forEach((s) => {
+          if (s.universalTransition) {
+            delete s.universalTransition.seriesKey; // Clear seriesKey
+          }
+        });
+        currentOption.series = seriesArray;
+        allOptions[option.Id] = currentOption;
+        console.log("previous option:", currentOption);
+        instance.setOption(currentOption, true); // Apply the updated option
+      }
 
       console.log(`Navigating back to optionId: ${previousOptionId}`);
 
