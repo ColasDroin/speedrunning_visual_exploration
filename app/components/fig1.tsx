@@ -20,6 +20,7 @@ const Page: React.FC = () => {
     title: {
       text: "Most speedrunned games",
     },
+    animation: true,
     tooltip: {
       trigger: "axis",
       axisPointer: {
@@ -38,12 +39,6 @@ const Page: React.FC = () => {
     grid: {
       left: 250,
     },
-    toolbox: {
-      show: true,
-      feature: {
-        saveAsImage: {},
-      },
-    },
     xAxis: {
       type: "value",
       name: "Submission count",
@@ -58,8 +53,15 @@ const Page: React.FC = () => {
     visualMap: {
       orient: "horizontal",
       left: "center",
-      text: ["% of all submissions in 2023"],
-      // Map the score column to color
+      text: ["submissions (%) in 2023"],
+      textStyle: {
+        //fontSize: 50,
+        color: "#fff",
+        //align: "center",
+        //verticalAlign: "middle",
+        //overflow: "break",
+      },
+
       dimension: "percent_2023",
       inRange: {
         color: ["#65B581", "#FFCE34", "#FD665F"],
@@ -78,6 +80,24 @@ const Page: React.FC = () => {
       ],
       source: game_counts,
     },
+    dataZoom: [
+      {
+        type: "slider",
+        show: true,
+        yAxisIndex: [0],
+        start: 0,
+        end: 10,
+        filterMode: "filter",
+        brushSelect: false,
+      },
+      {
+        type: "inside",
+        start: 0,
+        end: 10,
+        yAxisIndex: [0],
+        filterMode: "filter",
+      },
+    ],
     series: [
       {
         type: "bar",
@@ -89,15 +109,14 @@ const Page: React.FC = () => {
         },
         universalTransition: {
           enabled: true,
-          // divideShape: "clone",
         },
         label: {
           show: true,
           position: "inside",
-          // show category name
-          // formatter: function (params: unknown) {
-          //   return params.data["category1"];
-          // },
+        },
+        emphasis: {
+          disabled: false,
+          focus: "self",
         },
       },
     ],
@@ -106,10 +125,7 @@ const Page: React.FC = () => {
 
   // Add options for submission types
   submission_types.forEach((data, index) => {
-    // since dataItems of each data have same groupId in this
-    // example, we can use groupId as optionId for optionStack.
     const optionId = data[0]["identifier"];
-
     const option = {
       id: optionId,
       title: {
@@ -132,12 +148,6 @@ const Page: React.FC = () => {
       },
       grid: {
         left: 250,
-      },
-      toolbox: {
-        show: true,
-        feature: {
-          saveAsImage: {},
-        },
       },
       xAxis: {
         type: "value",
@@ -206,15 +216,7 @@ const Page: React.FC = () => {
   });
 
   distribution_types.forEach((data, index) => {
-    // since dataItems of each data have same groupId in this
-    // example, we can use groupId as optionId for optionStack.
     const optionId = data[0]["identifier"];
-
-    // Get the list of all "child_identifier_per_bin"
-    const l_child_identifiers_per_bin = data.map(
-      (item) => item["child_identifier_per_bin"]
-    );
-
     const option = {
       id: optionId,
       title: {
@@ -237,12 +239,6 @@ const Page: React.FC = () => {
       },
       grid: {
         left: 250,
-      },
-      toolbox: {
-        show: true,
-        feature: {
-          saveAsImage: {},
-        },
       },
       xAxis: {
         type: "value",
@@ -286,12 +282,11 @@ const Page: React.FC = () => {
         encode: {
           x: "count_all",
           y: "bin_label",
-          itemGroupId: "identifier", //"child_identifier_per_bin", // "identifier", // "child_identifier_per_bin", //
-          itemChildGroupId: "child_identifier_per_bin", // "child_identifier"
+          itemGroupId: "identifier",
+          itemChildGroupId: "child_identifier_per_bin",
         },
         universalTransition: {
           enabled: true,
-          // seriesKey: l_child_identifiers_per_bin,
         },
       },
       graphic: [
@@ -358,9 +353,16 @@ const Page: React.FC = () => {
             type: "shadow",
           },
           formatter: function (params: unknown) {
+            const formatTime = (seconds: number) => {
+              const h = Math.floor(seconds / 3600);
+              const m = Math.floor((seconds % 3600) / 60);
+              const s = Math.floor(seconds % 60);
+              const ms = Math.floor((seconds % 1) * 1000);
+              return `${h}h ${m}m ${s}s ${ms}ms`;
+            };
             return [
               "Date: " + params.data[0],
-              "Run time: " + params.data[1],
+              "Run time: " + formatTime(params.data[1]),
               "Player: " + params.data[2],
               "Location: " + params.data[3],
             ].join("<br/>");
@@ -368,12 +370,6 @@ const Page: React.FC = () => {
         },
         grid: {
           left: 250,
-        },
-        toolbox: {
-          show: true,
-          feature: {
-            saveAsImage: {},
-          },
         },
         yAxis: {
           type: "time",
