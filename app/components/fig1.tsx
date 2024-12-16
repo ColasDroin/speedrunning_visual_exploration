@@ -95,7 +95,10 @@ const Page: React.FC = () => {
         start: 0,
         end: 10,
         yAxisIndex: [0],
-        filterMode: "filter",
+        filterMode: "empty",
+        zoomLock: false,
+        moveOnMouseWheel: true,
+        zoomOnMouseWheel: false,
       },
     ],
     series: [
