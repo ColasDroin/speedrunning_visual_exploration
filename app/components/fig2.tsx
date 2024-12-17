@@ -50,57 +50,97 @@ const Page: React.FC = () => {
       },
       animationDurationUpdate: 1500,
       animationEasingUpdate: "quinticInOut",
+      tooltip: {},
+      legend: [
+        {
+          // selectedMode: 'single',
+          data: networkData.categories.map(function (a) {
+            return a.name;
+          }),
+        },
+      ],
       series: [
         {
           type: "graph",
-          layout: "none",
+          layout: "circular",
+          circular: {
+            rotateLabel: true,
+          },
+          categories: networkData.categories,
           data: networkData.nodes.map((node: RawNode) => ({
             id: node.id,
             name: node.name,
-            symbolSize: node.size / 50,
+            symbolSize: node.size / 10,
             x: node.x,
             y: node.y,
-            category: node.community,
-            itemStyle: {
-              color: (() => {
-                switch (node.community) {
-                  case 0:
-                    return "#ff0000"; // Red
-                  case 1:
-                    return "#00ff00"; // Green
-                  case 2:
-                    return "#0000ff"; // Blue
-                  case 3:
-                    return "#ffff00"; // Yellow
-                  case 4:
-                    return "#ff00ff"; // Magenta
-                  case 5:
-                    return "#00ffff"; // Cyan
-                  default:
-                    return "#ffffff"; // White
-                }
-              })(),
+            category: node.category,
+            label: {
+              show: node.size > 300 ? true : false,
+              formatter: (params: any) => {
+                return params.data.name;
+              },
+            },
+            emphasis: {
+              // Place emphasis on each node directly
+              label: {
+                show: true, // Ensure the label is shown on hover
+                fontSize: 14,
+                fontWeight: "bold",
+                formatter: (params: any) => params.data.name, // Optional formatter
+              },
             },
           })),
           edges: networkData.edges.map((edge: RawEdge) => ({
             source: edge.source,
             target: edge.target,
-            // lineStyle: { width: edge.scaled_edge_weight },
-            // value: edge.weight,
+            lineStyle: {
+              width: Math.max(1, edge.scaled_egde_weight / 10),
+              curveness: 0.3,
+              opacity: 0.2,
+              color: "source",
+            },
+            value: edge.weight,
+            emphasis: {
+              lineStyle: {
+                width: Math.max(10, edge.scaled_egde_weight / 10), // Emphasize with thicker line
+                opacity: 1, // Make edge fully opaque
+              },
+            },
           })),
           emphasis: {
             focus: "adjacency",
             label: {
-              position: "right",
-              show: true,
+              show: true, // Ensure adjacent node labels appear
+              fontWeight: "bold",
             },
           },
+
           tooltip: {
             formatter: (params: any) => {
-              return params.data.name;
+              console.log("Params:", params);
+              if ("name" in params.data) {
+                return;
+              } else {
+                return (
+                  "Common runners between\n" +
+                  "<b>" +
+                  params.data.source +
+                  "</b>" +
+                  " and " +
+                  "<b>" +
+                  params.data.target +
+                  "</b>" +
+                  ":" +
+                  "<b>" +
+                  params.data.value +
+                  "</b>"
+                );
+              }
             },
+            extraCssText:
+              "max-width: 200px; white-space: normal; word-wrap: break-word;",
           },
-          roam: true,
+          roam: false,
         },
       ],
     };
