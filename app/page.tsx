@@ -39,7 +39,8 @@ export default function Home() {
                 speedrun.com
               </a>
             </span>{" "}
-            API to better understand the amazing feats of speedrunners.
+            API to better understand the amazing feats of speedrunners. RUN DATA
+            ONLY GOES BACK TO 2012 I ONLY CONSIDER FULL GAME RUNS
           </div>
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
