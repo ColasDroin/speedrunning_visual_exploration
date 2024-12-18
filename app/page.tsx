@@ -1,6 +1,7 @@
 import Banner from "./components/banner";
 import Fig1 from "./components/fig1";
 import Fig2 from "./components/fig2";
+import Fig3 from "./components/fig3";
 import styles from "./styles/banner.module.css";
 
 export default function Home() {
@@ -62,6 +63,28 @@ export default function Home() {
 
           <div className="mx-auto">
             <Fig2 />
+          </div>
+
+          <div
+            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            data-text="EVOLUTION OF GAME POPULARITY"
+          >
+            EVOLUTION OF GAME POPULARITY
+          </div>
+
+          <div className="mx-auto">
+            <Fig3 />
+          </div>
+
+          <div
+            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            data-text="MOST COMPETITIVE COUNTRIES"
+          >
+            MOST COMPETITIVE COUNTRIES
+          </div>
+
+          <div className="mx-auto">
+            <Fig3 />
           </div>
         </div>
       </div>
