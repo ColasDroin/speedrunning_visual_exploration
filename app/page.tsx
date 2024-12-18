@@ -2,6 +2,7 @@ import Banner from "./components/banner";
 import Fig1 from "./components/fig1";
 import Fig2 from "./components/fig2";
 import Fig3 from "./components/fig3";
+import Fig4 from "./components/fig4";
 import styles from "./styles/banner.module.css";
 
 export default function Home() {
@@ -84,7 +85,7 @@ export default function Home() {
           </div>
 
           <div className="mx-auto">
-            <Fig3 />
+            <Fig4 />
           </div>
         </div>
       </div>
