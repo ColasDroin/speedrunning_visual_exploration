@@ -117,7 +117,7 @@ const Page: React.FC = () => {
 
           tooltip: {
             formatter: (params: any) => {
-              console.log("Params:", params);
+              // console.log("Params:", params);
               if ("name" in params.data) {
                 return;
               } else {
@@ -145,8 +145,8 @@ const Page: React.FC = () => {
       ],
     };
 
-    console.log("Prepared nodes:", networkData.nodes);
-    console.log("Prepared edges:", networkData.edges);
+    // console.log("Prepared nodes:", networkData.nodes);
+    // console.log("Prepared edges:", networkData.edges);
     // Update the chart option state
     setOption(newOption);
   };

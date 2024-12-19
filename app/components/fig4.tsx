@@ -2,9 +2,12 @@
 // Import necessary libraries
 import React, { useRef, useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
+import * as echarts from "echarts";
 import flagData from "../../public/data/flag_data.json";
+import worldJson from "../../public/data/world_map.json";
 import pako from "pako";
-import { getCountryGeoJSONByAlpha2 } from "geojson-places";
+
+echarts.registerMap("WORLD", worldJson);
 
 interface Flag {
   name: string;
@@ -22,13 +25,10 @@ function getFlag(countryCode: string) {
 }
 const updateFrequency = 500;
 
-// Get the country geojson of Spain
-const result = getCountryGeoJSONByAlpha2("ES");
-console.log("ICI", result);
-
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
+  const [isRaceFinished, setIsRaceFinished] = useState<boolean>(false);
 
   // Function to prepare scatter options
   const prepareGraph = async () => {
@@ -61,10 +61,45 @@ const Page: React.FC = () => {
       }
     }
 
-    const startIndex = 1;
+    const startIndex = yearMonth.length - 4; //1;
     const startMonth = yearMonth[startIndex];
+    const endMonth = yearMonth[yearMonth.length - 1];
 
-    // Create the new chart option
+    // Create the map option
+    const mapOption = {
+      visualMap: {
+        left: "right",
+        min: 0,
+        max: 60000,
+        inRange: {
+          // prettier-ignore
+          color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'],
+        },
+        text: ["High", "Low"],
+        calculable: false,
+      },
+      dataset: {
+        source: data.filter(function (d: string[]) {
+          return d[0] === endMonth;
+        }),
+      },
+      series: [
+        {
+          id: "runscore",
+          type: "map",
+          roam: true,
+          map: "WORLD",
+          animationDurationUpdate: 1000,
+          universalTransition: true,
+          encode: {
+            value: 2,
+            name: 1,
+          },
+        },
+      ],
+    };
+
+    // Create the bar race option
     const option: echarts.EChartsOption = {
       grid: {
         top: 10,
@@ -189,6 +224,12 @@ const Page: React.FC = () => {
           ],
         },
       }));
+
+      // If it's the last year in the data, transition to the map option
+      if (year === endMonth) {
+        setIsRaceFinished(true);
+        setOption(mapOption, true); // Transition to map visualization
+      }
     }
   };
 
