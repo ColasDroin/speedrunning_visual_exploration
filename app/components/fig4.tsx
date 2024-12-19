@@ -43,7 +43,7 @@ const Page: React.FC = () => {
 
     const data = raceData.data;
     const yearMonth: string[] = [...new Set(data.map((d: string[]) => d[0]))];
-    const startIndex = yearMonth.length - 4;
+    const startIndex = yearMonth.length - 4; //12; //
     const startMonth = yearMonth[startIndex];
     const endMonth = yearMonth[yearMonth.length - 1];
 
@@ -67,7 +67,7 @@ const Page: React.FC = () => {
       yAxis: {
         type: "category",
         inverse: true,
-        max: 10,
+        max: 20,
         axisLabel: {
           show: true,
           fontSize: 14,
@@ -81,22 +81,35 @@ const Page: React.FC = () => {
         },
         animationDuration: 300,
         animationDurationUpdate: 300,
+        data: data
+          .filter((d: string[]) => d[0] === startMonth)
+          .map(function (item) {
+            return item[1];
+          }),
       },
       dataset: {
+        // Bind initial dataset
         source: data.filter((d: string[]) => d[0] === startMonth),
+        dimensions: ["month", "name", "value", "color"],
       },
       series: [
         {
           realtimeSort: true,
           seriesLayoutBy: "column",
+          id: "race_score",
           type: "bar",
           itemStyle: {
             color: (params: any) => params.data[3],
           },
           encode: {
-            x: 2,
-            y: 1,
+            x: "value",
+            y: "name",
           },
+          // data: data
+          //   .filter((d: string[]) => d[0] === startMonth)
+          //   .map(function (item) {
+          //     return item[2];
+          //   }),
           label: {
             show: true,
             precision: 1,
@@ -110,6 +123,7 @@ const Page: React.FC = () => {
       animationDurationUpdate: updateFrequency,
       animationEasing: "linear",
       animationEasingUpdate: "linear",
+      universalTransition: true,
       graphic: {
         elements: [
           {
@@ -143,7 +157,7 @@ const Page: React.FC = () => {
         trigger: "item",
         formatter: function (params: any) {
           console.log(params);
-          return `${params.name}: ${params.value}`;
+          return `Score of ${params.data.full_name}: ${params.value}`;
         },
       },
       visualMap: [
@@ -173,6 +187,8 @@ const Page: React.FC = () => {
       ],
       series: [
         {
+          // $action: "replace", // Tell ECharts to replace the series
+          id: "race_score",
           name: "World Map",
           type: "map",
           map: "WORLD",
@@ -183,6 +199,7 @@ const Page: React.FC = () => {
             .map((d: string[]) => ({
               name: d[1], // Assuming the country name is at index 1
               value: parseFloat(d[2]), // Assuming the score is at index 2
+              full_name: d[4],
             })),
           // emphasis: {
           //   label: {
@@ -199,8 +216,9 @@ const Page: React.FC = () => {
           //   },
           // },
           animation: true,
-          animationDurationUpdate: 1000,
+          animationDurationUpdate: 2000,
           animationEasingUpdate: "cubicInOut",
+          universalTransition: true,
           label: {
             show: false,
           },
@@ -213,43 +231,14 @@ const Page: React.FC = () => {
     // Update function for the race
     const updateYear = (year: string) => {
       const source = data.filter((d: string[]) => d[0] === year);
-
+      const chartInstance = chartRef.current?.getEchartsInstance();
       if (year === endMonth) {
-        // Fade out the bar chart
-        setOption((prevOption) => ({
-          ...prevOption,
-          series: [
-            {
-              ...prevOption.series[0],
-              animationDuration: 200,
-              itemStyle: {
-                opacity: 0,
-              },
-            },
-          ],
-          yAxis: {
-            ...prevOption.yAxis,
-            show: false,
-            animationDuration: 200,
-          },
-          xAxis: {
-            show: false,
-            animationDuration: 200,
-          },
-        }));
-
-        // Switch to map with animation
         setTimeout(() => {
-          const chartInstance = chartRef.current?.getEchartsInstance();
           if (chartInstance) {
-            chartInstance.clear();
-            chartInstance.setOption(mapOption, {
-              notMerge: true,
-              replaceMerge: ["series"],
-              animation: true,
-              animationDuration: 1000,
-              animationEasing: "cubicInOut",
-            });
+            chartInstance.setOption(
+              mapOption,
+              { notMerge: true } // Ensure the map fully replaces the bar chart
+            );
           }
         }, 300);
       } else {
