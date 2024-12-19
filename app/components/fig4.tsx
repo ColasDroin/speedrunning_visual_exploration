@@ -52,16 +52,16 @@ const Page: React.FC = () => {
 
     // Map option
     const mapOption: echarts.EChartsOption = {
-      backgroundColor: "#000",
-      title: {
-        text: endMonth,
-        left: "center",
-        top: "top",
-        textStyle: {
-          color: "#fff",
-          fontSize: 24,
-        },
-      },
+      // backgroundColor: "#000",
+      // title: {
+      //   text: endMonth,
+      //   left: "center",
+      //   top: "top",
+      //   textStyle: {
+      //     color: "#fff",
+      //     fontSize: 24,
+      //   },
+      // },
       tooltip: {
         trigger: "item",
         formatter: function (params: any) {
@@ -74,7 +74,9 @@ const Page: React.FC = () => {
           min: 0,
           max: maxValue,
           text: ["High", "Low"],
-          left: "right",
+          orient: "horizontal",
+          left: "center",
+          // left: "right",
           inRange: {
             color: [
               "#313695",
@@ -99,7 +101,7 @@ const Page: React.FC = () => {
           name: "World Map",
           type: "map",
           map: "WORLD",
-          roam: true,
+          roam: false,
           data: data
             .filter((d: string[]) => d[0] === endMonth)
             .map((d: string[]) => ({
@@ -314,7 +316,7 @@ const Page: React.FC = () => {
     <ReactECharts
       ref={chartRef}
       option={option || {}}
-      style={{ height: "1000px", width: "100%" }}
+      style={{ height: "800px", width: "100%" }}
       opts={{ renderer: "canvas" }}
       theme="dark"
     />
