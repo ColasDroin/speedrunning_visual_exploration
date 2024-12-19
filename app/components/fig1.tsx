@@ -86,7 +86,7 @@ const Page: React.FC = () => {
         show: true,
         yAxisIndex: [0],
         start: 0,
-        end: 10,
+        end: 20,
         filterMode: "filter",
         brushSelect: false,
       },
