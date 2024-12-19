@@ -43,6 +43,83 @@ const Page: React.FC = () => {
       return;
     }
 
+    // Function to create a custom image with circle border
+    const createImageWithCircleBorder = (size: number, borderColor: string) => {
+      return new Promise<HTMLImageElement>((resolve, reject) => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+          reject(new Error("Failed to get canvas context"));
+          return;
+        }
+
+        const image = new Image();
+        image.onload = () => {
+          // Set canvas size to be large enough to fit the circle + image
+          canvas.width = size + 20; // Adding space for the border
+          canvas.height = size + 20; // Adding space for the border
+
+          // Draw the circular clip path to mask the image
+          ctx.beginPath();
+          ctx.arc(
+            canvas.width / 2,
+            canvas.height / 2,
+            size / 2,
+            0,
+            Math.PI * 2
+          ); // Circle clipping path
+          ctx.clip(); // Apply the clip
+
+          // Draw the dolphin image inside the clipped area
+          ctx.drawImage(
+            image,
+            canvas.width / 2 - size / 2, // Position the image (center it)
+            canvas.height / 2 - size / 2, // Position the image (center it)
+            size, // Image width
+            size // Image height
+          );
+
+          // Draw the border around the clipped circle
+          ctx.beginPath();
+          ctx.arc(
+            canvas.width / 2,
+            canvas.height / 2,
+            size / 2 + 10,
+            0,
+            Math.PI * 2
+          ); // Circle with border
+          ctx.lineWidth = 25;
+          ctx.strokeStyle = borderColor;
+          ctx.stroke();
+          ctx.closePath();
+
+          // Convert the canvas to a data URL
+          const dataUrl = canvas.toDataURL("image/png");
+          const customImage = new Image();
+          customImage.src = dataUrl;
+          customImage.onload = () => resolve(customImage);
+        };
+        image.onerror = reject;
+
+        // Set the source of the image to be the dolphin image
+        image.src = "images/test.png";
+      });
+    };
+
+    const customImages = await Promise.all(
+      networkData.nodes.map(async (node: RawNode) => {
+        const category = networkData.categories[node.category];
+        const categoryColor = "red"; //category ? category.itemStyle.color : "#000000"; // Default to black if no color is defined
+        const size = node.size / 10 + 10; // Size of the node
+
+        // Create the custom image with circle border
+        const dataUrl = await createImageWithCircleBorder(size, categoryColor);
+        return "image://" + dataUrl.src; // Use the data URL for the symbol
+      })
+    );
+
+    console.log("ICI", customImages[0]);
     // Create the new chart option
     const newOption: echarts.EChartsOption = {
       title: {
@@ -67,11 +144,10 @@ const Page: React.FC = () => {
             rotateLabel: true,
           },
           categories: networkData.categories,
-          data: networkData.nodes.map((node: RawNode) => ({
+          data: networkData.nodes.map((node: RawNode, index: number) => ({
             id: node.id,
             name: node.name,
-            symbol:
-              "https://pawpatrol.fandom.com/wiki/Baby_dolphin?file=Baby_Dolphin.png",
+            symbol: customImages[index], // Use an image as the symbol
             symbolSize: node.size / 10,
             x: node.x,
             y: node.y,
@@ -91,6 +167,12 @@ const Page: React.FC = () => {
                 formatter: (params: any) => params.data.name, // Optional formatter
               },
             },
+            // itemStyle: {
+            //   borderColor: "red", // Set the border color to match the category color
+            //   borderWidth: 30, // Set the border width
+            //   borderType: "solid", // Set the border type
+            //   color: "blue", // Set the node color
+            // },
           })),
           edges: networkData.edges.map((edge: RawEdge) => ({
             source: edge.source,
