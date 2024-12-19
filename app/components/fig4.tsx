@@ -1,5 +1,5 @@
 "use client";
-// Import necessary libraries
+
 import React, { useRef, useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import * as echarts from "echarts";
@@ -13,29 +13,22 @@ interface Flag {
   name: string;
   emoji: string;
 }
+
 function getFlag(countryCode: string) {
-  if (!countryCode) {
-    return "";
-  }
-  return (
-    flagData.find(function (item) {
-      return item.code === countryCode;
-    }) || {}
-  ).emoji;
+  if (!countryCode) return "";
+  return (flagData.find((item) => item.code === countryCode) || {}).emoji;
 }
+
 const updateFrequency = 500;
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
-  const [isRaceFinished, setIsRaceFinished] = useState<boolean>(false);
 
-  // Function to prepare scatter options
   const prepareGraph = async () => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
     let raceData: any[] = [];
 
-    // Fetch and decompress scatter data
     try {
       const response = await fetch(`${baseUrl}/data/race_data.json.gz`);
       const buffer = await response.arrayBuffer();
@@ -48,59 +41,17 @@ const Page: React.FC = () => {
       return;
     }
 
-    const headerData = raceData.header;
     const data = raceData.data;
-
-    const yearMonth: string[] = [];
-    for (let i = 0; i < data.length; ++i) {
-      if (
-        yearMonth.length === 0 ||
-        yearMonth[yearMonth.length - 1] !== data[i][0]
-      ) {
-        yearMonth.push(data[i][0]);
-      }
-    }
-
-    const startIndex = yearMonth.length - 4; //1;
+    const yearMonth: string[] = [...new Set(data.map((d: string[]) => d[0]))];
+    const startIndex = yearMonth.length - 4;
     const startMonth = yearMonth[startIndex];
     const endMonth = yearMonth[yearMonth.length - 1];
 
-    // Create the map option
-    const mapOption = {
-      visualMap: {
-        left: "right",
-        min: 0,
-        max: 60000,
-        inRange: {
-          // prettier-ignore
-          color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'],
-        },
-        text: ["High", "Low"],
-        calculable: false,
-      },
-      dataset: {
-        source: data.filter(function (d: string[]) {
-          return d[0] === endMonth;
-        }),
-      },
-      series: [
-        {
-          id: "runscore",
-          type: "map",
-          roam: true,
-          map: "WORLD",
-          animationDurationUpdate: 1000,
-          universalTransition: true,
-          encode: {
-            value: 2,
-            name: 1,
-          },
-        },
-      ],
-    };
+    // Find max value for consistent visualMap scaling
+    const maxValue = Math.max(...data.map((d: string[]) => parseFloat(d[2])));
 
-    // Create the bar race option
-    const option: echarts.EChartsOption = {
+    // Bar race option
+    const barOption: echarts.EChartsOption = {
       grid: {
         top: 10,
         bottom: 30,
@@ -110,16 +61,8 @@ const Page: React.FC = () => {
       xAxis: {
         max: "dataMax",
         axisLabel: {
-          formatter: function (n: number) {
-            return Math.round(n) + "";
-          },
+          formatter: (n: number) => Math.round(n).toString(),
         },
-      },
-      dataset: {
-        source: data.filter(function (d: string[]) {
-          return d[0] === startMonth;
-        }),
-        // dimensions: raceData[0],
       },
       yAxis: {
         type: "category",
@@ -128,9 +71,7 @@ const Page: React.FC = () => {
         axisLabel: {
           show: true,
           fontSize: 14,
-          formatter: function (value: any) {
-            return value + "{flag|" + getFlag(value) + "}";
-          },
+          formatter: (value: any) => value + "{flag|" + getFlag(value) + "}",
           rich: {
             flag: {
               fontSize: 25,
@@ -141,16 +82,16 @@ const Page: React.FC = () => {
         animationDuration: 300,
         animationDurationUpdate: 300,
       },
+      dataset: {
+        source: data.filter((d: string[]) => d[0] === startMonth),
+      },
       series: [
         {
           realtimeSort: true,
           seriesLayoutBy: "column",
           type: "bar",
           itemStyle: {
-            color: function (params: any) {
-              // Access the fourth column value from the dataset
-              return params.data[3]; // Assuming the fourth column in your dataset is color
-            },
+            color: (params: any) => params.data[3],
           },
           encode: {
             x: 2,
@@ -165,7 +106,6 @@ const Page: React.FC = () => {
           },
         },
       ],
-      // Disable init animation.
       animationDuration: 0,
       animationDurationUpdate: updateFrequency,
       animationEasing: "linear",
@@ -187,61 +127,164 @@ const Page: React.FC = () => {
       },
     };
 
-    // Update the chart option state
-    setOption(option);
-
-    for (let i = startIndex; i < yearMonth.length - 1; ++i) {
-      (function (i) {
-        setTimeout(function () {
-          updateYear(yearMonth[i + 1]);
-        }, (i - startIndex) * updateFrequency);
-      })(i);
-    }
-
-    function updateYear(year: string) {
-      const source = data.filter(function (d: string[]) {
-        return d[0] === year;
-      });
-
-      setOption((prevOption) => ({
-        ...prevOption,
-        series: [
-          {
-            ...prevOption.series[0],
-            data: source,
+    // Map option
+    const mapOption: echarts.EChartsOption = {
+      backgroundColor: "#000",
+      title: {
+        text: endMonth,
+        left: "center",
+        top: "top",
+        textStyle: {
+          color: "#fff",
+          fontSize: 24,
+        },
+      },
+      tooltip: {
+        trigger: "item",
+        formatter: function (params: any) {
+          console.log(params);
+          return `${params.name}: ${params.value}`;
+        },
+      },
+      visualMap: [
+        {
+          type: "continuous",
+          min: 0,
+          max: maxValue,
+          text: ["High", "Low"],
+          left: "right",
+          inRange: {
+            color: [
+              "#313695",
+              "#4575b4",
+              "#74add1",
+              "#abd9e9",
+              "#e0f3f8",
+              "#ffffbf",
+              "#fee090",
+              "#fdae61",
+              "#f46d43",
+              "#d73027",
+              "#a50026",
+            ].reverse(),
           },
-        ],
-        graphic: {
-          ...prevOption.graphic,
-          elements: [
+          calculable: false,
+        },
+      ],
+      series: [
+        {
+          name: "World Map",
+          type: "map",
+          map: "WORLD",
+          roam: true,
+
+          data: data
+            .filter((d: string[]) => d[0] === endMonth)
+            .map((d: string[]) => ({
+              name: d[1], // Assuming the country name is at index 1
+              value: parseFloat(d[2]), // Assuming the score is at index 2
+            })),
+          // emphasis: {
+          //   label: {
+          //     show: true,
+          //   },
+          //   itemStyle: {
+          //     areaColor: "#ff0",
+          //   },
+          // },
+          // select: {
+          //   label: {
+          //     show: true,
+          //     color: "#fff",
+          //   },
+          // },
+          animation: true,
+          animationDurationUpdate: 1000,
+          animationEasingUpdate: "cubicInOut",
+          label: {
+            show: false,
+          },
+        },
+      ],
+    };
+
+    setOption(barOption);
+
+    // Update function for the race
+    const updateYear = (year: string) => {
+      const source = data.filter((d: string[]) => d[0] === year);
+
+      if (year === endMonth) {
+        // Fade out the bar chart
+        setOption((prevOption) => ({
+          ...prevOption,
+          series: [
             {
-              ...prevOption.graphic.elements[0],
-              style: {
-                ...prevOption.graphic.elements[0].style,
-                text: year,
+              ...prevOption.series[0],
+              animationDuration: 200,
+              itemStyle: {
+                opacity: 0,
               },
             },
           ],
-        },
-      }));
+          yAxis: {
+            ...prevOption.yAxis,
+            show: false,
+            animationDuration: 200,
+          },
+          xAxis: {
+            show: false,
+            animationDuration: 200,
+          },
+        }));
 
-      // If it's the last year in the data, transition to the map option
-      if (year === endMonth) {
-        setIsRaceFinished(true);
-        setOption(mapOption, true); // Transition to map visualization
+        // Switch to map with animation
+        setTimeout(() => {
+          const chartInstance = chartRef.current?.getEchartsInstance();
+          if (chartInstance) {
+            chartInstance.clear();
+            chartInstance.setOption(mapOption, {
+              notMerge: true,
+              replaceMerge: ["series"],
+              animation: true,
+              animationDuration: 1000,
+              animationEasing: "cubicInOut",
+            });
+          }
+        }, 300);
+      } else {
+        setOption((prevOption) => ({
+          ...prevOption,
+          dataset: { source },
+          graphic: {
+            elements: [
+              {
+                ...prevOption.graphic.elements[0],
+                style: { ...prevOption.graphic.elements[0].style, text: year },
+              },
+            ],
+          },
+        }));
       }
+    };
+
+    // Schedule updates
+    for (let i = startIndex; i < yearMonth.length - 1; ++i) {
+      setTimeout(
+        () => updateYear(yearMonth[i + 1]),
+        (i - startIndex) * updateFrequency
+      );
     }
   };
 
-  // Use effect to prepare options and initialize the chart
   useEffect(() => {
     prepareGraph();
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []);
 
   return (
     <ReactECharts
       ref={chartRef}
-      option={option || {}} // Render an empty chart initially
+      option={option || {}}
       style={{ height: "1000px", width: "100%" }}
       opts={{ renderer: "canvas" }}
       theme="dark"
