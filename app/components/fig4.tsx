@@ -24,6 +24,7 @@ const updateFrequency = 500;
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
+  const updateFunctionsRef = useRef<Function[]>([]);
 
   const prepareGraph = async () => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
@@ -43,12 +44,79 @@ const Page: React.FC = () => {
 
     const data = raceData.data;
     const yearMonth: string[] = [...new Set(data.map((d: string[]) => d[0]))];
-    const startIndex = yearMonth.length - 4; //12; //
+    const startIndex = 12;
     const startMonth = yearMonth[startIndex];
     const endMonth = yearMonth[yearMonth.length - 1];
 
-    // Find max value for consistent visualMap scaling
     const maxValue = Math.max(...data.map((d: string[]) => parseFloat(d[2])));
+
+    // Map option
+    const mapOption: echarts.EChartsOption = {
+      backgroundColor: "#000",
+      title: {
+        text: endMonth,
+        left: "center",
+        top: "top",
+        textStyle: {
+          color: "#fff",
+          fontSize: 24,
+        },
+      },
+      tooltip: {
+        trigger: "item",
+        formatter: function (params: any) {
+          return `Score of ${params.data.full_name}: ${params.value}`;
+        },
+      },
+      visualMap: [
+        {
+          type: "continuous",
+          min: 0,
+          max: maxValue,
+          text: ["High", "Low"],
+          left: "right",
+          inRange: {
+            color: [
+              "#313695",
+              "#4575b4",
+              "#74add1",
+              "#abd9e9",
+              "#e0f3f8",
+              "#ffffbf",
+              "#fee090",
+              "#fdae61",
+              "#f46d43",
+              "#d73027",
+              "#a50026",
+            ].reverse(),
+          },
+          calculable: false,
+        },
+      ],
+      series: [
+        {
+          id: "race_score",
+          name: "World Map",
+          type: "map",
+          map: "WORLD",
+          roam: true,
+          data: data
+            .filter((d: string[]) => d[0] === endMonth)
+            .map((d: string[]) => ({
+              name: d[1],
+              value: parseFloat(d[2]),
+              full_name: d[4],
+            })),
+          animation: true,
+          animationDurationUpdate: 2000,
+          animationEasingUpdate: "cubicInOut",
+          universalTransition: true,
+          label: {
+            show: false,
+          },
+        },
+      ],
+    };
 
     // Bar race option
     const barOption: echarts.EChartsOption = {
@@ -88,7 +156,6 @@ const Page: React.FC = () => {
           }),
       },
       dataset: {
-        // Bind initial dataset
         source: data.filter((d: string[]) => d[0] === startMonth),
         dimensions: ["month", "name", "value", "color"],
       },
@@ -105,11 +172,6 @@ const Page: React.FC = () => {
             x: "value",
             y: "name",
           },
-          // data: data
-          //   .filter((d: string[]) => d[0] === startMonth)
-          //   .map(function (item) {
-          //     return item[2];
-          //   }),
           label: {
             show: true,
             precision: 1,
@@ -137,137 +199,115 @@ const Page: React.FC = () => {
             },
             z: 100,
           },
+          {
+            type: "rect",
+            right: "10%",
+            bottom: "50%",
+            z: 110,
+            shape: {
+              width: 100,
+              height: 40,
+            },
+            style: {
+              fill: "#007BFF",
+              stroke: "#0056b3",
+              lineWidth: 1,
+              shadowBlur: 2,
+              shadowColor: "rgba(0,0,0,0.3)",
+              shadowOffsetX: 1,
+              shadowOffsetY: 1,
+              text: "Skip to Map",
+              fontSize: 14,
+              textFill: "#ffffff",
+              textAlign: "center",
+              textVerticalAlign: "middle",
+              cursor: "pointer",
+            },
+            onclick: function () {
+              // Clear all pending timeouts
+              updateFunctionsRef.current.forEach((updateFn) => updateFn());
+
+              // Update directly to the last month's data
+              const source = data.filter((d: string[]) => d[0] === endMonth);
+              setOption((prevOption) => ({
+                ...prevOption,
+                dataset: { source },
+                graphic: {
+                  elements: [
+                    {
+                      ...prevOption?.graphic?.elements[0],
+                      style: {
+                        ...prevOption?.graphic?.elements[0]?.style,
+                        text: endMonth,
+                      },
+                    },
+                    prevOption?.graphic?.elements[1],
+                  ],
+                },
+              }));
+
+              // After a short delay, switch to the map
+              setTimeout(() => {
+                const chartInstance = chartRef.current?.getEchartsInstance();
+                if (chartInstance) {
+                  chartInstance.setOption(mapOption, { notMerge: true });
+                }
+              }, updateFrequency);
+            },
+          },
         ],
       },
-    };
-
-    // Map option
-    const mapOption: echarts.EChartsOption = {
-      backgroundColor: "#000",
-      title: {
-        text: endMonth,
-        left: "center",
-        top: "top",
-        textStyle: {
-          color: "#fff",
-          fontSize: 24,
-        },
-      },
-      tooltip: {
-        trigger: "item",
-        formatter: function (params: any) {
-          console.log(params);
-          return `Score of ${params.data.full_name}: ${params.value}`;
-        },
-      },
-      visualMap: [
-        {
-          type: "continuous",
-          min: 0,
-          max: maxValue,
-          text: ["High", "Low"],
-          left: "right",
-          inRange: {
-            color: [
-              "#313695",
-              "#4575b4",
-              "#74add1",
-              "#abd9e9",
-              "#e0f3f8",
-              "#ffffbf",
-              "#fee090",
-              "#fdae61",
-              "#f46d43",
-              "#d73027",
-              "#a50026",
-            ].reverse(),
-          },
-          calculable: false,
-        },
-      ],
-      series: [
-        {
-          // $action: "replace", // Tell ECharts to replace the series
-          id: "race_score",
-          name: "World Map",
-          type: "map",
-          map: "WORLD",
-          roam: true,
-
-          data: data
-            .filter((d: string[]) => d[0] === endMonth)
-            .map((d: string[]) => ({
-              name: d[1], // Assuming the country name is at index 1
-              value: parseFloat(d[2]), // Assuming the score is at index 2
-              full_name: d[4],
-            })),
-          // emphasis: {
-          //   label: {
-          //     show: true,
-          //   },
-          //   itemStyle: {
-          //     areaColor: "#ff0",
-          //   },
-          // },
-          // select: {
-          //   label: {
-          //     show: true,
-          //     color: "#fff",
-          //   },
-          // },
-          animation: true,
-          animationDurationUpdate: 2000,
-          animationEasingUpdate: "cubicInOut",
-          universalTransition: true,
-          label: {
-            show: false,
-          },
-        },
-      ],
     };
 
     setOption(barOption);
 
     // Update function for the race
     const updateYear = (year: string) => {
-      const source = data.filter((d: string[]) => d[0] === year);
-      const chartInstance = chartRef.current?.getEchartsInstance();
       if (year === endMonth) {
-        setTimeout(() => {
-          if (chartInstance) {
-            chartInstance.setOption(
-              mapOption,
-              { notMerge: true } // Ensure the map fully replaces the bar chart
-            );
-          }
-        }, 300);
-      } else {
-        setOption((prevOption) => ({
-          ...prevOption,
-          dataset: { source },
-          graphic: {
-            elements: [
-              {
-                ...prevOption.graphic.elements[0],
-                style: { ...prevOption.graphic.elements[0].style, text: year },
-              },
-            ],
-          },
-        }));
+        const chartInstance = chartRef.current?.getEchartsInstance();
+        if (chartInstance) {
+          setTimeout(() => {
+            chartInstance.setOption(mapOption, { notMerge: true });
+          }, updateFrequency);
+        }
       }
+
+      setOption((prevOption) => ({
+        ...prevOption,
+        dataset: { source: data.filter((d: string[]) => d[0] === year) },
+        graphic: {
+          elements: [
+            {
+              ...prevOption?.graphic?.elements[0],
+              style: {
+                ...prevOption?.graphic?.elements[0]?.style,
+                text: year,
+              },
+            },
+            prevOption?.graphic?.elements[1],
+          ],
+        },
+      }));
     };
 
-    // Schedule updates
+    // Store update functions in ref for cleanup
+    const updates: Function[] = [];
     for (let i = startIndex; i < yearMonth.length - 1; ++i) {
-      setTimeout(
+      const timeoutId = setTimeout(
         () => updateYear(yearMonth[i + 1]),
         (i - startIndex) * updateFrequency
       );
+      updates.push(() => clearTimeout(timeoutId));
     }
+    updateFunctionsRef.current = updates;
   };
 
   useEffect(() => {
     prepareGraph();
+    return () => {
+      // Cleanup timeouts when component unmounts
+      updateFunctionsRef.current.forEach((updateFn) => updateFn());
+    };
   }, []);
 
   return (
