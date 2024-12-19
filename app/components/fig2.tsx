@@ -25,6 +25,20 @@ const Page: React.FC = () => {
     scaled_edge_weight: number;
   }
 
+  // Define a list of predefined colors
+  const predefinedColors = [
+    "#FF5733", // Red
+    "#33FF57", // Green
+    "#3357FF", // Blue
+    "#FF33A6", // Pink
+    "#FFFF33", // Yellow
+    "#33FFF7", // Cyan
+    "#FF9333", // Orange
+    "#9B33FF", // Purple
+    "#FF5733", // Red (again, for more categories)
+    "#7FFF33", // Lime
+  ];
+
   // Function to prepare scatter options
   const prepareGraph = async () => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
@@ -56,11 +70,25 @@ const Page: React.FC = () => {
 
         const image = new Image();
         image.onload = () => {
-          // Set canvas size to be large enough to fit the circle + image
-          canvas.width = size + 20; // Adding space for the border
-          canvas.height = size + 20; // Adding space for the border
+          // Set canvas size to be large enough to fit the circle and image
+          canvas.width = size + 10; // Adding space for the border (smaller than before)
+          canvas.height = size + 10; // Adding space for the border (smaller than before)
 
-          // Draw the circular clip path to mask the image
+          // Draw the border around the circle first, exactly around the image
+          ctx.beginPath();
+          ctx.arc(
+            canvas.width / 2,
+            canvas.height / 2,
+            size / 2 + 2,
+            0,
+            Math.PI * 2
+          ); // Circle with smaller border
+          ctx.lineWidth = 5;
+          ctx.strokeStyle = borderColor;
+          ctx.stroke();
+          ctx.closePath();
+
+          // Now clip the canvas to a circle for the image
           ctx.beginPath();
           ctx.arc(
             canvas.width / 2,
@@ -80,20 +108,6 @@ const Page: React.FC = () => {
             size // Image height
           );
 
-          // Draw the border around the clipped circle
-          ctx.beginPath();
-          ctx.arc(
-            canvas.width / 2,
-            canvas.height / 2,
-            size / 2 + 10,
-            0,
-            Math.PI * 2
-          ); // Circle with border
-          ctx.lineWidth = 25;
-          ctx.strokeStyle = borderColor;
-          ctx.stroke();
-          ctx.closePath();
-
           // Convert the canvas to a data URL
           const dataUrl = canvas.toDataURL("image/png");
           const customImage = new Image();
@@ -109,8 +123,8 @@ const Page: React.FC = () => {
 
     const customImages = await Promise.all(
       networkData.nodes.map(async (node: RawNode) => {
-        const category = networkData.categories[node.category];
-        const categoryColor = "red"; //category ? category.itemStyle.color : "#000000"; // Default to black if no color is defined
+        const colorIndex = node.category % predefinedColors.length; // Map the category index to the color list
+        const categoryColor = predefinedColors[colorIndex]; // Get the color for this category
         const size = node.size / 10 + 10; // Size of the node
 
         // Create the custom image with circle border
@@ -119,7 +133,6 @@ const Page: React.FC = () => {
       })
     );
 
-    console.log("ICI", customImages[0]);
     // Create the new chart option
     const newOption: echarts.EChartsOption = {
       title: {
@@ -130,9 +143,15 @@ const Page: React.FC = () => {
       tooltip: {},
       legend: [
         {
-          // selectedMode: 'single',
           data: networkData.categories.map(function (a) {
-            return a.name;
+            // Map each category to the predefined color
+            const colorIndex = a.id % predefinedColors.length;
+            return {
+              name: a.name,
+              itemStyle: {
+                color: predefinedColors[colorIndex], // Set the color for the legend
+              },
+            };
           }),
         },
       ],
@@ -178,7 +197,7 @@ const Page: React.FC = () => {
             source: edge.source,
             target: edge.target,
             lineStyle: {
-              width: Math.max(1, edge.scaled_egde_weight / 10),
+              width: Math.max(1, edge.scaled_edge_weight / 10),
               curveness: 0.3,
               opacity: 0.2,
               color: "source",
@@ -186,7 +205,7 @@ const Page: React.FC = () => {
             value: edge.weight,
             emphasis: {
               lineStyle: {
-                width: Math.max(10, edge.scaled_egde_weight / 10), // Emphasize with thicker line
+                width: Math.max(10, edge.scaled_edge_weight / 10), // Emphasize with thicker line
                 opacity: 1, // Make edge fully opaque
               },
             },
