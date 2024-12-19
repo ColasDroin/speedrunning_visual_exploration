@@ -70,6 +70,8 @@ const Page: React.FC = () => {
           data: networkData.nodes.map((node: RawNode) => ({
             id: node.id,
             name: node.name,
+            symbol:
+              "https://pawpatrol.fandom.com/wiki/Baby_dolphin?file=Baby_Dolphin.png",
             symbolSize: node.size / 10,
             x: node.x,
             y: node.y,
