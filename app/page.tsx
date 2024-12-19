@@ -29,7 +29,6 @@ export default function Home() {
             thought possible. It’s about taking a game you love, learning its
             every nuance, and pushing it to its absolute breaking point.
           </div>
-
           <div className="mx-auto mt-2">
             Let&apos;s analyze some data gathered from the{" "}
             <span className={`${styles.subtleGlow}`}>
@@ -46,47 +45,50 @@ export default function Home() {
           </div>
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            data-text="UNDERSTANDING SPEEDRUNNING"
+          >
+            UNDERSTANDING SPEEDRUNNING
+          </div>
+          {/* <div className="mx-auto">
+            <Fig1 />
+          </div> */}
+          <div
+            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
             data-text="THE MOST SPEEDRUNNED GAMES"
           >
             THE MOST SPEEDRUNNED GAMES
           </div>
-
           <div className="mx-auto">
             <Fig1 />
           </div>
-
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
             data-text="GAMES COMMUNITIES"
           >
             GAMES COMMUNITIES
           </div>
-
           <div className="mx-auto">
             <Fig2 />
           </div>
-
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
             data-text="EVOLUTION OF GAME POPULARITY"
           >
             EVOLUTION OF GAME POPULARITY
           </div>
-
           <div className="mx-auto">
             <Fig3 />
           </div>
-
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
             data-text="MOST COMPETITIVE COUNTRIES"
           >
             MOST COMPETITIVE COUNTRIES
           </div>
-
           <div className="mx-auto">
             <Fig4 />
           </div>
+          COLOR SCRAPPED FROM https://github.com/sshaw/national_colors
         </div>
       </div>
     </div>

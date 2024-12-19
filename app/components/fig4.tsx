@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import flagData from "../../public/data/flag_data.json";
 import pako from "pako";
+import { getCountryGeoJSONByAlpha2 } from "geojson-places";
 
 interface Flag {
   name: string;
@@ -19,30 +20,11 @@ function getFlag(countryCode: string) {
     }) || {}
   ).emoji;
 }
+const updateFrequency = 500;
 
-const countryColors: Record<string, string> = {
-  Australia: "#00008b",
-  Canada: "#f00",
-  China: "#ffde00",
-  Cuba: "#002a8f",
-  Finland: "#003580",
-  France: "#ed2939",
-  Germany: "#000",
-  Iceland: "#003897",
-  India: "#f93",
-  Japan: "#bc002d",
-  "North Korea": "#024fa2",
-  "South Korea": "#000",
-  "New Zealand": "#00247d",
-  Norway: "#ef2b2d",
-  Poland: "#dc143c",
-  Russia: "#d52b1e",
-  Turkey: "#e30a17",
-  "United Kingdom": "#00247d",
-  "United States": "#b22234",
-};
-
-const updateFrequency = 2000;
+// Get the country geojson of Spain
+const result = getCountryGeoJSONByAlpha2("ES");
+console.log("ICI", result);
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
@@ -73,9 +55,9 @@ const Page: React.FC = () => {
     for (let i = 0; i < data.length; ++i) {
       if (
         yearMonth.length === 0 ||
-        yearMonth[yearMonth.length - 1] !== data[i][2]
+        yearMonth[yearMonth.length - 1] !== data[i][0]
       ) {
-        yearMonth.push(data[i][2]);
+        yearMonth.push(data[i][0]);
       }
     }
 
@@ -100,8 +82,9 @@ const Page: React.FC = () => {
       },
       dataset: {
         source: data.filter(function (d: string[]) {
-          return d[2] === startMonth;
+          return d[0] === startMonth;
         }),
+        // dimensions: raceData[0],
       },
       yAxis: {
         type: "category",
@@ -129,13 +112,14 @@ const Page: React.FC = () => {
           seriesLayoutBy: "column",
           type: "bar",
           itemStyle: {
-            color: function (param) {
-              return countryColors[(param.value as number[])[0]] || "#5470c6";
+            color: function (params: any) {
+              // Access the fourth column value from the dataset
+              return params.data[3]; // Assuming the fourth column in your dataset is color
             },
           },
           encode: {
-            x: 1,
-            y: 0,
+            x: 2,
+            y: 1,
           },
           label: {
             show: true,
@@ -181,11 +165,30 @@ const Page: React.FC = () => {
 
     function updateYear(year: string) {
       const source = data.filter(function (d: string[]) {
-        return d[2] === year;
+        return d[0] === year;
       });
-      (option as any).series[0].data = source;
-      (option as any).graphic.elements[0].style.text = year;
-      setOption(option);
+
+      setOption((prevOption) => ({
+        ...prevOption,
+        series: [
+          {
+            ...prevOption.series[0],
+            data: source,
+          },
+        ],
+        graphic: {
+          ...prevOption.graphic,
+          elements: [
+            {
+              ...prevOption.graphic.elements[0],
+              style: {
+                ...prevOption.graphic.elements[0].style,
+                text: year,
+              },
+            },
+          ],
+        },
+      }));
     }
   };
 
