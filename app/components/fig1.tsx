@@ -6,6 +6,7 @@ import game_counts from "../../public/data/game_counts.json";
 import submission_types from "../../public/data/submission_types.json";
 import distribution_types from "../../public/data/distribution_types.json";
 import pako from "pako";
+import { filter } from "echarts/types/src/export/api/util.js";
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
@@ -331,10 +332,22 @@ const Page: React.FC = () => {
 
     // Add scatter plot options
     for (const data of Object.entries(scatterData)) {
-      const dic_per_bin = data[1];
+      const dic_per_bin = data[1][0];
+      const best_line = data[1][1];
       const optionId = data[0];
       const l_series = [];
       for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
+        l_series.push({
+          type: "line",
+          data: best_line,
+          encode: { x: 0, y: 1 },
+          universalTransition: { enabled: true },
+          // make very long animation
+          animationDuration: 2000,
+          symbol: "none",
+          tooltip: { show: false }, // Disable tooltip for line
+          z: 1,
+        });
         l_series.push({
           type: "scatter",
           dimensions: ["date", "time", "player", "location"],
@@ -343,6 +356,7 @@ const Page: React.FC = () => {
           id: bin_id,
           encode: { x: "date", y: "time" },
           universalTransition: { enabled: true },
+          z: 2,
         });
       }
 
@@ -351,6 +365,15 @@ const Page: React.FC = () => {
         title: {
           text: "Speedrun times for category X of game X",
         },
+        dataZoom: [
+          // {
+          //   type: "inside",
+          //   yAxisIndex: [0],
+          //   filterMode: "none",
+          //   startValue: Math.min(...l_series[0].data.map((d) => d[0])) * 0.8,
+          //   endValue: Math.max(...l_series[0].data.map((d) => d[0])) * 2,
+          // },
+        ],
         tooltip: {
           trigger: "item",
           axisPointer: {
@@ -378,23 +401,13 @@ const Page: React.FC = () => {
         yAxis: {
           type: "time",
           name: "Speedrun time",
+          min: Math.min(...l_series[0].data.map((d) => d[1])) * 0.8,
+          max: Math.max(...l_series[0].data.map((d) => d[1])) * 2,
         },
         xAxis: {
           type: "time",
           name: "Date",
         },
-        // visualMap: {
-        //   orient: "horizontal",
-        //   left: "center",
-        //   text: ["Test"],
-        //   // Map the score column to color
-        //   dimension: "time",
-        //   inRange: {
-        //     color: ["#65B581", "#FFCE34", "#FD665F"],
-        //   },
-        //   min: 0,
-        //   max: 1000,
-        // },
         animationDurationUpdate: 500,
         series: l_series,
         graphic: [
