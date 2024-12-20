@@ -116,6 +116,7 @@ const Page: React.FC = () => {
         label: {
           show: true,
           position: "inside",
+          formatter: "{b}",
         },
         emphasis: {
           disabled: false,

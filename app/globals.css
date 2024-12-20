@@ -20,6 +20,7 @@ html {
   /* To make use of full height of page*/
   min-height: 100%;
   margin: 0;
+  scroll-behavior: smooth;
 }
 
 @layer base {
