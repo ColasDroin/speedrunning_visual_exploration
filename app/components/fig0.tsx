@@ -1,12 +1,38 @@
 "use client";
 // Import necessary libraries
 import React, { useRef, useEffect, useState } from "react";
+import { throttle } from "lodash"; // Import throttle function
 import ReactECharts from "echarts-for-react";
 import dataCategories from "../../public/data/categories.json";
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
+  const [scrollDepth, setScrollDepth] = useState(0); // Track scroll depth
+
+  useEffect(() => {
+    const handleScroll = throttle(() => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.body.scrollHeight;
+      const maxDepth = 10;
+      const newDepth = Math.min(
+        maxDepth,
+        Math.floor(
+          (scrollPosition / (documentHeight - windowHeight)) * maxDepth
+        )
+      );
+      setScrollDepth(newDepth); // Update the scroll depth
+    }, 500); // Throttle to update at most every 100ms
+
+    // Add scroll event listener
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      // Clean up the event listener
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     const chartOption: echarts.EChartsOption = {
@@ -20,18 +46,9 @@ const Page: React.FC = () => {
         left: "3%",
         orient: "vertical",
         data: [
-          {
-            name: "Super Mario 64",
-            icon: "rectangle",
-          },
-          {
-            name: "Portal",
-            icon: "rectangle",
-          },
-          {
-            name: "MineCraft: Java Edition",
-            icon: "rectangle",
-          },
+          { name: "Super Mario 64", icon: "rectangle" },
+          { name: "Portal", icon: "rectangle" },
+          { name: "MineCraft: Java Edition", icon: "rectangle" },
         ],
         borderColor: "#c23531",
       },
@@ -44,16 +61,13 @@ const Page: React.FC = () => {
           bottom: "25%",
           left: "1%",
           right: "77%",
-          //layout: "radial",
           orient: "vertical",
           symbol: "emptyCircle",
           symbolSize: 7,
-          initialTreeDepth: 3,
+          initialTreeDepth: scrollDepth, // Adjust depth dynamically
           animationDurationUpdate: 750,
           expandAndCollapse: true,
-          emphasis: {
-            focus: "descendant",
-          },
+          emphasis: { focus: "descendant" },
           label: {
             position: "top",
             rotate: -90,
@@ -78,15 +92,12 @@ const Page: React.FC = () => {
           bottom: "25%",
           left: "23%",
           right: "20%",
-          //layout: "radial",
           orient: "vertical",
           symbol: "emptyCircle",
           symbolSize: 7,
-          initialTreeDepth: 3,
+          initialTreeDepth: scrollDepth, // Adjust depth dynamically
           animationDurationUpdate: 750,
-          emphasis: {
-            focus: "descendant",
-          },
+          emphasis: { focus: "descendant" },
           label: {
             position: "top",
             rotate: -90,
@@ -111,15 +122,12 @@ const Page: React.FC = () => {
           bottom: "52%",
           left: "80%",
           right: "1%",
-          //layout: "radial",
           orient: "vertical",
           symbol: "emptyCircle",
           symbolSize: 7,
-          initialTreeDepth: 2,
+          initialTreeDepth: scrollDepth, // Adjust depth dynamically
           animationDurationUpdate: 750,
-          emphasis: {
-            focus: "descendant",
-          },
+          emphasis: { focus: "descendant" },
           label: {
             position: "top",
             rotate: -90,
@@ -140,7 +148,7 @@ const Page: React.FC = () => {
     };
 
     setOption(chartOption);
-  }, []); // The empty dependency array ensures this runs only once
+  }, [scrollDepth]); // Update chart when scroll depth changes
 
   return (
     <ReactECharts
