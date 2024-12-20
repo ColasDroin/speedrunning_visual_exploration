@@ -1,4 +1,5 @@
 import Banner from "./components/banner";
+import Fig0 from "./components/fig0";
 import Fig1 from "./components/fig1";
 import Fig2 from "./components/fig2";
 import Fig3 from "./components/fig3";
@@ -75,6 +76,9 @@ export default function Home() {
             competitive. The figure belows illustrate the main categories and
             their rules for for the top 10 games with the most submissions.
           </p>
+          <div className="mx-auto">
+            <Fig0 />
+          </div>
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
             data-text="THE MOST SPEEDRUNNED GAMES"
