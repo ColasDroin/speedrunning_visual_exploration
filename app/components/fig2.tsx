@@ -58,7 +58,11 @@ const Page: React.FC = () => {
     }
 
     // Function to create a custom image with circle border
-    const createImageWithCircleBorder = (size: number, borderColor: string) => {
+    const createImageWithCircleBorder = (
+      size: number,
+      borderColor: string,
+      imageName: string
+    ) => {
       return new Promise<HTMLImageElement>((resolve, reject) => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -117,7 +121,7 @@ const Page: React.FC = () => {
         image.onerror = reject;
 
         // Set the source of the image to be the dolphin image
-        image.src = "images/test.png";
+        image.src = "images/" + imageName + "_cover.webp";
       });
     };
 
@@ -128,7 +132,11 @@ const Page: React.FC = () => {
         const size = node.size / 10 + 10; // Size of the node
 
         // Create the custom image with circle border
-        const dataUrl = await createImageWithCircleBorder(size, categoryColor);
+        const dataUrl = await createImageWithCircleBorder(
+          size,
+          categoryColor,
+          node.real_id
+        );
         return "image://" + dataUrl.src; // Use the data URL for the symbol
       })
     );
@@ -165,7 +173,7 @@ const Page: React.FC = () => {
           categories: networkData.categories,
           data: networkData.nodes.map((node: RawNode, index: number) => ({
             id: node.id,
-            name: node.name,
+            name: node.id,
             symbol: customImages[index], // Use an image as the symbol
             symbolSize: node.size / 10,
             x: node.x,
@@ -174,7 +182,7 @@ const Page: React.FC = () => {
             label: {
               show: node.size > 300 ? true : false,
               formatter: (params: any) => {
-                return params.data.name;
+                return params.data.id;
               },
             },
             emphasis: {
@@ -183,8 +191,9 @@ const Page: React.FC = () => {
                 show: true, // Ensure the label is shown on hover
                 fontSize: 14,
                 fontWeight: "bold",
-                formatter: (params: any) => params.data.name, // Optional formatter
+                formatter: (params: any) => params.data.id, // Optional formatter
               },
+              scale: 1.1,
             },
             // itemStyle: {
             //   borderColor: "red", // Set the border color to match the category color
