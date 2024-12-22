@@ -150,26 +150,26 @@ const Page: React.FC = () => {
               // Clear all pending timeouts
               updateFunctionsRef.current.forEach((updateFn) => updateFn());
 
-              // Switch to bar race with $action: "replace"
-              const barOptionWithReplace = {
-                ...barOption,
-                series: barOption.series.map((s) => ({
-                  ...s,
-                  $action: "replace", // Add replace action to series
-                })),
-                graphic: {
-                  elements: barOption.graphic.elements,
-                },
-              };
-
+              // Restart the bar race with proper animations
               const chartInstance = chartRef.current?.getEchartsInstance();
               if (chartInstance) {
-                chartInstance.setOption(barOptionWithReplace, {
+                // const barOptionWithTransition = {
+                //   ...barOption,
+                //   series: barOption.series.map((s) => ({
+                //     ...s,
+                //     $action: "replace", // Ensures a smooth transition
+                //     animation: true, // Enables animation
+                //   })),
+                //   graphic: {
+                //     elements: barOption.graphic.elements,
+                //   },
+                // };
+                chartInstance.setOption(barOption, {
                   notMerge: true,
                 });
               }
 
-              // Restart the bar race updates
+              // Restart the bar race logic
               prepareGraph();
             },
           },
@@ -221,6 +221,7 @@ const Page: React.FC = () => {
       series: [
         {
           realtimeSort: true,
+          animation: true,
           seriesLayoutBy: "column",
           id: "race_score",
           type: "bar",
@@ -240,11 +241,12 @@ const Page: React.FC = () => {
           },
         },
       ],
-      animationDuration: 0,
+      animationDuration: 300,
       animationDurationUpdate: updateFrequency,
       animationEasing: "linear",
       animationEasingUpdate: "linear",
       universalTransition: true,
+
       // Updated graphic elements with the new "Restart Bar Race" button
       graphic: {
         elements: [
@@ -326,7 +328,7 @@ const Page: React.FC = () => {
                 if (chartInstance) {
                   chartInstance.setOption(mapOption, { notMerge: true });
                 }
-              }, updateFrequency);
+              }, 0);
             },
           },
           {
