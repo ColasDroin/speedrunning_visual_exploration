@@ -87,7 +87,7 @@ const Page: React.FC = () => {
             0,
             Math.PI * 2
           ); // Circle with smaller border
-          ctx.lineWidth = 5;
+          ctx.lineWidth = 2;
           ctx.strokeStyle = borderColor;
           ctx.stroke();
           ctx.closePath();
