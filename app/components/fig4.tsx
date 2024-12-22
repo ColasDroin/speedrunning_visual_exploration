@@ -246,60 +246,77 @@ const Page: React.FC = () => {
             z: 100,
           },
           {
-            type: "rect",
+            type: "group",
             right: "10%",
             bottom: "50%",
             z: 110,
-            shape: {
-              width: 100,
-              height: 40,
-            },
-            style: {
-              fill: "#007BFF",
-              stroke: "#0056b3",
-              lineWidth: 1,
-              shadowBlur: 2,
-              shadowColor: "rgba(0,0,0,0.3)",
-              shadowOffsetX: 1,
-              shadowOffsetY: 1,
-              text: "Skip to Map",
-              fontSize: 14,
-              textFill: "#ffffff",
-              textAlign: "center",
-              textVerticalAlign: "middle",
-              cursor: "pointer",
-            },
-            onclick: function () {
-              // Clear all pending timeouts
-              updateFunctionsRef.current.forEach((updateFn) => updateFn());
-
-              // Update directly to the last month's data
-              const source = data.filter((d: string[]) => d[0] === endMonth);
-              setOption((prevOption) => ({
-                ...prevOption,
-                dataset: { source },
-                graphic: {
-                  elements: [
-                    {
-                      ...prevOption?.graphic?.elements[0],
-                      style: {
-                        ...prevOption?.graphic?.elements[0]?.style,
-                        text: endMonth,
-                      },
-                    },
-                    prevOption?.graphic?.elements[1],
-                  ],
+            children: [
+              {
+                type: "rect",
+                shape: {
+                  width: 140,
+                  height: 40,
                 },
-              }));
+                left: "center",
+                top: "center",
+                style: {
+                  fill: "#007BFF",
+                  stroke: "#0056b3",
+                  lineWidth: 1,
+                  shadowBlur: 2,
+                  shadowColor: "rgba(0,0,0,0.3)",
+                  shadowOffsetX: 1,
+                  shadowOffsetY: 1,
+                  cursor: "pointer",
+                },
+                onclick: function () {
+                  // Clear all pending timeouts
+                  updateFunctionsRef.current.forEach((updateFn) => updateFn());
 
-              // After a short delay, switch to the map
-              setTimeout(() => {
-                const chartInstance = chartRef.current?.getEchartsInstance();
-                if (chartInstance) {
-                  chartInstance.setOption(mapOption, { notMerge: true });
-                }
-              }, updateFrequency);
-            },
+                  // Update directly to the last month's data
+                  const source = data.filter(
+                    (d: string[]) => d[0] === endMonth
+                  );
+                  setOption((prevOption) => ({
+                    ...prevOption,
+                    dataset: { source },
+                    graphic: {
+                      elements: [
+                        {
+                          ...prevOption?.graphic?.elements[0],
+                          style: {
+                            ...prevOption?.graphic?.elements[0]?.style,
+                            text: endMonth,
+                          },
+                        },
+                        prevOption?.graphic?.elements[1],
+                      ],
+                    },
+                  }));
+
+                  // After a short delay, switch to the map
+                  setTimeout(() => {
+                    const chartInstance =
+                      chartRef.current?.getEchartsInstance();
+                    if (chartInstance) {
+                      chartInstance.setOption(mapOption, { notMerge: true });
+                    }
+                  }, updateFrequency);
+                },
+              },
+              {
+                type: "text",
+                style: {
+                  text: "Skip to Map",
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  fill: "#FFFFFF",
+                  textAlign: "center",
+                  textVerticalAlign: "middle",
+                  cursor: "pointer",
+                },
+              },
+            ],
           },
           {
             type: "rect",
@@ -318,11 +335,11 @@ const Page: React.FC = () => {
               shadowColor: "rgba(0,0,0,0.3)",
               shadowOffsetX: 1,
               shadowOffsetY: 1,
-              text: "Restart Bar Race",
-              fontSize: 14,
-              textFill: "#ffffff",
-              textAlign: "center",
-              textVerticalAlign: "middle",
+              // text: "Restart Bar Race",
+              // fontSize: 14,
+              // textFill: "#ffffff",
+              // textAlign: "center",
+              // textVerticalAlign: "middle",
               cursor: "pointer",
             },
             onclick: function () {
