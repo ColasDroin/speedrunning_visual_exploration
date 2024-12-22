@@ -170,6 +170,10 @@ const Page: React.FC = () => {
           circular: {
             rotateLabel: true,
           },
+          top: "20%",
+          bottom: "20%",
+          left: "20%",
+          right: "20%",
           categories: networkData.categories,
           data: networkData.nodes.map((node: RawNode, index: number) => ({
             real_id: node.real_id,
@@ -181,7 +185,7 @@ const Page: React.FC = () => {
             y: node.y,
             category: node.category,
             label: {
-              show: node.size > 300 ? true : false,
+              show: node.size > 200 ? true : false,
               formatter: (params: any) => {
                 return params.data.id;
               },
