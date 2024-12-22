@@ -132,32 +132,6 @@ const Page: React.FC = () => {
                   shadowOffsetY: 1,
                   cursor: "pointer",
                 },
-                onclick: function () {
-                  // Clear all pending timeouts
-                  updateFunctionsRef.current.forEach((updateFn) => updateFn());
-
-                  // Switch to bar race with $action: "replace"
-                  const barOptionWithReplace = {
-                    ...barOption,
-                    series: barOption.series.map((s) => ({
-                      ...s,
-                      $action: "replace", // Add replace action to series
-                    })),
-                    graphic: {
-                      elements: barOption.graphic.elements,
-                    },
-                  };
-
-                  const chartInstance = chartRef.current?.getEchartsInstance();
-                  if (chartInstance) {
-                    chartInstance.setOption(barOptionWithReplace, {
-                      notMerge: true,
-                    });
-                  }
-
-                  // Restart the bar race updates
-                  prepareGraph();
-                },
               },
               {
                 type: "text",
@@ -172,6 +146,32 @@ const Page: React.FC = () => {
                 },
               },
             ],
+            onclick: function () {
+              // Clear all pending timeouts
+              updateFunctionsRef.current.forEach((updateFn) => updateFn());
+
+              // Switch to bar race with $action: "replace"
+              const barOptionWithReplace = {
+                ...barOption,
+                series: barOption.series.map((s) => ({
+                  ...s,
+                  $action: "replace", // Add replace action to series
+                })),
+                graphic: {
+                  elements: barOption.graphic.elements,
+                },
+              };
+
+              const chartInstance = chartRef.current?.getEchartsInstance();
+              if (chartInstance) {
+                chartInstance.setOption(barOptionWithReplace, {
+                  notMerge: true,
+                });
+              }
+
+              // Restart the bar race updates
+              prepareGraph();
+            },
           },
         ],
       },
@@ -283,40 +283,6 @@ const Page: React.FC = () => {
                   shadowOffsetY: 1,
                   cursor: "pointer",
                 },
-                onclick: function () {
-                  // Clear all pending timeouts
-                  updateFunctionsRef.current.forEach((updateFn) => updateFn());
-
-                  // Update directly to the last month's data
-                  const source = data.filter(
-                    (d: string[]) => d[0] === endMonth
-                  );
-                  setOption((prevOption) => ({
-                    ...prevOption,
-                    dataset: { source },
-                    graphic: {
-                      elements: [
-                        {
-                          ...prevOption?.graphic?.elements[0],
-                          style: {
-                            ...prevOption?.graphic?.elements[0]?.style,
-                            text: endMonth,
-                          },
-                        },
-                        prevOption?.graphic?.elements[1],
-                      ],
-                    },
-                  }));
-
-                  // After a short delay, switch to the map
-                  setTimeout(() => {
-                    const chartInstance =
-                      chartRef.current?.getEchartsInstance();
-                    if (chartInstance) {
-                      chartInstance.setOption(mapOption, { notMerge: true });
-                    }
-                  }, updateFrequency);
-                },
               },
               {
                 type: "text",
@@ -331,6 +297,37 @@ const Page: React.FC = () => {
                 },
               },
             ],
+            onclick: function () {
+              // Clear all pending timeouts
+              updateFunctionsRef.current.forEach((updateFn) => updateFn());
+
+              // Update directly to the last month's data
+              const source = data.filter((d: string[]) => d[0] === endMonth);
+              setOption((prevOption) => ({
+                ...prevOption,
+                dataset: { source },
+                graphic: {
+                  elements: [
+                    {
+                      ...prevOption?.graphic?.elements[0],
+                      style: {
+                        ...prevOption?.graphic?.elements[0]?.style,
+                        text: endMonth,
+                      },
+                    },
+                    prevOption?.graphic?.elements[1],
+                  ],
+                },
+              }));
+
+              // After a short delay, switch to the map
+              setTimeout(() => {
+                const chartInstance = chartRef.current?.getEchartsInstance();
+                if (chartInstance) {
+                  chartInstance.setOption(mapOption, { notMerge: true });
+                }
+              }, updateFrequency);
+            },
           },
           {
             type: "group",
@@ -356,34 +353,6 @@ const Page: React.FC = () => {
                   shadowOffsetY: 1,
                   cursor: "pointer",
                 },
-                onclick: function () {
-                  // Clear all pending timeouts
-                  updateFunctionsRef.current.forEach((updateFn) => updateFn());
-
-                  // Restart the bar race from the beginning
-                  setOption((prevOption) => ({
-                    ...prevOption,
-                    dataset: {
-                      source: data.filter((d: string[]) => d[0] === startMonth),
-                    },
-                    graphic: {
-                      elements: [
-                        {
-                          ...prevOption?.graphic?.elements[0],
-                          style: {
-                            ...prevOption?.graphic?.elements[0]?.style,
-                            text: startMonth,
-                          },
-                        },
-                        prevOption?.graphic?.elements[1],
-                        prevOption?.graphic?.elements[2],
-                      ],
-                    },
-                  }));
-
-                  // Start the bar race updates again
-                  prepareGraph();
-                },
               },
               {
                 type: "text",
@@ -398,6 +367,34 @@ const Page: React.FC = () => {
                 },
               },
             ],
+            onclick: function () {
+              // Clear all pending timeouts
+              updateFunctionsRef.current.forEach((updateFn) => updateFn());
+
+              // Restart the bar race from the beginning
+              setOption((prevOption) => ({
+                ...prevOption,
+                dataset: {
+                  source: data.filter((d: string[]) => d[0] === startMonth),
+                },
+                graphic: {
+                  elements: [
+                    {
+                      ...prevOption?.graphic?.elements[0],
+                      style: {
+                        ...prevOption?.graphic?.elements[0]?.style,
+                        text: startMonth,
+                      },
+                    },
+                    prevOption?.graphic?.elements[1],
+                    prevOption?.graphic?.elements[2],
+                  ],
+                },
+              }));
+
+              // Start the bar race updates again
+              prepareGraph();
+            },
           },
         ],
       },
