@@ -50,18 +50,7 @@ const Page: React.FC = () => {
 
     const maxValue = Math.max(...data.map((d: string[]) => parseFloat(d[2])));
 
-    // Map option
     const mapOption: echarts.EChartsOption = {
-      // backgroundColor: "#000",
-      // title: {
-      //   text: endMonth,
-      //   left: "center",
-      //   top: "top",
-      //   textStyle: {
-      //     color: "#fff",
-      //     fontSize: 24,
-      //   },
-      // },
       tooltip: {
         trigger: "item",
         formatter: function (params: any) {
@@ -76,7 +65,6 @@ const Page: React.FC = () => {
           text: ["High", "Low"],
           orient: "horizontal",
           left: "center",
-          // left: "right",
           inRange: {
             color: [
               "#313695",
@@ -118,6 +106,61 @@ const Page: React.FC = () => {
           },
         },
       ],
+      graphic: {
+        elements: [
+          {
+            type: "rect",
+            right: "10%",
+            bottom: "10%",
+            z: 110,
+            shape: {
+              width: 140,
+              height: 40,
+            },
+            style: {
+              fill: "#28a745",
+              stroke: "#19692c",
+              lineWidth: 1,
+              shadowBlur: 2,
+              shadowColor: "rgba(0,0,0,0.3)",
+              shadowOffsetX: 1,
+              shadowOffsetY: 1,
+              text: "Restart Bar Race",
+              fontSize: 14,
+              textFill: "#ffffff",
+              textAlign: "center",
+              textVerticalAlign: "middle",
+              cursor: "pointer",
+            },
+            onclick: function () {
+              // Clear all pending timeouts
+              updateFunctionsRef.current.forEach((updateFn) => updateFn());
+
+              // Switch to bar race with $action: "replace"
+              const barOptionWithReplace = {
+                ...barOption,
+                series: barOption.series.map((s) => ({
+                  ...s,
+                  $action: "replace", // Add replace action to series
+                })),
+                graphic: {
+                  elements: barOption.graphic.elements,
+                },
+              };
+
+              const chartInstance = chartRef.current?.getEchartsInstance();
+              if (chartInstance) {
+                chartInstance.setOption(barOptionWithReplace, {
+                  notMerge: true,
+                });
+              }
+
+              // Restart the bar race updates
+              prepareGraph();
+            },
+          },
+        ],
+      },
     };
 
     // Bar race option
@@ -137,7 +180,7 @@ const Page: React.FC = () => {
       yAxis: {
         type: "category",
         inverse: true,
-        max: 20,
+        max: 10,
         axisLabel: {
           show: true,
           fontSize: 14,
@@ -188,6 +231,7 @@ const Page: React.FC = () => {
       animationEasing: "linear",
       animationEasingUpdate: "linear",
       universalTransition: true,
+      // Updated graphic elements with the new "Restart Bar Race" button
       graphic: {
         elements: [
           {
@@ -255,6 +299,59 @@ const Page: React.FC = () => {
                   chartInstance.setOption(mapOption, { notMerge: true });
                 }
               }, updateFrequency);
+            },
+          },
+          {
+            type: "rect",
+            right: "10%",
+            bottom: "40%",
+            z: 110,
+            shape: {
+              width: 140,
+              height: 40,
+            },
+            style: {
+              fill: "#28a745",
+              stroke: "#19692c",
+              lineWidth: 1,
+              shadowBlur: 2,
+              shadowColor: "rgba(0,0,0,0.3)",
+              shadowOffsetX: 1,
+              shadowOffsetY: 1,
+              text: "Restart Bar Race",
+              fontSize: 14,
+              textFill: "#ffffff",
+              textAlign: "center",
+              textVerticalAlign: "middle",
+              cursor: "pointer",
+            },
+            onclick: function () {
+              // Clear all pending timeouts
+              updateFunctionsRef.current.forEach((updateFn) => updateFn());
+
+              // Restart the bar race from the beginning
+              setOption((prevOption) => ({
+                ...prevOption,
+                dataset: {
+                  source: data.filter((d: string[]) => d[0] === startMonth),
+                },
+                graphic: {
+                  elements: [
+                    {
+                      ...prevOption?.graphic?.elements[0],
+                      style: {
+                        ...prevOption?.graphic?.elements[0]?.style,
+                        text: startMonth,
+                      },
+                    },
+                    prevOption?.graphic?.elements[1],
+                    prevOption?.graphic?.elements[2],
+                  ],
+                },
+              }));
+
+              // Start the bar race updates again
+              prepareGraph();
             },
           },
         ],
