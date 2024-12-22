@@ -172,6 +172,7 @@ const Page: React.FC = () => {
           },
           categories: networkData.categories,
           data: networkData.nodes.map((node: RawNode, index: number) => ({
+            real_id: node.real_id,
             id: node.id,
             name: node.id,
             symbol: customImages[index], // Use an image as the symbol
@@ -195,12 +196,6 @@ const Page: React.FC = () => {
               },
               scale: 1.1,
             },
-            // itemStyle: {
-            //   borderColor: "red", // Set the border color to match the category color
-            //   borderWidth: 30, // Set the border width
-            //   borderType: "solid", // Set the border type
-            //   color: "blue", // Set the node color
-            // },
           })),
           edges: networkData.edges.map((edge: RawEdge) => ({
             source: edge.source,
@@ -229,9 +224,16 @@ const Page: React.FC = () => {
 
           tooltip: {
             formatter: (params: any) => {
-              // console.log("Params:", params);
+              // Show the image in full size when hovering over a node
               if ("name" in params.data) {
-                return;
+                const imageUrl =
+                  "images/" + params.data.real_id + "_cover.webp"; // Use the correct image source
+                console.log(params);
+                console.log("ICI", imageUrl);
+                return `<div style="text-align: center;">
+                    <img src="${imageUrl}" style="width: 360px; height: 256px;" />
+                    <br><b>${params.data.name}</b>
+                  </div>`;
               } else {
                 return (
                   "Common runners between\n" +
@@ -257,8 +259,6 @@ const Page: React.FC = () => {
       ],
     };
 
-    // console.log("Prepared nodes:", networkData.nodes);
-    // console.log("Prepared edges:", networkData.edges);
     // Update the chart option state
     setOption(newOption);
   };
