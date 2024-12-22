@@ -38,7 +38,7 @@ const Page: React.FC = () => {
       },
     },
     grid: {
-      left: 250,
+      left: 0,
     },
     xAxis: {
       type: "value",
@@ -50,26 +50,27 @@ const Page: React.FC = () => {
     yAxis: {
       type: "category",
       inverse: true,
+      show: false,
     },
-    visualMap: {
-      orient: "horizontal",
-      left: "center",
-      text: ["submissions (%) in 2023"],
-      textStyle: {
-        //fontSize: 50,
-        color: "#fff",
-        //align: "center",
-        //verticalAlign: "middle",
-        //overflow: "break",
-      },
+    // visualMap: {
+    //   orient: "horizontal",
+    //   left: "center",
+    //   text: ["submissions (%) in 2023"],
+    //   textStyle: {
+    //     //fontSize: 50,
+    //     color: "#fff",
+    //     //align: "center",
+    //     //verticalAlign: "middle",
+    //     //overflow: "break",
+    //   },
 
-      dimension: "percent_2023",
-      inRange: {
-        color: ["#65B581", "#FFCE34", "#FD665F"],
-      },
-      min: 0,
-      max: 100,
-    },
+    //   dimension: "percent_2023",
+    //   inRange: {
+    //     color: ["#65B581", "#FFCE34", "#FD665F"],
+    //   },
+    //   min: 0,
+    //   max: 100,
+    // },
     animationDurationUpdate: 500,
     dataset: {
       dimensions: [
@@ -118,10 +119,45 @@ const Page: React.FC = () => {
           show: true,
           position: "inside",
           formatter: "{b}",
+          color: "#fff", // Bright text for contrast
+          textShadowBlur: 3,
+          textShadowColor: "#000",
+        },
+        itemStyle: {
+          borderRadius: [5, 5, 5, 5], // Rounded corners for a smooth look
+          borderWidth: 2,
+          borderColor: "#333", // Adds a distinct outline
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 1,
+            y2: 0,
+            colorStops: [
+              { offset: 0, color: "#ff5733" }, // Start color
+              { offset: 0.5, color: "#33c5ff" }, // Middle color
+              { offset: 1, color: "#ff33d4" }, // End color
+            ],
+          },
+          shadowBlur: 10,
+          shadowColor: "rgba(0,0,0,0.5)",
         },
         emphasis: {
-          disabled: false,
           focus: "self",
+          itemStyle: {
+            shadowBlur: 20,
+            shadowColor: "#fff", // Highlight with a bright glow
+            color: {
+              type: "radial",
+              x: 0.5,
+              y: 0.5,
+              r: 1,
+              colorStops: [
+                { offset: 0, color: "#ffcc33" },
+                { offset: 1, color: "#ff5733" },
+              ],
+            },
+          },
         },
       },
     ],
@@ -152,7 +188,7 @@ const Page: React.FC = () => {
         },
       },
       grid: {
-        left: 250,
+        left: 200,
       },
       xAxis: {
         type: "value",
@@ -243,7 +279,7 @@ const Page: React.FC = () => {
         },
       },
       grid: {
-        left: 250,
+        left: 200,
       },
       xAxis: {
         type: "value",
@@ -396,7 +432,7 @@ const Page: React.FC = () => {
           },
         },
         grid: {
-          left: 250,
+          left: 200,
         },
         yAxis: {
           type: "time",
@@ -566,7 +602,7 @@ const Page: React.FC = () => {
     <ReactECharts
       ref={chartRef}
       option={option_1}
-      style={{ height: "1000px", width: "100%" }}
+      style={{ height: "800px", width: "100%" }}
       opts={{ renderer: "canvas" }}
       theme="light"
       onEvents={onEvents}
