@@ -239,13 +239,13 @@ const Page: React.FC = () => {
             valueAnimation: true,
             fontFamily: "monospace",
           },
+          animationDurationUpdate: updateFrequency,
+          animationDuration: 300,
+          animationEasingUpdate: "linear",
+          animationEasing: "linear",
+          universalTransition: true,
         },
       ],
-      animationDuration: 300,
-      animationDurationUpdate: updateFrequency,
-      animationEasing: "linear",
-      animationEasingUpdate: "linear",
-      universalTransition: true,
 
       // Updated graphic elements with the new "Restart Bar Race" button
       graphic: {
