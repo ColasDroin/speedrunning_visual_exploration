@@ -154,7 +154,6 @@ const Page: React.FC = () => {
               const chartInstance = chartRef.current?.getEchartsInstance();
               // Get mapOption and log it
               const mapOptionCurrent = chartInstance.getOption();
-              console.log("mapOptionCurrent", mapOptionCurrent);
               if (chartInstance) {
                 const barOptionWithTransition = {
                   ...barOption,
@@ -166,7 +165,6 @@ const Page: React.FC = () => {
                     ...s,
                   })),
                 };
-                console.log("ICI", barOptionWithTransition);
                 chartInstance.setOption(barOptionWithTransition, {
                   notMerge: true,
                 });
