@@ -152,19 +152,22 @@ const Page: React.FC = () => {
 
               // Restart the bar race with proper animations
               const chartInstance = chartRef.current?.getEchartsInstance();
+              // Get mapOption and log it
+              const mapOptionCurrent = chartInstance.getOption();
+              console.log("mapOptionCurrent", mapOptionCurrent);
               if (chartInstance) {
-                // const barOptionWithTransition = {
-                //   ...barOption,
-                //   series: barOption.series.map((s) => ({
-                //     ...s,
-                //     $action: "replace", // Ensures a smooth transition
-                //     animation: true, // Enables animation
-                //   })),
-                //   graphic: {
-                //     elements: barOption.graphic.elements,
-                //   },
-                // };
-                chartInstance.setOption(barOption, {
+                const barOptionWithTransition = {
+                  ...barOption,
+                  dataset: {
+                    source: data.filter((d: string[]) => d[0] === startMonth),
+                    dimensions: ["month", "name", "value", "color"],
+                  },
+                  series: barOption.series.map((s) => ({
+                    ...s,
+                  })),
+                };
+                console.log("ICI", barOptionWithTransition);
+                chartInstance.setOption(barOptionWithTransition, {
                   notMerge: true,
                 });
               }
@@ -208,11 +211,6 @@ const Page: React.FC = () => {
         },
         animationDuration: 300,
         animationDurationUpdate: 300,
-        data: data
-          .filter((d: string[]) => d[0] === startMonth)
-          .map(function (item) {
-            return item[1];
-          }),
       },
       dataset: {
         source: data.filter((d: string[]) => d[0] === startMonth),
@@ -402,7 +400,8 @@ const Page: React.FC = () => {
       },
     };
 
-    setOption(barOption);
+    const clone = Object.assign({}, barOption);
+    setOption(clone);
 
     // Update function for the race
     const updateYear = (year: string) => {
