@@ -3,10 +3,9 @@
 import React, { useRef, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
 import game_counts from "../../public/data/game_counts.json";
-import submission_types from "../../public/data/submission_types.json";
-import distribution_types from "../../public/data/distribution_types.json";
+//import submission_types from "../../public/data/submission_types.json";
+//import distribution_types from "../../public/data/distribution_types.json";
 import pako from "pako";
-import { filter } from "echarts/types/src/export/api/util.js";
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
@@ -164,195 +163,13 @@ const Page: React.FC = () => {
   };
   allOptions[game_counts[0]["identifier"]] = option_1;
 
-  // Add options for submission types
-  submission_types.forEach((data, index) => {
-    const optionId = data[0]["identifier"];
-    const option = {
-      id: optionId,
-      title: {
-        text: "Most speedrunned category of game X",
-      },
-      tooltip: {
-        trigger: "axis",
-        axisPointer: {
-          type: "shadow",
-        },
-        formatter: function (params: unknown) {
-          return [
-            "Category: " + params[0].data["name_category"],
-            "Submissions: " + params[0].data["count"],
-            "% of submissions in 2023: " +
-              parseFloat(params[0].data["percent_2023"]).toFixed(1) +
-              "%",
-          ].join("<br/>");
-        },
-      },
-      grid: {
-        left: 200,
-      },
-      xAxis: {
-        type: "value",
-        name: "Submission count per category",
-        axisLabel: {
-          formatter: "{value}",
-        },
-      },
-      yAxis: {
-        type: "category",
-        inverse: true,
-      },
-      visualMap: {
-        orient: "horizontal",
-        left: "center",
-        text: ["% of all submissions in 2023"],
-        // Map the score column to color
-        dimension: "percent_2023",
-        inRange: {
-          color: ["#65B581", "#FFCE34", "#FD665F"],
-        },
-        min: 0,
-        max: 100,
-      },
-      animationDurationUpdate: 500,
-      dataset: {
-        dimensions: [
-          "name_category",
-          "count",
-          "identifier",
-          "child_identifier",
-          "percent_2023",
-        ],
-        source: data,
-      },
-      series: {
-        type: "bar",
-        encode: {
-          x: "count",
-          y: "name_category",
-          itemGroupId: "identifier",
-          itemChildGroupId: "child_identifier",
-        },
-        universalTransition: {
-          enabled: true,
-          // divideShape: "clone",
-        },
-      },
-      graphic: [
-        {
-          type: "text",
-          left: 50,
-          top: 20,
-          style: {
-            text: "Back",
-            fontSize: 18,
-            fill: "grey",
-          },
-          onclick: function () {
-            goBack();
-          },
-        },
-      ],
-    };
-    allOptions[optionId] = option;
-  });
-
-  distribution_types.forEach((data, index) => {
-    const optionId = data[0]["identifier"];
-    const option = {
-      id: optionId,
-      title: {
-        text: "Distribution of speedrun times for category X of game X",
-      },
-      tooltip: {
-        trigger: "item",
-        axisPointer: {
-          type: "shadow",
-        },
-        formatter: function (params: unknown) {
-          return [
-            "Bin: " + params.data["bin_label"],
-            "Submissions: " + params.data["count_all"],
-            "% of submissions in 2023: " +
-              parseFloat(params.data["percent_2023"]).toFixed(1) +
-              "%",
-          ].join("<br/>");
-        },
-      },
-      grid: {
-        left: 200,
-      },
-      xAxis: {
-        type: "value",
-        name: "Submission count per category",
-        axisLabel: {
-          formatter: "{value}",
-        },
-      },
-      yAxis: {
-        type: "category",
-        // inverse: true,
-      },
-      visualMap: {
-        orient: "horizontal",
-        left: "center",
-        text: ["% of all submissions in 2023"],
-        // Map the score column to color
-        dimension: "percent_2023",
-        inRange: {
-          color: ["#65B581", "#FFCE34", "#FD665F"],
-        },
-        min: 0,
-        max: 100,
-      },
-      animationDurationUpdate: 500,
-      dataset: {
-        dimensions: [
-          "bin",
-          "bin_label",
-          "count_all",
-          "identifier",
-          "child_identifier",
-          "child_identifier_per_bin",
-          "percent_2023",
-        ],
-        source: data,
-      },
-      series: {
-        type: "bar",
-        // id: "test",
-        encode: {
-          x: "count_all",
-          y: "bin_label",
-          itemGroupId: "identifier",
-          itemChildGroupId: "child_identifier_per_bin",
-        },
-        universalTransition: {
-          enabled: true,
-        },
-      },
-      graphic: [
-        {
-          type: "text",
-          left: 50,
-          top: 20,
-          style: {
-            text: "Back",
-            fontSize: 18,
-            fill: "grey",
-          },
-          onclick: () => {
-            goBack();
-          },
-        },
-      ],
-    };
-    allOptions[optionId] = option;
-  });
-
-  // Function to prepare scatter options
+  // Function to prepare all others options
   const prepareOptions = async () => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
     let scatterData: any[] = [];
+    // let game_counts: any[] = [];
+    let submission_types: any[] = [];
+    let distribution_types: any[] = [];
 
     // Fetch and decompress scatter data
     try {
@@ -365,6 +182,226 @@ const Page: React.FC = () => {
     } catch (error) {
       console.error("Error fetching scatter data:", error);
     }
+
+    // try {
+    //   const response = await fetch(`${baseUrl}/data/game_counts.json.gz`);
+    //   const buffer = await response.arrayBuffer();
+    //   const decompressed = pako.inflate(new Uint8Array(buffer), {
+    //     to: "string",
+    //   });
+    //   game_counts = JSON.parse(decompressed);
+    // } catch (error) {
+    //   console.error("Error fetching game counts:", error);
+    // }
+
+    try {
+      const response = await fetch(`${baseUrl}/data/submission_types.json.gz`);
+      const buffer = await response.arrayBuffer();
+      const decompressed = pako.inflate(new Uint8Array(buffer), {
+        to: "string",
+      });
+      submission_types = JSON.parse(decompressed);
+    } catch (error) {
+      console.error("Error fetching submission types:", error);
+    }
+
+    try {
+      const response = await fetch(
+        `${baseUrl}/data/distribution_types.json.gz`
+      );
+      const buffer = await response.arrayBuffer();
+      const decompressed = pako.inflate(new Uint8Array(buffer), {
+        to: "string",
+      });
+      distribution_types = JSON.parse(decompressed);
+    } catch (error) {
+      console.error("Error fetching distribution types:", error);
+    }
+
+    // Add options for submission types
+    submission_types.forEach((data, index) => {
+      const optionId = data[0]["identifier"];
+      const option = {
+        id: optionId,
+        title: {
+          text: "Most speedrunned category of game X",
+        },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow",
+          },
+          formatter: function (params: unknown) {
+            return [
+              "Category: " + params[0].data["name_category"],
+              "Submissions: " + params[0].data["count"],
+              "% of submissions in 2023: " +
+                parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+                "%",
+            ].join("<br/>");
+          },
+        },
+        grid: {
+          left: 200,
+        },
+        xAxis: {
+          type: "value",
+          name: "Submission count per category",
+          axisLabel: {
+            formatter: "{value}",
+          },
+        },
+        yAxis: {
+          type: "category",
+          inverse: true,
+        },
+        visualMap: {
+          orient: "horizontal",
+          left: "center",
+          text: ["% of all submissions in 2023"],
+          // Map the score column to color
+          dimension: "percent_2023",
+          inRange: {
+            color: ["#65B581", "#FFCE34", "#FD665F"],
+          },
+          min: 0,
+          max: 100,
+        },
+        animationDurationUpdate: 500,
+        dataset: {
+          dimensions: [
+            "name_category",
+            "count",
+            "identifier",
+            "child_identifier",
+            "percent_2023",
+          ],
+          source: data,
+        },
+        series: {
+          type: "bar",
+          encode: {
+            x: "count",
+            y: "name_category",
+            itemGroupId: "identifier",
+            itemChildGroupId: "child_identifier",
+          },
+          universalTransition: {
+            enabled: true,
+            // divideShape: "clone",
+          },
+        },
+        graphic: [
+          {
+            type: "text",
+            left: 50,
+            top: 20,
+            style: {
+              text: "Back",
+              fontSize: 18,
+              fill: "grey",
+            },
+            onclick: function () {
+              goBack();
+            },
+          },
+        ],
+      };
+      allOptions[optionId] = option;
+    });
+
+    distribution_types.forEach((data, index) => {
+      const optionId = data[0]["identifier"];
+      const option = {
+        id: optionId,
+        title: {
+          text: "Distribution of speedrun times for category X of game X",
+        },
+        tooltip: {
+          trigger: "item",
+          axisPointer: {
+            type: "shadow",
+          },
+          formatter: function (params: unknown) {
+            return [
+              "Bin: " + params.data["bin_label"],
+              "Submissions: " + params.data["count_all"],
+              "% of submissions in 2023: " +
+                parseFloat(params.data["percent_2023"]).toFixed(1) +
+                "%",
+            ].join("<br/>");
+          },
+        },
+        grid: {
+          left: 200,
+        },
+        xAxis: {
+          type: "value",
+          name: "Submission count per category",
+          axisLabel: {
+            formatter: "{value}",
+          },
+        },
+        yAxis: {
+          type: "category",
+          // inverse: true,
+        },
+        visualMap: {
+          orient: "horizontal",
+          left: "center",
+          text: ["% of all submissions in 2023"],
+          // Map the score column to color
+          dimension: "percent_2023",
+          inRange: {
+            color: ["#65B581", "#FFCE34", "#FD665F"],
+          },
+          min: 0,
+          max: 100,
+        },
+        animationDurationUpdate: 500,
+        dataset: {
+          dimensions: [
+            "bin",
+            "bin_label",
+            "count_all",
+            "identifier",
+            "child_identifier",
+            "child_identifier_per_bin",
+            "percent_2023",
+          ],
+          source: data,
+        },
+        series: {
+          type: "bar",
+          // id: "test",
+          encode: {
+            x: "count_all",
+            y: "bin_label",
+            itemGroupId: "identifier",
+            itemChildGroupId: "child_identifier_per_bin",
+          },
+          universalTransition: {
+            enabled: true,
+          },
+        },
+        graphic: [
+          {
+            type: "text",
+            left: 50,
+            top: 20,
+            style: {
+              text: "Back",
+              fontSize: 18,
+              fill: "grey",
+            },
+            onclick: () => {
+              goBack();
+            },
+          },
+        ],
+      };
+      allOptions[optionId] = option;
+    });
 
     // Add scatter plot options
     for (const data of Object.entries(scatterData)) {
@@ -379,7 +416,7 @@ const Page: React.FC = () => {
           encode: { x: 0, y: 1 },
           universalTransition: { enabled: true },
           // make very long animation
-          animationDuration: 2000,
+          animationDuration: 3000,
           symbol: "none",
           tooltip: { show: false }, // Disable tooltip for line
           z: 1,
