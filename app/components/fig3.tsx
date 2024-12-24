@@ -54,7 +54,7 @@ const Page: React.FC = () => {
   const [completed, setCompleted] = useState(false);
 
   // For expansions/folding
-  const [expandedIndex, setExpandedIndex] = useState<number>(0); // we start expanded on the first
+  const [expandedIndex, setExpandedIndex] = useState<number>(-1); // we start expanded on the first
   const [appeared, setAppeared] = useState<boolean[]>([]);
 
   // For final folding
@@ -328,14 +328,23 @@ const Page: React.FC = () => {
    * 5) Watch revealedCount => animate the side panel
    ****************************************************/
   useEffect(() => {
-    // Mark newly revealed games as "appeared"
+    // Step 1: Add the item to the DOM, but don’t apply `.appeared` yet.
     setAppeared((prev) => {
       const newArr = [...prev];
-      for (let i = 0; i < revealedCount; i++) {
-        newArr[i] = true;
-      }
+      newArr[revealedCount - 1] = false; // Explicitly set as "not appeared"
       return newArr;
     });
+
+    // Step 2: Apply `.appeared` in the next render (or after a short delay)
+    const timer = setTimeout(() => {
+      setAppeared((prev) => {
+        const newArr = [...prev];
+        newArr[revealedCount - 1] = true; // Trigger the transition
+        return newArr;
+      });
+    }, 50); // Adjust timing as needed
+
+    return () => clearTimeout(timer);
   }, [revealedCount]);
 
   /****************************************************
@@ -358,19 +367,23 @@ const Page: React.FC = () => {
   return (
     <div style={{ display: "flex", maxWidth: "1200px", margin: "0 auto" }}>
       {/* LEFT: Chart container */}
+
       <div
         ref={chartContainerRef}
         style={{
           flex: "2",
+          aspectRatio: "1.2 / 1",
           border: "1px solid #444",
-          marginRight: "1rem",
-          height: "1000px",
+          marginLeft: "1rem",
         }}
       >
         <ReactECharts
           ref={chartRef}
           option={option || {}}
-          style={{ width: "100%", height: "100%" }}
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
           opts={{ renderer: "canvas" }}
           theme="dark"
         />
@@ -386,10 +399,9 @@ const Page: React.FC = () => {
           overflow: "visible",
         }}
       >
-        <h3>Featured Games</h3>
         {featuredGames.slice(0, revealedCount).map((g, idx) => {
-          const hasAppeared = appeared[idx] || false;
-          const isExpanded = idx === expandedIndex;
+          const hasAppeared = appeared[idx] || false; // Controls fade-in
+          const isExpanded = idx === expandedIndex; // Controls description expand/fold
 
           return (
             <div
@@ -406,7 +418,6 @@ const Page: React.FC = () => {
                 onMouseMove={onTitleMouseMove}
               >
                 {g.name}
-                {/* show tooltip only if NOT expanded */}
                 {!isExpanded && <div className="tooltip-text">{g.desc}</div>}
               </div>
 
@@ -421,7 +432,7 @@ const Page: React.FC = () => {
 
       {/* OPTIONAL: Portal-based floating tooltip (if you prefer a pointer-follow approach) */}
       <Portal>
-        {hoveringIndex !== null && hoveringIndex !== expandedIndex && (
+        {hoveringIndex !== null && (
           <div
             style={{
               position: "fixed",
