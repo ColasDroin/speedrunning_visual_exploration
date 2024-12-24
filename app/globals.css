@@ -64,35 +64,3 @@ html {
   opacity: 1;
   max-height: 150px; /* adjust as needed */
 }
-
-/* tooltip container */
-.category-tooltip {
-  position: relative; /* key to stacking */
-  display: inline-block;
-  cursor: pointer;
-}
-
-.category-tooltip .tooltip-text {
-  visibility: hidden;
-  /* Use a fully opaque color instead of a semi-transparent one */
-  background-color: #000;
-  /* Or #333, #444, etc., just ensure opacity is 1 */
-  color: #fff;
-  text-align: left;
-  padding: 8px;
-  border-radius: 4px;
-
-  position: absolute;
-  z-index: 99999; /* ensures it's on top */
-  top: 120%;
-  left: 0;
-
-  /* Fade in/out transitions */
-  opacity: 0;
-  transition: opacity 0.3s, visibility 0.3s;
-}
-
-.category-tooltip:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}

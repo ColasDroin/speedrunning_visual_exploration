@@ -5,9 +5,11 @@ import React, {
   useState,
   useCallback,
   useLayoutEffect,
+  MouseEvent,
 } from "react";
 import ReactECharts from "echarts-for-react";
 import pako from "pako";
+import Portal from "./Portal";
 
 interface RawNode {
   real_id: string;
@@ -84,9 +86,7 @@ const categoryDescriptions = [
 const CENTER_TOLERANCE = 50;
 const DEBOUNCE_INTERVAL = 1500;
 const STARTING_CATEGORIES = 1;
-
-// For the final wait before folding the last category:
-const FINAL_GRACE_PERIOD = 1500; // ms (1.5 seconds)
+const FINAL_GRACE_PERIOD = 1500; // ms (1.5 seconds) for the last fold
 
 const predefinedColors = [
   "#FF5733",
@@ -101,7 +101,7 @@ const predefinedColors = [
   "#7FFF33",
 ];
 
-const Page: React.FC = () => {
+const Fig2WithPortal: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -124,20 +124,27 @@ const Page: React.FC = () => {
   // Track if we've folded the last category
   const [hasFoldedLast, setHasFoldedLast] = useState(false);
 
-  // NEW: When the last category is revealed, store the time:
+  // If we revealed final category, store time
   const [timeLastCategoryReveal, setTimeLastCategoryReveal] = useState<
     number | null
   >(null);
 
+  // For Portal tooltip:
+  const [hoveringIndex, setHoveringIndex] = useState<number | null>(null);
+  const [hoverCoords, setHoverCoords] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+
   const lastRevealRef = useRef<number>(0);
 
   /****************************************************
-   * Wheel handler
+   * handleWheel
    ****************************************************/
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       if (!allNetworkData || !chartContainerRef.current) return;
-      if (completed) return; // No more logic if fully done
+      if (completed) return; // done
 
       const { categories } = allNetworkData;
       const totalCategories = categories.length;
@@ -147,6 +154,7 @@ const Page: React.FC = () => {
       const viewportCenter = window.innerHeight / 2;
       const distance = Math.abs(chartCenter - viewportCenter);
 
+      // If not locked yet
       if (!scrollLocked) {
         if (distance < CENTER_TOLERANCE) {
           setScrollLocked(true);
@@ -163,30 +171,26 @@ const Page: React.FC = () => {
 
         // If we've revealed all categories
         if (revealedCategories >= totalCategories) {
-          // Wait for the grace period before folding
-          // (only if we haven't folded last yet)
           if (!hasFoldedLast) {
             const now = Date.now();
 
-            // If we haven't recorded the reveal time, do so:
+            // record reveal time if missing
             if (!timeLastCategoryReveal) {
               setTimeLastCategoryReveal(now);
-              // do nothing else, let user see it
               return;
             }
 
-            // Check how long it's been since last category was revealed
+            // wait for grace period
             if (now - timeLastCategoryReveal < FINAL_GRACE_PERIOD) {
-              // Less than grace period => do nothing
               return;
             }
 
-            // If enough time has passed, fold the last category
+            // fold last category
             setHasFoldedLast(true);
             setExpandedIndex(-1);
             return;
           } else {
-            // We already folded last => now finalize
+            // finalize
             setCompleted(true);
             setScrollLocked(false);
             document.body.style.overflow = "auto";
@@ -194,13 +198,13 @@ const Page: React.FC = () => {
           }
         }
 
-        // Otherwise, normal reveal logic (with debounce)
+        // Otherwise normal reveal
         const now = Date.now();
         if (now - lastRevealRef.current >= DEBOUNCE_INTERVAL) {
           lastRevealRef.current = now;
           setRevealedCategories((prev) => {
             const newVal = prev + 1;
-            setExpandedIndex(newVal - 1); // expand newly revealed
+            setExpandedIndex(newVal - 1);
             return newVal;
           });
         }
@@ -217,7 +221,7 @@ const Page: React.FC = () => {
   );
 
   /****************************************************
-   * Attach "wheel" listener
+   * useLayoutEffect: attach wheel
    ****************************************************/
   useLayoutEffect(() => {
     window.addEventListener("wheel", handleWheel, { passive: false });
@@ -227,7 +231,7 @@ const Page: React.FC = () => {
   }, [handleWheel]);
 
   /****************************************************
-   * Fetch Data
+   * Fetch data
    ****************************************************/
   const prepareData = useCallback(async () => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
@@ -249,7 +253,7 @@ const Page: React.FC = () => {
   }, [prepareData]);
 
   /****************************************************
-   * Create images with circular border
+   * createImageWithCircleBorder
    ****************************************************/
   const createImageWithCircleBorder = useCallback(
     (size: number, borderColor: string, imageName: string) => {
@@ -314,14 +318,14 @@ const Page: React.FC = () => {
   );
 
   /****************************************************
-   * Build Option for Partial Reveal
+   * Build ECharts option for partial reveal
    ****************************************************/
   const getPartialOption = useCallback(
     async (networkData: NetworkData, categoriesCount: number) => {
       const total = networkData.categories.length;
       const usedCount = Math.min(categoriesCount, total);
 
-      // Use only the first `usedCount` categories
+      // Only the first usedCount categories
       const usedCategories = networkData.categories.slice(0, usedCount);
 
       // Filter nodes
@@ -476,6 +480,7 @@ const Page: React.FC = () => {
     if (!allNetworkData) return;
     const total = allNetworkData.categories.length;
 
+    // Update the chart to show up to `revealedCategories`
     getPartialOption(allNetworkData, revealedCategories);
 
     // Mark revealed categories as appeared
@@ -487,13 +492,22 @@ const Page: React.FC = () => {
       return newState;
     });
 
-    // If we've just revealed the final category, record the time:
+    // Logic for expanding/folding categories
+    if (revealedCategories === 1) {
+      // Keep the first category expanded
+      setExpandedIndex(0);
+    } else if (revealedCategories === 2) {
+      // Fold the first category and expand the second
+      setExpandedIndex(1);
+    } else if (revealedCategories > 2 && revealedCategories <= total) {
+      // Expand the most recently revealed category
+      setExpandedIndex(revealedCategories - 1);
+    }
+
+    // If we just revealed the final category, record time for folding logic
     if (revealedCategories === total && !timeLastCategoryReveal) {
       setTimeLastCategoryReveal(Date.now());
     }
-
-    // We do NOT finalize until the user sees the final category
-    // plus one additional scroll after the grace period.
   }, [
     revealedCategories,
     allNetworkData,
@@ -502,7 +516,23 @@ const Page: React.FC = () => {
   ]);
 
   /****************************************************
-   * RENDER
+   * Tooltip Mouse Handlers
+   ****************************************************/
+  const onTitleMouseEnter = (e: MouseEvent<HTMLDivElement>, catId: number) => {
+    setHoveringIndex(catId);
+    setHoverCoords({ x: e.clientX + 10, y: e.clientY + 10 });
+  };
+
+  const onTitleMouseLeave = () => {
+    setHoveringIndex(null);
+  };
+
+  const onTitleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    setHoverCoords({ x: e.clientX + 10, y: e.clientY + 10 });
+  };
+
+  /****************************************************
+   * Render
    ****************************************************/
   return (
     <div style={{ display: "flex", maxWidth: "1200px", margin: "0 auto" }}>
@@ -517,8 +547,6 @@ const Page: React.FC = () => {
           overflow: "visible",
         }}
       >
-        <h3>Categories Overview</h3>
-
         {categoryDescriptions.slice(0, revealedCategories).map((desc, idx) => {
           const isExpanded = idx === expandedIndex;
           const hasAppeared = appeared[idx] || false;
@@ -529,16 +557,20 @@ const Page: React.FC = () => {
               className={`category-wrapper ${hasAppeared ? "appeared" : ""}`}
               style={{ marginBottom: "1rem" }}
             >
-              {/* Title + Tooltip (when collapsed) */}
-              <div className="category-tooltip" style={{ fontWeight: "bold" }}>
+              {/* Title: we track hover events for tooltip */}
+              <div
+                style={{ fontWeight: "bold", display: "inline-block" }}
+                onMouseEnter={(e) => onTitleMouseEnter(e, desc.id)}
+                onMouseLeave={onTitleMouseLeave}
+                onMouseMove={onTitleMouseMove}
+              >
                 {desc.title}
-                {/* Show the tooltip if NOT expanded */}
-                {!isExpanded && <div className="tooltip-text">{desc.text}</div>}
               </div>
 
               {/* Folding container */}
               <div
                 className={`category-container ${isExpanded ? "expanded" : ""}`}
+                style={{ marginTop: "0.5rem" }}
               >
                 {isExpanded && <p style={{ margin: 0 }}>{desc.text}</p>}
               </div>
@@ -568,8 +600,31 @@ const Page: React.FC = () => {
           theme="dark"
         />
       </div>
+
+      {/* PORTAL-BASED TOOLTIP */}
+      <Portal>
+        {hoveringIndex !== null && (
+          <div
+            style={{
+              position: "fixed", // or 'absolute' if you prefer
+              top: hoverCoords.y,
+              left: hoverCoords.x,
+              zIndex: 999999, // ensure on top
+              backgroundColor: "#000",
+              color: "#fff",
+              padding: "8px",
+              borderRadius: "4px",
+              pointerEvents: "none",
+              maxWidth: "250px",
+            }}
+          >
+            {/* Show text of whichever category we are hovering */}
+            {categoryDescriptions[hoveringIndex]?.text}
+          </div>
+        )}
+      </Portal>
     </div>
   );
 };
 
-export default Page;
+export default Fig2WithPortal;
