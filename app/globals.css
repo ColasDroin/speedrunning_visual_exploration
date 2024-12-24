@@ -37,41 +37,59 @@ html {
   }
 }
 
+/* category-wrapper: fade/slide in container */
+.category-wrapper {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.category-wrapper.appeared {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* folding container for text */
 .category-container {
   overflow: hidden;
-  transition: max-height 0.5s ease, opacity 0.5s ease;
-  max-height: 0;
+  transform: scaleY(0);
+  transform-origin: top left;
   opacity: 0;
+  max-height: 0;
+  transition: transform 0.4s ease, max-height 0.4s ease, opacity 0.3s ease;
 }
 
 .category-container.expanded {
-  max-height: 100px; /* big enough to fit your text */
+  transform: scaleY(1);
   opacity: 1;
+  max-height: 150px; /* adjust as needed */
 }
 
-/* Simple tooltip styling */
+/* tooltip container */
 .category-tooltip {
-  position: relative;
+  position: relative; /* key to stacking */
   display: inline-block;
   cursor: pointer;
 }
 
 .category-tooltip .tooltip-text {
   visibility: hidden;
-  width: 200px;
-  background-color: #444;
+  /* Use a fully opaque color instead of a semi-transparent one */
+  background-color: #000;
+  /* Or #333, #444, etc., just ensure opacity is 1 */
   color: #fff;
   text-align: left;
   padding: 8px;
   border-radius: 4px;
 
-  /* Positioning */
   position: absolute;
-  z-index: 1;
+  z-index: 99999; /* ensures it's on top */
   top: 120%;
   left: 0;
+
+  /* Fade in/out transitions */
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s, visibility 0.3s;
 }
 
 .category-tooltip:hover .tooltip-text {

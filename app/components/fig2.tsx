@@ -17,7 +17,7 @@ interface RawNode {
   y: number;
   size: number;
   community: number;
-  category: number; // 0-based
+  category: number;
 }
 
 interface RawEdge {
@@ -28,7 +28,7 @@ interface RawEdge {
 }
 
 interface Category {
-  id: number; // 0-based
+  id: number;
   name: string;
 }
 
@@ -85,6 +85,9 @@ const CENTER_TOLERANCE = 50;
 const DEBOUNCE_INTERVAL = 1500;
 const STARTING_CATEGORIES = 1;
 
+// For the final wait before folding the last category:
+const FINAL_GRACE_PERIOD = 1500; // ms (1.5 seconds)
+
 const predefinedColors = [
   "#FF5733",
   "#33FF57",
@@ -112,8 +115,19 @@ const Page: React.FC = () => {
   const [scrollLocked, setScrollLocked] = useState(false);
   const [completed, setCompleted] = useState(false);
 
-  // NEW: Track which category is currently expanded
+  // Which category is currently expanded
   const [expandedIndex, setExpandedIndex] = useState<number>(-1);
+
+  // Fade-in for each category on appear
+  const [appeared, setAppeared] = useState<boolean[]>([]);
+
+  // Track if we've folded the last category
+  const [hasFoldedLast, setHasFoldedLast] = useState(false);
+
+  // NEW: When the last category is revealed, store the time:
+  const [timeLastCategoryReveal, setTimeLastCategoryReveal] = useState<
+    number | null
+  >(null);
 
   const lastRevealRef = useRef<number>(0);
 
@@ -122,8 +136,8 @@ const Page: React.FC = () => {
    ****************************************************/
   const handleWheel = useCallback(
     (e: WheelEvent) => {
-      if (completed) return;
       if (!allNetworkData || !chartContainerRef.current) return;
+      if (completed) return; // No more logic if fully done
 
       const { categories } = allNetworkData;
       const totalCategories = categories.length;
@@ -147,27 +161,59 @@ const Page: React.FC = () => {
         e.preventDefault();
         e.stopPropagation();
 
+        // If we've revealed all categories
         if (revealedCategories >= totalCategories) {
-          setCompleted(true);
-          setScrollLocked(false);
-          document.body.style.overflow = "auto";
-          return;
+          // Wait for the grace period before folding
+          // (only if we haven't folded last yet)
+          if (!hasFoldedLast) {
+            const now = Date.now();
+
+            // If we haven't recorded the reveal time, do so:
+            if (!timeLastCategoryReveal) {
+              setTimeLastCategoryReveal(now);
+              // do nothing else, let user see it
+              return;
+            }
+
+            // Check how long it's been since last category was revealed
+            if (now - timeLastCategoryReveal < FINAL_GRACE_PERIOD) {
+              // Less than grace period => do nothing
+              return;
+            }
+
+            // If enough time has passed, fold the last category
+            setHasFoldedLast(true);
+            setExpandedIndex(-1);
+            return;
+          } else {
+            // We already folded last => now finalize
+            setCompleted(true);
+            setScrollLocked(false);
+            document.body.style.overflow = "auto";
+            return;
+          }
         }
 
+        // Otherwise, normal reveal logic (with debounce)
         const now = Date.now();
         if (now - lastRevealRef.current >= DEBOUNCE_INTERVAL) {
           lastRevealRef.current = now;
-          // Reveal one more category
           setRevealedCategories((prev) => {
             const newVal = prev + 1;
-            // Expand the newly revealed category
-            setExpandedIndex(newVal - 1);
+            setExpandedIndex(newVal - 1); // expand newly revealed
             return newVal;
           });
         }
       }
     },
-    [scrollLocked, revealedCategories, allNetworkData, completed]
+    [
+      scrollLocked,
+      revealedCategories,
+      completed,
+      hasFoldedLast,
+      timeLastCategoryReveal,
+      allNetworkData,
+    ]
   );
 
   /****************************************************
@@ -275,7 +321,7 @@ const Page: React.FC = () => {
       const total = networkData.categories.length;
       const usedCount = Math.min(categoriesCount, total);
 
-      // Only first `usedCount` categories
+      // Use only the first `usedCount` categories
       const usedCategories = networkData.categories.slice(0, usedCount);
 
       // Filter nodes
@@ -430,16 +476,30 @@ const Page: React.FC = () => {
     if (!allNetworkData) return;
     const total = allNetworkData.categories.length;
 
-    // Rebuild with the new revealedCategories
     getPartialOption(allNetworkData, revealedCategories);
 
-    // If everything is revealed => unlock
-    if (revealedCategories >= total) {
-      setCompleted(true);
-      setScrollLocked(false);
-      document.body.style.overflow = "auto";
+    // Mark revealed categories as appeared
+    setAppeared((prev) => {
+      const newState = [...prev];
+      for (let i = 0; i < revealedCategories; i++) {
+        newState[i] = true;
+      }
+      return newState;
+    });
+
+    // If we've just revealed the final category, record the time:
+    if (revealedCategories === total && !timeLastCategoryReveal) {
+      setTimeLastCategoryReveal(Date.now());
     }
-  }, [revealedCategories, allNetworkData, getPartialOption]);
+
+    // We do NOT finalize until the user sees the final category
+    // plus one additional scroll after the grace period.
+  }, [
+    revealedCategories,
+    allNetworkData,
+    getPartialOption,
+    timeLastCategoryReveal,
+  ]);
 
   /****************************************************
    * RENDER
@@ -452,31 +512,34 @@ const Page: React.FC = () => {
           flex: "1",
           padding: "1rem",
           borderRight: "1px solid #444",
+          position: "relative",
+          zIndex: 9999,
+          overflow: "visible",
         }}
       >
         <h3>Categories Overview</h3>
 
         {categoryDescriptions.slice(0, revealedCategories).map((desc, idx) => {
           const isExpanded = idx === expandedIndex;
+          const hasAppeared = appeared[idx] || false;
+
           return (
-            <div key={desc.id} style={{ marginBottom: "1rem" }}>
+            <div
+              key={desc.id}
+              className={`category-wrapper ${hasAppeared ? "appeared" : ""}`}
+              style={{ marginBottom: "1rem" }}
+            >
               {/* Title + Tooltip (when collapsed) */}
               <div className="category-tooltip" style={{ fontWeight: "bold" }}>
                 {desc.title}
-                {/* Only show the tooltip if this category is NOT expanded */}
+                {/* Show the tooltip if NOT expanded */}
                 {!isExpanded && <div className="tooltip-text">{desc.text}</div>}
               </div>
 
-              {/* Expandable text container */}
+              {/* Folding container */}
               <div
                 className={`category-container ${isExpanded ? "expanded" : ""}`}
-                style={
-                  {
-                    // Extra inline style if needed
-                  }
-                }
               >
-                {/* Show text only if expanded */}
                 {isExpanded && <p style={{ margin: 0 }}>{desc.text}</p>}
               </div>
             </div>
