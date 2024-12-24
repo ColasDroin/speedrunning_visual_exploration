@@ -13,8 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased`}>{children}</body>
-      <div id="portal-root"></div>
+      <body className={`antialiased`}>
+        {children} {<div id="portal-root"></div>}
+      </body>
     </html>
   );
 }

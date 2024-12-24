@@ -64,3 +64,55 @@ html {
   opacity: 1;
   max-height: 150px; /* adjust as needed */
 }
+
+/* game-wrapper: fade/slide in container */
+.game-wrapper {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.game-wrapper.appeared {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* folding container for text */
+.game-container {
+  overflow: hidden;
+  transform: scaleY(0);
+  transform-origin: top left;
+  opacity: 0;
+  max-height: 0;
+  transition: transform 0.4s ease, max-height 0.4s ease, opacity 0.3s ease;
+}
+.game-container.expanded {
+  transform: scaleY(1);
+  opacity: 1;
+  max-height: 150px; /* adjust as needed */
+}
+
+/* tooltip container */
+/* .game-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+} */
+
+/* tooltip text */
+.tooltip-text {
+  visibility: hidden;
+  background-color: #000; /* fully opaque for readability */
+  color: #fff;
+  text-align: left;
+  padding: 8px;
+  border-radius: 4px;
+
+  position: absolute;
+  z-index: 99999;
+  top: 120%;
+  left: 0;
+
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+}
