@@ -38,76 +38,103 @@ interface NetworkData {
   categories: Category[];
 }
 
-// Adjust as needed:
-const CENTER_TOLERANCE = 50; // how close centers must be to lock
-const DEBOUNCE_INTERVAL = 1500; // ms wait before revealing next category
-const STARTING_CATEGORIES = 1; // categories visible at start
+const categoryDescriptions = [
+  {
+    id: 0,
+    title: "Indie and Challenging",
+    text: "Tough indie titles that push your skills to the limit.",
+  },
+  {
+    id: 1,
+    title: "Casual and Mobile",
+    text: "Quick, accessible games perfect for on-the-go or laid-back runs.",
+  },
+  {
+    id: 2,
+    title: "Classic and Retro",
+    text: "Timeless hits from older consoles that still captivate speedrunners.",
+  },
+  {
+    id: 3,
+    title: "3D Platformers and Open World",
+    text: "Sprawling adventures demanding dexterity and route planning.",
+  },
+  {
+    id: 4,
+    title: "Action",
+    text: "Fast-paced titles emphasizing combat and split-second reflexes.",
+  },
+  {
+    id: 5,
+    title: "Minecraft Versions",
+    text: "Different Minecraft editions, each with unique quirks and speedrun tactics.",
+  },
+  {
+    id: 6,
+    title: "Racing and Sports",
+    text: "High-speed competitive games driven by precision and practice.",
+  },
+  {
+    id: 7,
+    title: "Classic 3D Platformers",
+    text: "Beloved 3D icons requiring tight movement and nostalgic prowess.",
+  },
+];
 
-// Colors for categories
+const CENTER_TOLERANCE = 50;
+const DEBOUNCE_INTERVAL = 1500;
+const STARTING_CATEGORIES = 1;
+
 const predefinedColors = [
-  "#FF5733", // Red
-  "#33FF57", // Green
-  "#3357FF", // Blue
-  "#FF33A6", // Pink
-  "#FFFF33", // Yellow
-  "#33FFF7", // Cyan
-  "#FF9333", // Orange
-  "#9B33FF", // Purple
-  "#FF5733", // Red (again)
-  "#7FFF33", // Lime
+  "#FF5733",
+  "#33FF57",
+  "#3357FF",
+  "#FF33A6",
+  "#FFFF33",
+  "#33FFF7",
+  "#FF9333",
+  "#9B33FF",
+  "#FF5733",
+  "#7FFF33",
 ];
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Store the entire network data once fetched
   const [allNetworkData, setAllNetworkData] = useState<NetworkData | null>(
     null
   );
-
-  // Current ECharts option for the partial reveal
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
 
-  // How many categories have been revealed
   const [revealedCategories, setRevealedCategories] =
     useState(STARTING_CATEGORIES);
-
-  // Whether the scroll is currently locked
   const [scrollLocked, setScrollLocked] = useState(false);
-
-  // Has the user revealed all categories? If so, never lock again
   const [completed, setCompleted] = useState(false);
 
-  // Track the timestamp of the last time we revealed a category (debounce)
+  // NEW: Track which category is currently expanded
+  const [expandedIndex, setExpandedIndex] = useState<number>(-1);
+
   const lastRevealRef = useRef<number>(0);
 
   /****************************************************
-   * 1) Wheel Handler
+   * Wheel handler
    ****************************************************/
   const handleWheel = useCallback(
     (e: WheelEvent) => {
-      // If we've completed all categories, do nothing => no more locking
-      if (completed) {
-        return;
-      }
-
-      // If we have no data or container, do nothing
+      if (completed) return;
       if (!allNetworkData || !chartContainerRef.current) return;
 
       const { categories } = allNetworkData;
       const totalCategories = categories.length;
 
-      // Get chart center vs viewport center
       const rect = chartContainerRef.current.getBoundingClientRect();
       const chartCenter = rect.top + rect.height / 2;
       const viewportCenter = window.innerHeight / 2;
       const distance = Math.abs(chartCenter - viewportCenter);
 
-      // If not locked yet, check if the chart center is near the viewport center
       if (!scrollLocked) {
         if (distance < CENTER_TOLERANCE) {
-          // Lock scrolling
           setScrollLocked(true);
           document.body.style.overflow = "hidden";
           e.preventDefault();
@@ -116,12 +143,10 @@ const Page: React.FC = () => {
         }
       }
 
-      // If locked, prevent default scrolling
       if (scrollLocked) {
         e.preventDefault();
         e.stopPropagation();
 
-        // If we've already revealed everything, mark completed, unlock, and stop
         if (revealedCategories >= totalCategories) {
           setCompleted(true);
           setScrollLocked(false);
@@ -129,12 +154,16 @@ const Page: React.FC = () => {
           return;
         }
 
-        // Otherwise, check the debounce timer
         const now = Date.now();
         if (now - lastRevealRef.current >= DEBOUNCE_INTERVAL) {
           lastRevealRef.current = now;
-          // Reveal exactly ONE more category
-          setRevealedCategories((prev) => prev + 1);
+          // Reveal one more category
+          setRevealedCategories((prev) => {
+            const newVal = prev + 1;
+            // Expand the newly revealed category
+            setExpandedIndex(newVal - 1);
+            return newVal;
+          });
         }
       }
     },
@@ -142,7 +171,7 @@ const Page: React.FC = () => {
   );
 
   /****************************************************
-   * 2) Attach "wheel" listener
+   * Attach "wheel" listener
    ****************************************************/
   useLayoutEffect(() => {
     window.addEventListener("wheel", handleWheel, { passive: false });
@@ -152,7 +181,7 @@ const Page: React.FC = () => {
   }, [handleWheel]);
 
   /****************************************************
-   * 3) Fetch Data
+   * Fetch Data
    ****************************************************/
   const prepareData = useCallback(async () => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
@@ -174,7 +203,7 @@ const Page: React.FC = () => {
   }, [prepareData]);
 
   /****************************************************
-   * 4) Create images with circular border
+   * Create images with circular border
    ****************************************************/
   const createImageWithCircleBorder = useCallback(
     (size: number, borderColor: string, imageName: string) => {
@@ -188,7 +217,6 @@ const Page: React.FC = () => {
 
         const image = new Image();
         image.onload = () => {
-          // Set canvas size to be large enough for circle + border
           canvas.width = size + 10;
           canvas.height = size + 10;
 
@@ -240,14 +268,14 @@ const Page: React.FC = () => {
   );
 
   /****************************************************
-   * 5) Build Option for Partial Reveal
+   * Build Option for Partial Reveal
    ****************************************************/
   const getPartialOption = useCallback(
     async (networkData: NetworkData, categoriesCount: number) => {
       const total = networkData.categories.length;
       const usedCount = Math.min(categoriesCount, total);
 
-      // Only use the first `usedCount` categories
+      // Only first `usedCount` categories
       const usedCategories = networkData.categories.slice(0, usedCount);
 
       // Filter nodes
@@ -255,7 +283,7 @@ const Page: React.FC = () => {
         (node) => node.category < usedCount
       );
 
-      // Create custom images for the filtered nodes
+      // Create custom images
       const customImages = await Promise.all(
         filteredNodes.map(async (node) => {
           const colorIndex = node.category % predefinedColors.length;
@@ -276,7 +304,6 @@ const Page: React.FC = () => {
         (edge) => validNodeIds.has(edge.source) && validNodeIds.has(edge.target)
       );
 
-      // Build chart option
       const newOption: echarts.EChartsOption = {
         title: {
           text: "Game communities",
@@ -397,18 +424,16 @@ const Page: React.FC = () => {
   );
 
   /****************************************************
-   * 6) Watch revealedCategories
-   *    -> Build or update the partial chart
-   *    -> If final category is revealed, mark completed
+   * Watch revealedCategories
    ****************************************************/
   useEffect(() => {
     if (!allNetworkData) return;
     const total = allNetworkData.categories.length;
 
-    // Rebuild with the latest number of revealed categories
+    // Rebuild with the new revealedCategories
     getPartialOption(allNetworkData, revealedCategories);
 
-    // If everything is revealed => mark completed + unlock (once)
+    // If everything is revealed => unlock
     if (revealedCategories >= total) {
       setCompleted(true);
       setScrollLocked(false);
@@ -416,27 +441,70 @@ const Page: React.FC = () => {
     }
   }, [revealedCategories, allNetworkData, getPartialOption]);
 
+  /****************************************************
+   * RENDER
+   ****************************************************/
   return (
-    <div
-      ref={chartContainerRef}
-      style={{
-        width: "min(100vh, 1000px)",
-        maxWidth: "100%",
-        aspectRatio: "1.2 / 1",
-        margin: "0 auto",
-        border: "1px solid #444",
-      }}
-    >
-      <ReactECharts
-        ref={chartRef}
-        option={option || {}}
+    <div style={{ display: "flex", maxWidth: "1200px", margin: "0 auto" }}>
+      {/* Side panel */}
+      <div
         style={{
-          width: "100%",
-          height: "100%",
+          flex: "1",
+          padding: "1rem",
+          borderRight: "1px solid #444",
         }}
-        opts={{ renderer: "canvas" }}
-        theme="dark"
-      />
+      >
+        <h3>Categories Overview</h3>
+
+        {categoryDescriptions.slice(0, revealedCategories).map((desc, idx) => {
+          const isExpanded = idx === expandedIndex;
+          return (
+            <div key={desc.id} style={{ marginBottom: "1rem" }}>
+              {/* Title + Tooltip (when collapsed) */}
+              <div className="category-tooltip" style={{ fontWeight: "bold" }}>
+                {desc.title}
+                {/* Only show the tooltip if this category is NOT expanded */}
+                {!isExpanded && <div className="tooltip-text">{desc.text}</div>}
+              </div>
+
+              {/* Expandable text container */}
+              <div
+                className={`category-container ${isExpanded ? "expanded" : ""}`}
+                style={
+                  {
+                    // Extra inline style if needed
+                  }
+                }
+              >
+                {/* Show text only if expanded */}
+                {isExpanded && <p style={{ margin: 0 }}>{desc.text}</p>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Chart container */}
+      <div
+        ref={chartContainerRef}
+        style={{
+          flex: "2",
+          aspectRatio: "1.2 / 1",
+          border: "1px solid #444",
+          marginLeft: "1rem",
+        }}
+      >
+        <ReactECharts
+          ref={chartRef}
+          option={option || {}}
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+          opts={{ renderer: "canvas" }}
+          theme="dark"
+        />
+      </div>
     </div>
   );
 };

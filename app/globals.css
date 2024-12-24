@@ -36,3 +36,45 @@ html {
     @apply text-2xl;
   }
 }
+
+.category-container {
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+  max-height: 0;
+  opacity: 0;
+}
+
+.category-container.expanded {
+  max-height: 100px; /* big enough to fit your text */
+  opacity: 1;
+}
+
+/* Simple tooltip styling */
+.category-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.category-tooltip .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #444;
+  color: #fff;
+  text-align: left;
+  padding: 8px;
+  border-radius: 4px;
+
+  /* Positioning */
+  position: absolute;
+  z-index: 1;
+  top: 120%;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.category-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
