@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true, // Disable default image optimization
   },
-  assetPrefix: "/speedrunning_visual_exploration/",
-  basePath: "/speedrunning_visual_exploration",
+  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH_ASSETS || "",
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
   output: "export",
   typescript: {
     ignoreBuildErrors: true,
