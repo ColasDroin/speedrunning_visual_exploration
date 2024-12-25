@@ -1,3 +1,10 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTwitter,
+  faMastodon,
+  faFacebook,
+  faLinkedin,
+} from "@fortawesome/free-brands-svg-icons";
 import Banner from "./components/banner";
 import Fig0 from "./components/fig0";
 import Fig1 from "./components/fig1";
@@ -5,7 +12,6 @@ import Fig2 from "./components/fig2";
 import Fig3 from "./components/fig3";
 import Fig4 from "./components/fig4";
 import styles from "./styles/banner.module.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Home() {
   return (
@@ -121,6 +127,73 @@ export default function Home() {
             data-text="ABOUT THIS WORK"
           >
             ABOUT THIS WORK
+          </div>
+          <div className="mt-15 bg-gray-100 border border-gray-300 rounded-lg p-5 flex">
+            <div className="flex-shrink-0 mr-5">
+              <img
+                src="images/my_photo.jpg"
+                alt="Picture of Colas"
+                className="w-36 h-36 rounded-full border border-gray-300 object-cover"
+              />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Hi there, I'm Colas!</h2>
+              <p className="mt-2 text-gray-700">
+                I'm currently transitioning from academia in the hope of living
+                from my data visualization work. This is my first project, and
+                I'm thrilled to share it with you! Your support means the world
+                to me, whether it's by buying me a coffee, sharing my work on
+                social media, or simply spreading the word.
+              </p>
+              <div className="mt-4">
+                <a
+                  href="https://buymeacoffee.com/colasdroin"
+                  target="_blank"
+                  className="bg-yellow-400 text-black py-2 px-4 rounded-md font-semibold"
+                >
+                  Buy Me a Coffee
+                </a>
+              </div>
+              <div className="flex space-x-3 mt-4">
+                <a
+                  href="https://twitter.com/intent/tweet?text=Check+out+Colas%27+amazing+data+viz+work!&url=https://colasdroin.github.io/speedrunning_visual_exploration/"
+                  target="_blank"
+                  className="text-gray-700 hover:text-gray-900"
+                >
+                  <FontAwesomeIcon icon={faTwitter} size="lg" />
+                </a>
+                <a
+                  href="https://mastodon.social/share?text=Check+out+Colas%27+amazing+data+viz+work!&url=https://colasdroin.github.io/speedrunning_visual_exploration/"
+                  target="_blank"
+                  className="text-gray-700 hover:text-gray-900"
+                >
+                  <FontAwesomeIcon icon={faMastodon} size="lg" />
+                </a>
+                <a
+                  href="https://www.facebook.com/sharer/sharer.php?u=https://colasdroin.github.io/speedrunning_visual_exploration/"
+                  target="_blank"
+                  className="text-gray-700 hover:text-gray-900"
+                >
+                  <FontAwesomeIcon icon={faFacebook} size="lg" />
+                </a>
+                <a
+                  href="https://www.linkedin.com/shareArticle?mini=true&url=https://colasdroin.github.io/speedrunning_visual_exploration/&title=Check+out+Colas%27+data+visualization+work!"
+                  target="_blank"
+                  className="text-gray-700 hover:text-gray-900"
+                >
+                  <FontAwesomeIcon icon={faLinkedin} size="lg" />
+                </a>
+              </div>
+              <div className="mt-4">
+                <a
+                  href="https://www.linkedin.com/in/colas-droin/"
+                  target="_blank"
+                  className="text-blue-600 font-semibold"
+                >
+                  Connect with me on LinkedIn
+                </a>
+              </div>
+            </div>
           </div>
           COLOR SCRAPPED FROM https://github.com/sshaw/national_colors
         </div>
