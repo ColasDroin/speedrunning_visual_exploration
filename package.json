@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "predeploy": "pnpm run build && touch ./out/.nojekyll",
+    "predeploy": "NODE_ENV=production pnpm run build && touch ./out/.nojekyll",
     "deploy": "gh-pages -d out -t true"
   },
   "dependencies": {
