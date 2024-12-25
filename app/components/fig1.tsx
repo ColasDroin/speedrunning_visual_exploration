@@ -165,7 +165,7 @@ const Page: React.FC = () => {
 
   // Function to prepare all others options
   const prepareOptions = async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+    const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
     let scatterData: any[] = [];
     // let game_counts: any[] = [];
     let submission_types: any[] = [];

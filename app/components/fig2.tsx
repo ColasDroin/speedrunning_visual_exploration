@@ -234,7 +234,7 @@ const Fig2WithPortal: React.FC = () => {
    * Fetch data
    ****************************************************/
   const prepareData = useCallback(async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+    const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
     try {
       const response = await fetch(`${baseUrl}/data/network_data.json.gz`);
       const buffer = await response.arrayBuffer();

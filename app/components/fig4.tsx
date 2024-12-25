@@ -27,7 +27,7 @@ const Page: React.FC = () => {
   const updateFunctionsRef = useRef<Function[]>([]);
 
   const prepareGraph = async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+    const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
     let raceData: any[] = [];
 
     try {

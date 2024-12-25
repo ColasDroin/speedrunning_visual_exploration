@@ -156,7 +156,7 @@ const Page: React.FC = () => {
    * 2) Fetch popularity_data.json.gz
    ****************************************************/
   const prepareGraph = useCallback(async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+    const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
     try {
       const response = await fetch(`${baseUrl}/data/popularity_data.json.gz`);
       const buffer = await response.arrayBuffer();
