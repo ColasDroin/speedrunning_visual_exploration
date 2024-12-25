@@ -5,6 +5,7 @@ import Fig2 from "./components/fig2";
 import Fig3 from "./components/fig3";
 import Fig4 from "./components/fig4";
 import styles from "./styles/banner.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Home() {
   return (

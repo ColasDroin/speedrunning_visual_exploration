@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "../fontawesome";
 
 export const metadata: Metadata = {
   title: "Speedrun",

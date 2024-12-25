@@ -5,13 +5,17 @@
   "homepage": "https://colasdroin.github.io/speedrunning_visual_exploration",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
-    "predeploy": "NODE_ENV=production pnpm run build && touch ./out/.nojekyll",
+    "predeploy": "mv .env.local .env.local.bak || true && pnpm run build && touch ./out/.nojekyll && mv .env.local.bak .env.local || true",
     "deploy": "NODE_ENV=production gh-pages -d out -t true"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@types/lodash": "^4.17.13",
     "echarts": "^5.5.1",
     "echarts-for-react": "^3.0.2",
@@ -25,7 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/react": "^18.3.12",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
