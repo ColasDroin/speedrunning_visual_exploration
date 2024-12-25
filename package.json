@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "predeploy": "pnpm run build && touch ./out/.nojekyll",
-    "deploy": "gh-pages -d out  -t true"
+    "deploy": "gh-pages -d out -t true"
   },
   "dependencies": {
     "@types/lodash": "^4.17.13",
