@@ -371,19 +371,40 @@ const Page: React.FC = () => {
           ],
           source: data,
         },
-        series: {
-          type: "bar",
-          // id: "test",
-          encode: {
-            x: "count_all",
-            y: "bin_label",
-            itemGroupId: "identifier",
-            itemChildGroupId: "child_identifier_per_bin",
+        series: [
+          {
+            type: "bar",
+            // id: "test",
+            encode: {
+              x: "count_all",
+              y: "bin_label",
+              itemGroupId: "identifier",
+              itemChildGroupId: "child_identifier_per_bin",
+            },
+            universalTransition: {
+              enabled: true,
+            },
+            barGap: "0%", // No gap between bars of the same group
+            barCategoryGap: "0%", // No gap between bars in different categories
+            itemStyle: {
+              borderWidth: 0, // Highlight the outer lines
+              borderColor: "#000", // Black outer lines for emphasis
+              color: "#3498db", // Solid fill color for the bars
+            },
+            emphasis: {
+              focus: "series", // Highlight the whole bar on hover
+              itemStyle: {
+                borderColor: "#ff5733", // Highlight outer lines on hover
+                borderWidth: 3, // Make the outer lines thicker on hover
+              },
+            },
+            // label: {
+            //   show: true,
+            //   position: "top", // Place labels on top of bars
+            //   color: "#000", // Label color
+            // },
           },
-          universalTransition: {
-            enabled: true,
-          },
-        },
+        ],
         graphic: [
           {
             type: "text",
