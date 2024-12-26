@@ -7,6 +7,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import Banner from "./components/banner";
 import Fig0 from "./components/fig0";
+import Fig05 from "./components/fig05";
 import Fig1 from "./components/fig1";
 import Fig2 from "./components/fig2";
 import Fig3 from "./components/fig3";
@@ -91,6 +92,9 @@ export default function Home() {
             data-text="THE MOST SPEEDRUNNED GAMES"
           >
             THE MOST SPEEDRUNNED GAMES
+          </div>
+          <div className="mx-auto">
+            <Fig05 />
           </div>
           <div className="mx-auto">
             <Fig1 />
