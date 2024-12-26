@@ -6,6 +6,7 @@ import game_counts from "../../public/data/game_counts.json";
 //import submission_types from "../../public/data/submission_types.json";
 //import distribution_types from "../../public/data/distribution_types.json";
 import pako from "pako";
+import { filter } from "lodash";
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
@@ -346,18 +347,18 @@ const Page: React.FC = () => {
           type: "category",
           // inverse: true,
         },
-        visualMap: {
-          orient: "horizontal",
-          left: "center",
-          text: ["% of all submissions in 2023"],
-          // Map the score column to color
-          dimension: "percent_2023",
-          inRange: {
-            color: ["#65B581", "#FFCE34", "#FD665F"],
-          },
-          min: 0,
-          max: 100,
-        },
+        // visualMap: {
+        //   orient: "horizontal",
+        //   left: "center",
+        //   text: ["% of all submissions in 2023"],
+        //   // Map the score column to color
+        //   dimension: "percent_2023",
+        //   inRange: {
+        //     color: ["#65B581", "#FFCE34", "#FD665F"],
+        //   },
+        //   min: 0,
+        //   max: 100,
+        // },
         animationDurationUpdate: 500,
         dataset: {
           dimensions: [
@@ -432,17 +433,6 @@ const Page: React.FC = () => {
       const l_series = [];
       for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
         l_series.push({
-          type: "line",
-          data: best_line,
-          encode: { x: 0, y: 1 },
-          universalTransition: { enabled: true },
-          // make very long animation
-          animationDuration: 3000,
-          symbol: "none",
-          tooltip: { show: false }, // Disable tooltip for line
-          z: 1,
-        });
-        l_series.push({
           type: "scatter",
           dimensions: ["date", "time", "player", "location"],
           data: l_runs,
@@ -453,6 +443,32 @@ const Page: React.FC = () => {
           z: 2,
         });
       }
+      l_series.push({
+        type: "line",
+        data: best_line,
+        encode: { x: 0, y: 1 },
+        universalTransition: { enabled: true },
+        // make very long animation
+        animationDuration: 3000,
+        symbol: "none",
+        tooltip: { show: false }, // Disable tooltip for line
+        z: 1,
+      });
+
+      const yValues = best_line.map((item) => item[1]); // Extract y-values
+      const xValues = best_line.map((item) => new Date(item[0]).getTime()); // Extract x-values
+      const yMin = Math.min(...yValues);
+      const yMax = Math.max(...yValues);
+      const xMin = Math.min(...xValues);
+      const xMax = Math.max(...xValues);
+
+      const formatTime = (seconds) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+        const ms = Math.floor((seconds % 1) * 1000);
+        return `${h}h ${m}m ${s}s ${ms}ms`;
+      };
 
       allOptions[optionId] = {
         id: optionId,
@@ -460,13 +476,20 @@ const Page: React.FC = () => {
           text: "Speedrun times for category X of game X",
         },
         dataZoom: [
-          // {
-          //   type: "inside",
-          //   yAxisIndex: [0],
-          //   filterMode: "none",
-          //   startValue: Math.min(...l_series[0].data.map((d) => d[0])) * 0.8,
-          //   endValue: Math.max(...l_series[0].data.map((d) => d[0])) * 2,
-          // },
+          {
+            type: "inside",
+            yAxisIndex: [0],
+            filterMode: "filter",
+            startValue: yMin,
+            endValue: yMax,
+          },
+          {
+            type: "inside",
+            xAxisIndex: [0],
+            startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
+            endValue: xMax,
+            filter,
+          },
         ],
         tooltip: {
           trigger: "item",
@@ -474,13 +497,6 @@ const Page: React.FC = () => {
             type: "shadow",
           },
           formatter: function (params: unknown) {
-            const formatTime = (seconds: number) => {
-              const h = Math.floor(seconds / 3600);
-              const m = Math.floor((seconds % 3600) / 60);
-              const s = Math.floor(seconds % 60);
-              const ms = Math.floor((seconds % 1) * 1000);
-              return `${h}h ${m}m ${s}s ${ms}ms`;
-            };
             return [
               "Date: " + params.data[0],
               "Run time: " + formatTime(params.data[1]),
@@ -497,6 +513,13 @@ const Page: React.FC = () => {
           name: "Speedrun time",
           //min: Math.min(...l_series[0].data.map((d) => d[1])) * 0.8,
           // max: Math.max(...l_series[0].data.map((d) => d[1])) * 2,
+          axisLabel: {
+            formatter: function (value) {
+              // Apply the same formatting logic for y-axis labels
+              const timeInSeconds = new Date(value).getTime() / 1000; // Convert timestamp to seconds
+              return formatTime(timeInSeconds);
+            },
+          },
         },
         xAxis: {
           type: "time",
@@ -504,6 +527,8 @@ const Page: React.FC = () => {
         },
         animationDurationUpdate: 1000,
         animationThreshold: 20000,
+        progressive: 20000, // Number of points to render in each frame
+        progressiveThreshold: 20000, // Threshold for progressive rendering
         series: l_series,
         graphic: [
           {
