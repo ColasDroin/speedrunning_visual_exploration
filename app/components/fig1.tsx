@@ -1,58 +1,32 @@
 "use client";
-// Import necessary libraries
+
 import React, { useRef, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
 import game_counts from "../../public/data/game_counts.json";
 import scatterZelda from "../../public/data/scatter_zelda.json";
-//import submission_types from "../../public/data/submission_types.json";
-//import distribution_types from "../../public/data/distribution_types.json";
 import pako from "pako";
 
+type EChartsOption = echarts.EChartsOption;
+type ChartInstance = echarts.ECharts;
+type OptionsDictionary = Record<string, EChartsOption>;
+
 const Page: React.FC = () => {
+  // =============================================================================
+  // REFS & DATA STRUCTURES
+  // =============================================================================
   const chartRef = useRef<ReactECharts | null>(null);
-  type EChartsOption = echarts.EChartsOption;
-  const allOptions: { [key: string]: any } = {};
+  // Stores all possible chart options keyed by ID
+  const allOptions: OptionsDictionary = {};
+  // A stack to keep track of navigation history
   const optionStack: string[] = [];
-  let option_counts: EChartsOption;
-  let option_zelda: EChartsOption;
 
-  // Initialize the Zelda scatter plot
-  const optionId_zelda = Object.keys(scatterZelda)[0];
-  const dic_per_bin = scatterZelda[optionId_zelda][0];
-  const best_line = scatterZelda[optionId_zelda][1];
-  const l_series = [];
-  for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
-    l_series.push({
-      type: "scatter",
-      dimensions: ["date", "time", "player", "location"],
-      data: l_runs,
-      dataGroupId: bin_id,
-      id: bin_id,
-      encode: { x: "date", y: "time" },
-      universalTransition: { enabled: true },
-      z: 2,
-    });
-  }
-  l_series.push({
-    type: "line",
-    data: best_line,
-    encode: { x: 0, y: 1 },
-    universalTransition: { enabled: true },
-    // make very long animation
-    animationDuration: 3000,
-    symbol: "none",
-    tooltip: { show: false }, // Disable tooltip for line
-    z: 1,
-  });
-
-  const yValues = best_line.map((item) => item[1]); // Extract y-values
-  const xValues = best_line.map((item) => new Date(item[0]).getTime()); // Extract x-values
-  const yMin = Math.min(...yValues);
-  const yMax = Math.max(...yValues);
-  const xMin = Math.min(...xValues);
-  const xMax = Math.max(...xValues);
-
-  const formatTime = (seconds) => {
+  // =============================================================================
+  // HELPER FUNCTIONS
+  // =============================================================================
+  /**
+   * Convert a number of seconds to an `h m s ms` string.
+   */
+  const formatTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
@@ -60,137 +34,225 @@ const Page: React.FC = () => {
     return `${h}h ${m}m ${s}s ${ms}ms`;
   };
 
-  option_zelda = {
-    id: optionId_zelda,
-    title: {
-      text: "Speedrun times for category 100% of game TheLegendofZelda: Breath of the Wild",
-    },
-    dataZoom: [
-      {
-        type: "inside",
-        yAxisIndex: [0],
-        filterMode: "filter",
-        startValue: yMin,
-        endValue: yMax,
-      },
-      {
-        type: "inside",
-        xAxisIndex: [0],
-        startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
-        endValue: xMax,
-        filterMode: "filter",
-      },
-    ],
-    tooltip: {
-      trigger: "item",
-      axisPointer: {
-        type: "shadow",
-      },
-      formatter: function (params: unknown) {
-        return [
-          "Date: " + params.data[0],
-          "Run time: " + formatTime(params.data[1]),
-          "Player: " + params.data[2],
-          "Location: " + params.data[3],
-        ].join("<br/>");
-      },
-    },
-    grid: {
-      left: 200,
-    },
-    yAxis: {
-      type: "time",
-      name: "Speedrun time",
-      axisLabel: {
-        formatter: function (value) {
-          // Apply the same formatting logic for y-axis labels
-          const timeInSeconds = new Date(value).getTime() / 1000; // Convert timestamp to seconds
-          return formatTime(timeInSeconds);
-        },
-      },
-    },
-    xAxis: {
-      type: "time",
-      name: "Date",
-    },
-    animationDurationUpdate: 1000,
-    animationThreshold: 20000,
-    progressive: 20000, // Number of points to render in each frame
-    progressiveThreshold: 20000, // Threshold for progressive rendering
-    series: l_series,
-    graphic: [
-      {
-        type: "text",
-        left: 50,
-        top: 20,
-        style: {
-          text: "Back",
-          fontSize: 18,
-          fill: "grey",
-        },
-        onclick: function () {
-          goBack();
-        },
-      },
-    ],
+  /**
+   * Fetch and decompress GZipped JSON data from a URL.
+   */
+  const fetchAndDecompress = async (url: string): Promise<any[]> => {
+    try {
+      const response = await fetch(url);
+      const buffer = await response.arrayBuffer();
+      const decompressed = pako.inflate(new Uint8Array(buffer), {
+        to: "string",
+      });
+      return JSON.parse(decompressed);
+    } catch (error) {
+      console.error(`Error fetching or decompressing data from ${url}:`, error);
+      return [];
+    }
   };
 
-  // Initialize the counts option
-  option_counts = {
+  // =============================================================================
+  // CHART NAVIGATION
+  // =============================================================================
+
+  /**
+   * Move forward to a new chart option (push the current one onto the stack).
+   * This is where we preserve universal transitions by injecting seriesKey.
+   */
+  const goForward = (nextOptionId: string) => {
+    if (!allOptions[nextOptionId]) {
+      console.error(
+        `Option with ID "${nextOptionId}" is missing in allOptions.`
+      );
+      return;
+    }
+    if (!chartRef.current) return;
+
+    const instance = chartRef.current.getEchartsInstance();
+    const currentOption = instance.getOption() as EChartsOption;
+    const currentOptionId = currentOption.id as string;
+
+    // Push the current chart ID onto the stack so we can return via goBack()
+    optionStack.push(currentOptionId);
+    console.log("Pushing current option onto stack:", currentOptionId);
+    console.log(`Navigating forward to: ${nextOptionId}`);
+
+    // -------------------------------------------------------------------------
+    // 1) If we are transitioning between distribution <-> scatter,
+    //    we can add the seriesKey for universal transitions.
+    //    Adjust condition as needed (e.g. checking for "dist_", "scat_", etc.).
+    // -------------------------------------------------------------------------
+    const isDistributionOrScatter =
+      nextOptionId.startsWith("scat_") || nextOptionId.startsWith("dist_");
+
+    if (isDistributionOrScatter) {
+      // Create a safe copy of the current option if not already present
+      const copyKey = currentOptionId + "_copy";
+      if (!allOptions[copyKey]) {
+        const safeCopy = JSON.parse(JSON.stringify(currentOption));
+        safeCopy.id = copyKey;
+        // Ensure the "Back" graphic is preserved in the copy
+        safeCopy.graphic = [
+          {
+            type: "text",
+            left: 50,
+            top: 20,
+            style: {
+              text: "Back",
+              fontSize: 18,
+              fill: "grey",
+            },
+            onclick: () => goBack(),
+          },
+        ];
+        // Store the safe copy
+        allOptions[copyKey] = safeCopy;
+      }
+
+      // Attempt to set or update the `seriesKey` for the current chart to ensure
+      // universal transitions.
+      try {
+        // For example, if your dataset items have "child_identifier_per_bin"
+        // or something similar that you want to match from bar -> scatter
+        const datasetObj = currentOption?.dataset?.[0];
+        if (datasetObj?.source) {
+          const l_child_identifiers = datasetObj.source.map(
+            (item: any) => item.child_identifier_per_bin
+          );
+          // For each series in the current chart, set the universalTransition key
+          if (currentOption.series) {
+            const seriesArr = Array.isArray(currentOption.series)
+              ? currentOption.series
+              : [currentOption.series];
+
+            seriesArr.forEach((s: any) => {
+              s.universalTransition = s.universalTransition || {};
+              s.universalTransition.seriesKey = l_child_identifiers;
+            });
+          }
+          // Update the instance with the modified current option
+          instance.setOption(currentOption, { notMerge: false, silent: true });
+          // Store a “fresh” version of currentOption in allOptions
+          allOptions[currentOptionId] = instance.getOption() as EChartsOption;
+        }
+      } catch (error) {
+        console.error("Error injecting universalTransition:", error);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 2) Finally, set the new chart option
+    // -------------------------------------------------------------------------
+    try {
+      instance.setOption(allOptions[nextOptionId], true);
+    } catch (error) {
+      console.error(
+        "Error setting the new chart option. Trying fallback copy."
+      );
+      // If something fails, we can try the copy
+      const fallbackId = nextOptionId + "_copy";
+      if (allOptions[fallbackId]) {
+        instance.setOption(allOptions[fallbackId], true);
+      } else {
+        console.error("No fallback copy found for:", fallbackId);
+      }
+    }
+  };
+
+  /**
+   * Go back to the previous chart (pop from the stack).
+   * If needed, remove the `seriesKey` property to reset transitions.
+   */
+  const goBack = () => {
+    if (!chartRef.current) {
+      console.log("No chart reference available.");
+      return;
+    }
+    if (optionStack.length === 0) {
+      console.log("Already at the root chart. No previous chart in the stack.");
+      return;
+    }
+
+    const instance = chartRef.current.getEchartsInstance();
+    const currentOption = instance.getOption() as EChartsOption;
+    const prevOptionId = optionStack.pop()!; // pop the last ID
+    console.log("Going back from", currentOption.id, "to", prevOptionId);
+
+    // Example: if you want to remove the seriesKey when going back from distribution
+    // (Adjust logic as needed.)
+    if (
+      prevOptionId.endsWith("_submission") ||
+      prevOptionId.startsWith("dist_")
+    ) {
+      if (currentOption.series) {
+        const seriesArray = Array.isArray(currentOption.series)
+          ? currentOption.series
+          : [currentOption.series];
+        seriesArray.forEach((s: any) => {
+          if (s.universalTransition) {
+            delete s.universalTransition.seriesKey;
+          }
+        });
+        currentOption.series = seriesArray;
+      }
+      // Overwrite the local allOptions copy with these changes if you like
+      allOptions[currentOption.id as string] = currentOption;
+    }
+
+    const optionToGoBackTo = allOptions[prevOptionId];
+    if (!optionToGoBackTo) {
+      console.log("No stored option for", prevOptionId);
+      return;
+    }
+
+    instance.setOption(optionToGoBackTo, true);
+  };
+
+  /**
+   * Handle chart click events to move forward if a child ID is available.
+   */
+  const onChartClick = (params: any) => {
+    if (params.data?.child_identifier) {
+      goForward(params.data.child_identifier);
+    }
+  };
+
+  // =============================================================================
+  // EXAMPLE: FACTORY FUNCTIONS FOR CHART OPTIONS
+  // =============================================================================
+
+  /**
+   * Returns a bar chart option for the "Most speedrunned games" data (game_counts).
+   */
+  const createOptionForGameCounts = (): EChartsOption => ({
     id: game_counts[0]["identifier"],
-    title: {
-      text: "Most speedrunned games",
-    },
+    title: { text: "Most speedrunned games" },
     animation: true,
     tooltip: {
       trigger: "axis",
-      axisPointer: {
-        type: "shadow",
-      },
-      formatter: function (params: unknown) {
+      axisPointer: { type: "shadow" },
+      formatter: (params: any) => {
+        const item = params[0]?.data || {};
         return [
-          "Game: " + params[0].data["name"],
-          "Total Submissions: " + params[0].data["count"],
+          "Game: " + item["name"],
+          "Total Submissions: " + item["count"],
           "% of all submissions in 2023: " +
-            parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+            parseFloat(item["percent_2023"]).toFixed(1) +
             "%",
         ].join("<br/>");
       },
     },
-    grid: {
-      left: 0,
-    },
+    grid: { left: 0 },
     xAxis: {
       type: "value",
       name: "Submission count",
-      axisLabel: {
-        formatter: "{value}",
-      },
+      axisLabel: { formatter: "{value}" },
     },
     yAxis: {
       type: "category",
       inverse: true,
       show: false,
     },
-    // visualMap: {
-    //   orient: "horizontal",
-    //   left: "center",
-    //   text: ["submissions (%) in 2023"],
-    //   textStyle: {
-    //     //fontSize: 50,
-    //     color: "#fff",
-    //     //align: "center",
-    //     //verticalAlign: "middle",
-    //     //overflow: "break",
-    //   },
-
-    //   dimension: "percent_2023",
-    //   inRange: {
-    //     color: ["#65B581", "#FFCE34", "#FD665F"],
-    //   },
-    //   min: 0,
-    //   max: 100,
-    // },
     animationDurationUpdate: 500,
     dataset: {
       dimensions: [
@@ -232,21 +294,19 @@ const Page: React.FC = () => {
           itemGroupId: "identifier",
           itemChildGroupId: "child_identifier",
         },
-        universalTransition: {
-          enabled: true,
-        },
+        universalTransition: { enabled: true },
         label: {
           show: true,
           position: "inside",
           formatter: "{b}",
-          color: "#fff", // Bright text for contrast
+          color: "#fff",
           textShadowBlur: 3,
           textShadowColor: "#000",
         },
         itemStyle: {
-          borderRadius: [5, 5, 5, 5], // Rounded corners for a smooth look
+          borderRadius: [5, 5, 5, 5],
           borderWidth: 2,
-          borderColor: "#333", // Adds a distinct outline
+          borderColor: "#333",
           color: {
             type: "linear",
             x: 0,
@@ -254,9 +314,9 @@ const Page: React.FC = () => {
             x2: 1,
             y2: 0,
             colorStops: [
-              { offset: 0, color: "#ff5733" }, // Start color
-              { offset: 0.5, color: "#33c5ff" }, // Middle color
-              { offset: 1, color: "#ff33d4" }, // End color
+              { offset: 0, color: "#ff5733" },
+              { offset: 0.5, color: "#33c5ff" },
+              { offset: 1, color: "#ff33d4" },
             ],
           },
           shadowBlur: 10,
@@ -266,7 +326,7 @@ const Page: React.FC = () => {
           focus: "self",
           itemStyle: {
             shadowBlur: 20,
-            shadowColor: "#fff", // Highlight with a bright glow
+            shadowColor: "#fff",
             color: {
               type: "radial",
               x: 0.5,
@@ -281,116 +341,185 @@ const Page: React.FC = () => {
         },
       },
     ],
-  };
-  allOptions[game_counts[0]["identifier"]] = option_counts;
-  allOptions[optionId_zelda] = option_zelda;
-  optionStack.push(option_counts.id as string);
-  const title_zelda = optionId_zelda.split("_")[1];
-  const type_zelda = optionId_zelda.split("_")[2];
-  optionStack.push(title_zelda + "_type_submission");
-  optionStack.push("dist_" + title_zelda + "_" + type_zelda);
+  });
 
-  // Function to prepare all others options
-  const prepareOptions = async () => {
-    const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
-    let scatterData: any[] = [];
-    // let game_counts: any[] = [];
-    let submission_types: any[] = [];
-    let distribution_types: any[] = [];
+  /**
+   * Returns a scatter chart option for the Zelda data (scatterZelda).
+   */
+  const createZeldaScatterOption = (): EChartsOption => {
+    const optionId = Object.keys(scatterZelda)[0];
+    const [dic_per_bin, best_line] = scatterZelda[optionId];
 
-    // Fetch and decompress scatter data
-    try {
-      const response = await fetch(`${baseUrl}/data/scatter_data.json.gz`);
-      const buffer = await response.arrayBuffer();
-      const decompressed = pako.inflate(new Uint8Array(buffer), {
-        to: "string",
-      });
-      scatterData = JSON.parse(decompressed);
-    } catch (error) {
-      console.error("Error fetching scatter data:", error);
-    }
+    // Build scatter series
+    const l_series = Object.entries(dic_per_bin).map(
+      ([bin_id, l_runs]: any) => ({
+        type: "scatter",
+        dimensions: ["date", "time", "player", "location"],
+        data: l_runs,
+        dataGroupId: bin_id,
+        id: bin_id,
+        encode: { x: "date", y: "time" },
+        universalTransition: { enabled: true },
+        z: 2,
+      })
+    );
 
-    // try {
-    //   const response = await fetch(`${baseUrl}/data/game_counts.json.gz`);
-    //   const buffer = await response.arrayBuffer();
-    //   const decompressed = pako.inflate(new Uint8Array(buffer), {
-    //     to: "string",
-    //   });
-    //   game_counts = JSON.parse(decompressed);
-    // } catch (error) {
-    //   console.error("Error fetching game counts:", error);
-    // }
+    // Add the "best_line" series
+    l_series.push({
+      type: "line",
+      data: best_line,
+      encode: { x: 0, y: 1 },
+      universalTransition: { enabled: true },
+      animationDuration: 3000,
+      symbol: "none",
+      tooltip: { show: false },
+      z: 1,
+    });
 
-    try {
-      const response = await fetch(`${baseUrl}/data/submission_types.json.gz`);
-      const buffer = await response.arrayBuffer();
-      const decompressed = pako.inflate(new Uint8Array(buffer), {
-        to: "string",
-      });
-      submission_types = JSON.parse(decompressed);
-    } catch (error) {
-      console.error("Error fetching submission types:", error);
-    }
+    const yValues = best_line.map((item: [string, number]) => item[1]);
+    const xValues = best_line.map((item: [string]) =>
+      new Date(item[0]).getTime()
+    );
+    const yMin = Math.min(...yValues);
+    const yMax = Math.max(...yValues);
+    const xMin = Math.min(...xValues);
+    const xMax = Math.max(...xValues);
 
-    try {
-      const response = await fetch(
-        `${baseUrl}/data/distribution_types.json.gz`
-      );
-      const buffer = await response.arrayBuffer();
-      const decompressed = pako.inflate(new Uint8Array(buffer), {
-        to: "string",
-      });
-      distribution_types = JSON.parse(decompressed);
-    } catch (error) {
-      console.error("Error fetching distribution types:", error);
-    }
-
-    // Add options for submission types
-    submission_types.forEach((data, index) => {
-      const optionId = data[0]["identifier"];
-      const option = {
-        id: optionId,
-        title: {
-          text: "Most speedrunned category of game X",
+    return {
+      id: optionId,
+      title: {
+        text: "Speedrun times for category 100% of game TheLegendofZelda: Breath of the Wild",
+      },
+      dataZoom: [
+        {
+          type: "inside",
+          yAxisIndex: [0],
+          filterMode: "filter",
+          startValue: yMin,
+          endValue: yMax,
         },
+        {
+          type: "inside",
+          xAxisIndex: [0],
+          startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
+          endValue: xMax,
+          filterMode: "filter",
+        },
+      ],
+      tooltip: {
+        trigger: "item",
+        axisPointer: { type: "shadow" },
+        formatter: (params: any) => {
+          return [
+            "Date: " + params.data[0],
+            "Run time: " + formatTime(params.data[1]),
+            "Player: " + params.data[2],
+            "Location: " + params.data[3],
+          ].join("<br/>");
+        },
+      },
+      grid: { left: 200 },
+      yAxis: {
+        type: "time",
+        name: "Speedrun time",
+        axisLabel: {
+          formatter: (value: string) => {
+            const timeInSeconds = new Date(value).getTime() / 1000;
+            return formatTime(timeInSeconds);
+          },
+        },
+      },
+      xAxis: {
+        type: "time",
+        name: "Date",
+      },
+      animationDurationUpdate: 1000,
+      animationThreshold: 20000,
+      progressive: 20000,
+      progressiveThreshold: 20000,
+      series: l_series,
+      graphic: [
+        {
+          type: "text",
+          left: 50,
+          top: 20,
+          style: {
+            text: "Back",
+            fontSize: 18,
+            fill: "grey",
+          },
+          onclick: () => goBack(),
+        },
+      ],
+    };
+  };
+
+  // =============================================================================
+  // PREPARE ALL CHART OPTIONS (LOCAL + FETCHED)
+  // =============================================================================
+  const prepareOptions = async () => {
+    const option_counts = createOptionForGameCounts();
+    const option_zelda = createZeldaScatterOption();
+
+    // Put them into the dictionary
+    allOptions[option_counts.id!] = option_counts;
+    allOptions[option_zelda.id!] = option_zelda;
+
+    // Option stack initially starts with one chart if you like, or empty if you prefer
+    optionStack.push(option_counts.id as string);
+    const title_zelda = option_zelda.id.split("_")[1];
+    const type_zelda = option_zelda.id.split("_")[2];
+    optionStack.push(title_zelda + "_type_submission");
+    optionStack.push("dist_" + title_zelda + "_" + type_zelda);
+
+    // Function to prepare all others options
+
+    // Fetch additional data (compressed) if needed
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+    const scatterData = await fetchAndDecompress(
+      `${baseUrl}/data/scatter_data.json.gz`
+    );
+    const submissionTypes = await fetchAndDecompress(
+      `${baseUrl}/data/submission_types.json.gz`
+    );
+    const distributionTypes = await fetchAndDecompress(
+      `${baseUrl}/data/distribution_types.json.gz`
+    );
+
+    // Build and add more charts from submission_types
+    submissionTypes.forEach((dataSet: any[]) => {
+      const optionId = dataSet[0]["identifier"];
+      allOptions[optionId] = {
+        id: optionId,
+        title: { text: "Most speedrunned category of game X" },
         tooltip: {
           trigger: "axis",
-          axisPointer: {
-            type: "shadow",
-          },
-          formatter: function (params: unknown) {
+          axisPointer: { type: "shadow" },
+          formatter: (params: any) => {
+            const item = params[0]?.data || {};
             return [
-              "Category: " + params[0].data["name_category"],
-              "Submissions: " + params[0].data["count"],
+              "Category: " + item["name_category"],
+              "Submissions: " + item["count"],
               "% of submissions in 2023: " +
-                parseFloat(params[0].data["percent_2023"]).toFixed(1) +
+                parseFloat(item["percent_2023"]).toFixed(1) +
                 "%",
             ].join("<br/>");
           },
         },
-        grid: {
-          left: 200,
-        },
+        grid: { left: 200 },
         xAxis: {
           type: "value",
           name: "Submission count per category",
-          axisLabel: {
-            formatter: "{value}",
-          },
+          axisLabel: { formatter: "{value}" },
         },
-        yAxis: {
-          type: "category",
-          inverse: true,
-        },
+        yAxis: { type: "category", inverse: true },
         visualMap: {
           orient: "horizontal",
           left: "center",
           text: ["% of all submissions in 2023"],
-          // Map the score column to color
           dimension: "percent_2023",
-          inRange: {
-            color: ["#65B581", "#FFCE34", "#FD665F"],
-          },
+          inRange: { color: ["#65B581", "#FFCE34", "#FD665F"] },
           min: 0,
           max: 100,
         },
@@ -403,7 +532,7 @@ const Page: React.FC = () => {
             "child_identifier",
             "percent_2023",
           ],
-          source: data,
+          source: dataSet,
         },
         series: {
           type: "bar",
@@ -413,10 +542,7 @@ const Page: React.FC = () => {
             itemGroupId: "identifier",
             itemChildGroupId: "child_identifier",
           },
-          universalTransition: {
-            enabled: true,
-            // divideShape: "clone",
-          },
+          universalTransition: { enabled: true },
         },
         graphic: [
           {
@@ -428,63 +554,41 @@ const Page: React.FC = () => {
               fontSize: 18,
               fill: "grey",
             },
-            onclick: function () {
-              goBack();
-            },
+            onclick: () => goBack(),
           },
         ],
       };
-      allOptions[optionId] = option;
     });
 
-    distribution_types.forEach((data, index) => {
-      const optionId = data[0]["identifier"];
-      const option = {
+    // Build and add more charts from distribution_types
+    distributionTypes.forEach((dataSet: any[]) => {
+      const optionId = dataSet[0]["identifier"];
+      allOptions[optionId] = {
         id: optionId,
         title: {
           text: "Distribution of speedrun times for category X of game X",
         },
         tooltip: {
           trigger: "item",
-          axisPointer: {
-            type: "shadow",
-          },
-          formatter: function (params: unknown) {
+          axisPointer: { type: "shadow" },
+          formatter: (params: any) => {
+            const item = params.data || {};
             return [
-              "Bin: " + params.data["bin_label"],
-              "Submissions: " + params.data["count_all"],
+              "Bin: " + item["bin_label"],
+              "Submissions: " + item["count_all"],
               "% of submissions in 2023: " +
-                parseFloat(params.data["percent_2023"]).toFixed(1) +
+                parseFloat(item["percent_2023"]).toFixed(1) +
                 "%",
             ].join("<br/>");
           },
         },
-        grid: {
-          left: 200,
-        },
+        grid: { left: 200 },
         xAxis: {
           type: "value",
           name: "Submission count per category",
-          axisLabel: {
-            formatter: "{value}",
-          },
+          axisLabel: { formatter: "{value}" },
         },
-        yAxis: {
-          type: "category",
-          // inverse: true,
-        },
-        // visualMap: {
-        //   orient: "horizontal",
-        //   left: "center",
-        //   text: ["% of all submissions in 2023"],
-        //   // Map the score column to color
-        //   dimension: "percent_2023",
-        //   inRange: {
-        //     color: ["#65B581", "#FFCE34", "#FD665F"],
-        //   },
-        //   min: 0,
-        //   max: 100,
-        // },
+        yAxis: { type: "category" },
         animationDurationUpdate: 500,
         dataset: {
           dimensions: [
@@ -496,40 +600,32 @@ const Page: React.FC = () => {
             "child_identifier_per_bin",
             "percent_2023",
           ],
-          source: data,
+          source: dataSet,
         },
         series: [
           {
             type: "bar",
-            // id: "test",
             encode: {
               x: "count_all",
               y: "bin_label",
               itemGroupId: "identifier",
               itemChildGroupId: "child_identifier_per_bin",
             },
-            universalTransition: {
-              enabled: true,
-            },
-            barGap: "0%", // No gap between bars of the same group
-            barCategoryGap: "0%", // No gap between bars in different categories
+            universalTransition: { enabled: true },
+            barGap: "0%",
+            barCategoryGap: "0%",
             itemStyle: {
-              borderWidth: 0, // Highlight the outer lines
-              borderColor: "#000", // Black outer lines for emphasis
-              color: "#3498db", // Solid fill color for the bars
+              borderWidth: 0,
+              borderColor: "#000",
+              color: "#3498db",
             },
             emphasis: {
-              focus: "series", // Highlight the whole bar on hover
+              focus: "series",
               itemStyle: {
-                borderColor: "#ff5733", // Highlight outer lines on hover
-                borderWidth: 3, // Make the outer lines thicker on hover
+                borderColor: "#ff5733",
+                borderWidth: 3,
               },
             },
-            // label: {
-            //   show: true,
-            //   position: "top", // Place labels on top of bars
-            //   color: "#000", // Label color
-            // },
           },
         ],
         graphic: [
@@ -542,168 +638,101 @@ const Page: React.FC = () => {
               fontSize: 18,
               fill: "grey",
             },
-            onclick: () => {
-              goBack();
-            },
+            onclick: () => goBack(),
           },
         ],
       };
-      allOptions[optionId] = option;
     });
 
-    // Add scatter plot options
-    for (const data of Object.entries(scatterData)) {
-      const dic_per_bin = data[1][0];
-      const best_line = data[1][1];
-      const optionId = data[0];
-      const l_series = [];
-      for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
+    // Build scatter charts from the *fetched* scatterData (like the Zelda example)
+    Object.entries(scatterData).forEach(
+      ([optionId, [dic_per_bin, best_line]]: any) => {
+        // Build scatter series
+        const l_series = Object.entries(dic_per_bin).map(
+          ([bin_id, l_runs]: any) => ({
+            type: "scatter",
+            dimensions: ["date", "time", "player", "location"],
+            data: l_runs,
+            dataGroupId: bin_id,
+            id: bin_id,
+            encode: { x: "date", y: "time" },
+            universalTransition: { enabled: true },
+            z: 2,
+          })
+        );
+        // Add the line
         l_series.push({
-          type: "scatter",
-          dimensions: ["date", "time", "player", "location"],
-          data: l_runs,
-          dataGroupId: bin_id,
-          id: bin_id,
-          encode: { x: "date", y: "time" },
+          type: "line",
+          data: best_line,
+          encode: { x: 0, y: 1 },
           universalTransition: { enabled: true },
-          z: 2,
+          animationDuration: 3000,
+          symbol: "none",
+          tooltip: { show: false },
+          z: 1,
         });
-      }
-      l_series.push({
-        type: "line",
-        data: best_line,
-        encode: { x: 0, y: 1 },
-        universalTransition: { enabled: true },
-        // make very long animation
-        animationDuration: 3000,
-        symbol: "none",
-        tooltip: { show: false }, // Disable tooltip for line
-        z: 1,
-      });
 
-      const yValues = best_line.map((item) => item[1]); // Extract y-values
-      const xValues = best_line.map((item) => new Date(item[0]).getTime()); // Extract x-values
-      const yMin = Math.min(...yValues);
-      const yMax = Math.max(...yValues);
-      const xMin = Math.min(...xValues);
-      const xMax = Math.max(...xValues);
+        const yValues = best_line.map((item: [string, number]) => item[1]);
+        const xValues = best_line.map((item: [string]) =>
+          new Date(item[0]).getTime()
+        );
+        const yMin = Math.min(...yValues);
+        const yMax = Math.max(...yValues);
+        const xMin = Math.min(...xValues);
+        const xMax = Math.max(...xValues);
 
-      const formatTime = (seconds) => {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = Math.floor(seconds % 60);
-        const ms = Math.floor((seconds % 1) * 1000);
-        return `${h}h ${m}m ${s}s ${ms}ms`;
-      };
-
-      allOptions[optionId] = {
-        id: optionId,
-        title: {
-          text: "Speedrun times for category X of game X",
-        },
-        dataZoom: [
-          {
-            type: "inside",
-            yAxisIndex: [0],
-            filterMode: "filter",
-            startValue: yMin,
-            endValue: yMax,
-          },
-          {
-            type: "inside",
-            xAxisIndex: [0],
-            startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
-            endValue: xMax,
-            filterMode: "filter",
-          },
-        ],
-        tooltip: {
-          trigger: "item",
-          axisPointer: {
-            type: "shadow",
-          },
-          formatter: function (params: unknown) {
-            return [
-              "Date: " + params.data[0],
-              "Run time: " + formatTime(params.data[1]),
-              "Player: " + params.data[2],
-              "Location: " + params.data[3],
-            ].join("<br/>");
-          },
-        },
-        grid: {
-          left: 200,
-        },
-        yAxis: {
-          type: "time",
-          name: "Speedrun time",
-          //min: Math.min(...l_series[0].data.map((d) => d[1])) * 0.8,
-          // max: Math.max(...l_series[0].data.map((d) => d[1])) * 2,
-          axisLabel: {
-            formatter: function (value) {
-              // Apply the same formatting logic for y-axis labels
-              const timeInSeconds = new Date(value).getTime() / 1000; // Convert timestamp to seconds
-              return formatTime(timeInSeconds);
+        allOptions[optionId] = {
+          id: optionId,
+          title: { text: "Speedrun times for category X of game X" },
+          dataZoom: [
+            {
+              type: "inside",
+              yAxisIndex: [0],
+              filterMode: "filter",
+              startValue: yMin,
+              endValue: yMax,
+            },
+            {
+              type: "inside",
+              xAxisIndex: [0],
+              startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
+              endValue: xMax,
+              filterMode: "filter",
+            },
+          ],
+          tooltip: {
+            trigger: "item",
+            axisPointer: { type: "shadow" },
+            formatter: (params: any) => {
+              return [
+                "Date: " + params.data[0],
+                "Run time: " + formatTime(params.data[1]),
+                "Player: " + params.data[2],
+                "Location: " + params.data[3],
+              ].join("<br/>");
             },
           },
-        },
-        xAxis: {
-          type: "time",
-          name: "Date",
-        },
-        animationDurationUpdate: 1000,
-        animationThreshold: 20000,
-        progressive: 20000, // Number of points to render in each frame
-        progressiveThreshold: 20000, // Threshold for progressive rendering
-        series: l_series,
-        graphic: [
-          {
-            type: "text",
-            left: 50,
-            top: 20,
-            style: {
-              text: "Back",
-              fontSize: 18,
-              fill: "grey",
-            },
-            onclick: function () {
-              goBack();
+          grid: { left: 200 },
+          yAxis: {
+            type: "time",
+            name: "Speedrun time",
+            axisLabel: {
+              formatter: (value: string) => {
+                const timeInSeconds = new Date(value).getTime() / 1000;
+                return formatTime(timeInSeconds);
+              },
             },
           },
-        ],
-      };
-    }
-  };
-
-  // Use effect to prepare options and initialize the chart
-  useEffect(() => {
-    (async () => {
-      try {
-        await prepareOptions();
-      } catch (error) {
-        console.error("Error preparing options:", error);
-      }
-    })();
-  });
-
-  const goForward = (optionId: string) => {
-    if (!allOptions[optionId]) {
-      console.error(`Option with ID "${optionId}" is missing in allOptions.`);
-      return;
-    }
-
-    if (chartRef.current) {
-      const instance = chartRef.current.getEchartsInstance();
-      const currentOption = instance.getOption();
-      optionStack.push(currentOption.id as string); // Push current option ID
-      // Check if transitioning to a distribution_types chart
-      if (optionId.startsWith("scat_")) {
-        // Make a safe copy of the current option (if it doesn't exist)
-        if (!allOptions[currentOption.id + "_copy"]) {
-          const safeCopy = JSON.parse(JSON.stringify(currentOption));
-          safeCopy.id = currentOption.id + "_copy";
-          // Ensure onclick event is present
-          safeCopy.graphic = [
+          xAxis: {
+            type: "time",
+            name: "Date",
+          },
+          animationDurationUpdate: 1000,
+          animationThreshold: 20000,
+          progressive: 20000,
+          progressiveThreshold: 20000,
+          series: l_series,
+          graphic: [
             {
               type: "text",
               left: 50,
@@ -713,105 +742,40 @@ const Page: React.FC = () => {
                 fontSize: 18,
                 fill: "grey",
               },
-              onclick: () => goBack(), // Ensure this is correctly set
+              onclick: () => goBack(),
             },
-          ];
-
-          allOptions[safeCopy.id] = safeCopy;
-        }
-
-        const l_child_identifiers_per_bin =
-          currentOption.dataset[0]?.source?.map(
-            (item) => item.child_identifier_per_bin
-          );
-
-        currentOption.series.forEach((s) => {
-          if (l_child_identifiers_per_bin) {
-            s.universalTransition = s.universalTransition || {}; // Ensure object exists
-            s.universalTransition.seriesKey = l_child_identifiers_per_bin; // Set seriesKey dynamically
-          }
-        });
-        // Update the current option with merged options
-        try {
-          instance.setOption(currentOption, { notMerge: false, silent: true });
-          allOptions[currentOption.id] = instance.getOption();
-        } catch (error) {
-          console.log("Prevent graph update");
-          // instance.setOption(safeCopy, true);
-          //allOptions[currentOption.id] = instance.getOption();
-        }
+          ],
+        };
       }
+    );
+  };
 
-      // Move to the next
-      console.log(`Navigating to optionId: ${optionId}`);
+  // =============================================================================
+  // REACT HOOKS
+  // =============================================================================
+  useEffect(() => {
+    (async () => {
       try {
-        const option = allOptions[optionId];
-        instance.setOption(option, true); // Apply the updated option
+        await prepareOptions();
       } catch (error) {
-        console.log("Error updating graph");
-        console.log("Falling back to safe copy first");
-        optionId = optionId + "_copy";
-        const safeCopy = allOptions[optionId];
-        instance.setOption(safeCopy, true); // Apply the updated option
+        console.error("Error preparing options:", error);
       }
-    }
-  };
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const goBack = () => {
-    console.log("Going back...");
-    if (chartRef.current && optionStack.length > 0) {
-      console.log(
-        "Current graph id:",
-        chartRef.current.getEchartsInstance().getOption().id
-      );
-      const instance = chartRef.current.getEchartsInstance();
-      const previousOptionId = optionStack.pop()!;
-      const option = allOptions[previousOptionId];
-      const currentOption = instance.getOption();
+  // =============================================================================
+  // RENDER
+  // =============================================================================
+  const onEvents = { click: onChartClick };
 
-      // Remove seriesKey if transitioning back from distribution_types
-      if (previousOptionId.endsWith("_submission")) {
-        // Ensure `series` is an array
-        const seriesArray = Array.isArray(currentOption.series)
-          ? currentOption.series
-          : [currentOption.series];
-
-        seriesArray.forEach((s) => {
-          if (s.universalTransition) {
-            delete s.universalTransition.seriesKey; // Clear seriesKey
-          }
-        });
-        currentOption.series = seriesArray;
-        allOptions[option.Id] = currentOption;
-        console.log("previous option:", currentOption);
-        instance.setOption(currentOption, true); // Apply the updated option
-      }
-
-      console.log(`Navigating back to optionId: ${previousOptionId}`);
-      console.log("current option:", option);
-
-      instance.setOption(option, true); // Apply the updated option
-    } else {
-      console.log("Already at root level!");
-    }
-  };
-
-  const onChartClick = (params: any) => {
-    const dataItem = params.data;
-    if (dataItem?.child_identifier) {
-      const nextOptionId = dataItem.child_identifier;
-      goForward(nextOptionId);
-    }
-  };
-
-  const onEvents = {
-    click: onChartClick,
-  };
+  // By default, show the Zelda scatter or the "Most speedrunned games" bar chart
+  const defaultZeldaOption = createZeldaScatterOption();
 
   return (
     <ReactECharts
       ref={chartRef}
-      option={option_zelda}
+      option={defaultZeldaOption}
       style={{ height: "800px", width: "100%" }}
       opts={{ renderer: "canvas" }}
       theme="light"
