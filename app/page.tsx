@@ -195,7 +195,30 @@ export default function Home() {
               </div>
             </div>
           </div>
-          COLOR SCRAPPED FROM https://github.com/sshaw/national_colors
+
+          {/* Disclaimer */}
+          <div className="mt-10 bg-gray-200 border border-gray-300 rounded-lg p-5">
+            <p className="text-sm text-gray-600">
+              <strong>Disclaimer:</strong> All trademarks, logos, and images
+              displayed on this website are the property of their respective
+              owners. They are used here for informational purposes and to
+              facilitate a better experience for visitors. This website is not
+              affiliated with, endorsed, sponsored, or specifically approved by
+              any video game company or its licensors. All data, including
+              images, has been sourced from the public API of{" "}
+              <a
+                href="https://www.speedrun.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600"
+              >
+                speedrun.com
+              </a>
+              . If you are a copyright or trademark owner and believe your
+              material has been used in an unauthorized way, please contact me
+              immediately and and I will address the issue promptly.
+            </p>
+          </div>
         </div>
       </div>
     </div>

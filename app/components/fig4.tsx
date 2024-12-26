@@ -4,10 +4,8 @@ import React, { useRef, useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import * as echarts from "echarts";
 import flagData from "../../public/data/flag_data.json";
-import worldJson from "../../public/data/world_map.json";
+// import worldJson from "../../public/data/world_map.json";
 import pako from "pako";
-
-echarts.registerMap("WORLD", worldJson);
 
 interface Flag {
   name: string;
@@ -29,6 +27,7 @@ const Page: React.FC = () => {
   const prepareGraph = async () => {
     const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
     let raceData: any[] = [];
+    let worldJson: any = {};
 
     try {
       const response = await fetch(`${baseUrl}/data/race_data.json.gz`);
@@ -37,6 +36,14 @@ const Page: React.FC = () => {
         to: "string",
       });
       raceData = JSON.parse(decompressed);
+
+      const responseWorld = await fetch(`${baseUrl}/data/world_map.json.gz`);
+      const bufferWorld = await responseWorld.arrayBuffer();
+      const decompressedWorld = pako.inflate(new Uint8Array(bufferWorld), {
+        to: "string",
+      });
+      worldJson = JSON.parse(decompressedWorld);
+      echarts.registerMap("WORLD", worldJson);
     } catch (error) {
       console.error("Error fetching scatter data:", error);
       return;
