@@ -36,9 +36,9 @@ const featuredGames = [
 ];
 
 const CENTER_TOLERANCE = 50;
-const DEBOUNCE_INTERVAL = 1500;
+const DEBOUNCE_INTERVAL = 1000;
 const STARTING_REVEALED = 1;
-const FINAL_GRACE_PERIOD = 1500; // ms
+const FINAL_GRACE_PERIOD = 1000; // ms
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);

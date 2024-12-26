@@ -84,9 +84,9 @@ const categoryDescriptions = [
 ];
 
 const CENTER_TOLERANCE = 50;
-const DEBOUNCE_INTERVAL = 1500;
+const DEBOUNCE_INTERVAL = 1000;
 const STARTING_CATEGORIES = 1;
-const FINAL_GRACE_PERIOD = 1500; // ms (1.5 seconds) for the last fold
+const FINAL_GRACE_PERIOD = 1000; // ms (1.5 seconds) for the last fold
 
 const predefinedColors = [
   "#FF5733",
