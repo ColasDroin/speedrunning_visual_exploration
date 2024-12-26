@@ -174,29 +174,6 @@ const Page: React.FC = () => {
       return;
     }
 
-    // Preserve your custom "isSpecial" logic (for the initial scatter->bar flow)
-    // const isSpecial = currentOption.id?.startsWith("scatspecial_");
-    // if (isSpecial) {
-    //   try {
-    //     const datasetObj = prevOption?.dataset;
-    //     if (datasetObj?.source) {
-    //       const l_child_identifiers = datasetObj.source.map(
-    //         (item: any) => item.child_identifier_per_bin
-    //       );
-    //       const seriesArr = Array.isArray(prevOption.series)
-    //         ? prevOption.series
-    //         : [prevOption.series];
-
-    //       seriesArr.forEach((s: any) => {
-    //         s.universalTransition = s.universalTransition || {};
-    //         s.universalTransition.seriesKey = l_child_identifiers;
-    //       });
-    //     }
-    //   } catch (error) {
-    //     console.log("Error injecting seriesKey on goBack:", error);
-    //   }
-    // }
-
     // The original code also removed the `seriesKey` if we return to certain charts
     // Example: if (previousOptionId.endsWith("_submission") || previousOptionId.startsWith("dist_")) { ... }
     // Or you can adapt it exactly as in your original code:
@@ -475,10 +452,6 @@ const Page: React.FC = () => {
 
     // Initialize stack with the "Most speedrunned games" ID, etc.
     optionStack.push(option_counts.id as string);
-    // const title_zelda = option_zelda.id.split("_")[1];
-    // const type_zelda = option_zelda.id.split("_")[2];
-    // optionStack.push(title_zelda + "_type_submission");
-    // optionStack.push("dist_" + title_zelda + "_" + type_zelda);
 
     // Load data from your server
     const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || "";
