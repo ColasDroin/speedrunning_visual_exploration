@@ -3,20 +3,140 @@
 import React, { useRef, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
 import game_counts from "../../public/data/game_counts.json";
+import scatterZelda from "../../public/data/scatter_zelda.json";
 //import submission_types from "../../public/data/submission_types.json";
 //import distribution_types from "../../public/data/distribution_types.json";
 import pako from "pako";
-import { filter } from "lodash";
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   type EChartsOption = echarts.EChartsOption;
   const allOptions: { [key: string]: any } = {};
   const optionStack: string[] = [];
-  let option_1: EChartsOption;
+  let option_counts: EChartsOption;
+  let option_zelda: EChartsOption;
 
-  // Initialize the first option
-  option_1 = {
+  // Initialize the Zelda scatter plot
+  const optionId_zelda = Object.keys(scatterZelda)[0];
+  const dic_per_bin = scatterZelda[optionId_zelda][0];
+  const best_line = scatterZelda[optionId_zelda][1];
+  const l_series = [];
+  for (const [bin_id, l_runs] of Object.entries(dic_per_bin)) {
+    l_series.push({
+      type: "scatter",
+      dimensions: ["date", "time", "player", "location"],
+      data: l_runs,
+      dataGroupId: bin_id,
+      id: bin_id,
+      encode: { x: "date", y: "time" },
+      universalTransition: { enabled: true },
+      z: 2,
+    });
+  }
+  l_series.push({
+    type: "line",
+    data: best_line,
+    encode: { x: 0, y: 1 },
+    universalTransition: { enabled: true },
+    // make very long animation
+    animationDuration: 3000,
+    symbol: "none",
+    tooltip: { show: false }, // Disable tooltip for line
+    z: 1,
+  });
+
+  const yValues = best_line.map((item) => item[1]); // Extract y-values
+  const xValues = best_line.map((item) => new Date(item[0]).getTime()); // Extract x-values
+  const yMin = Math.min(...yValues);
+  const yMax = Math.max(...yValues);
+  const xMin = Math.min(...xValues);
+  const xMax = Math.max(...xValues);
+
+  const formatTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 1000);
+    return `${h}h ${m}m ${s}s ${ms}ms`;
+  };
+
+  option_zelda = {
+    id: optionId_zelda,
+    title: {
+      text: "Speedrun times for category 100% of game TheLegendofZelda: Breath of the Wild",
+    },
+    dataZoom: [
+      {
+        type: "inside",
+        yAxisIndex: [0],
+        filterMode: "filter",
+        startValue: yMin,
+        endValue: yMax,
+      },
+      {
+        type: "inside",
+        xAxisIndex: [0],
+        startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
+        endValue: xMax,
+        filterMode: "filter",
+      },
+    ],
+    tooltip: {
+      trigger: "item",
+      axisPointer: {
+        type: "shadow",
+      },
+      formatter: function (params: unknown) {
+        return [
+          "Date: " + params.data[0],
+          "Run time: " + formatTime(params.data[1]),
+          "Player: " + params.data[2],
+          "Location: " + params.data[3],
+        ].join("<br/>");
+      },
+    },
+    grid: {
+      left: 200,
+    },
+    yAxis: {
+      type: "time",
+      name: "Speedrun time",
+      axisLabel: {
+        formatter: function (value) {
+          // Apply the same formatting logic for y-axis labels
+          const timeInSeconds = new Date(value).getTime() / 1000; // Convert timestamp to seconds
+          return formatTime(timeInSeconds);
+        },
+      },
+    },
+    xAxis: {
+      type: "time",
+      name: "Date",
+    },
+    animationDurationUpdate: 1000,
+    animationThreshold: 20000,
+    progressive: 20000, // Number of points to render in each frame
+    progressiveThreshold: 20000, // Threshold for progressive rendering
+    series: l_series,
+    graphic: [
+      {
+        type: "text",
+        left: 50,
+        top: 20,
+        style: {
+          text: "Back",
+          fontSize: 18,
+          fill: "grey",
+        },
+        onclick: function () {
+          goBack();
+        },
+      },
+    ],
+  };
+
+  // Initialize the counts option
+  option_counts = {
     id: game_counts[0]["identifier"],
     title: {
       text: "Most speedrunned games",
@@ -162,7 +282,13 @@ const Page: React.FC = () => {
       },
     ],
   };
-  allOptions[game_counts[0]["identifier"]] = option_1;
+  allOptions[game_counts[0]["identifier"]] = option_counts;
+  allOptions[optionId_zelda] = option_zelda;
+  optionStack.push(option_counts.id as string);
+  const title_zelda = optionId_zelda.split("_")[1];
+  const type_zelda = optionId_zelda.split("_")[2];
+  optionStack.push(title_zelda + "_type_submission");
+  optionStack.push("dist_" + title_zelda + "_" + type_zelda);
 
   // Function to prepare all others options
   const prepareOptions = async () => {
@@ -488,7 +614,7 @@ const Page: React.FC = () => {
             xAxisIndex: [0],
             startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
             endValue: xMax,
-            filter,
+            filterMode: "filter",
           },
         ],
         tooltip: {
@@ -685,7 +811,7 @@ const Page: React.FC = () => {
   return (
     <ReactECharts
       ref={chartRef}
-      option={option_1}
+      option={option_zelda}
       style={{ height: "800px", width: "100%" }}
       opts={{ renderer: "canvas" }}
       theme="light"
