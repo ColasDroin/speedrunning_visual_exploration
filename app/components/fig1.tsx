@@ -2,8 +2,10 @@
 
 import React, { useRef, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
+// Example data
 import game_counts from "../../public/data/game_counts.json";
 import scatterZelda from "../../public/data/scatter_zelda.json";
+// pako for Gzip
 import pako from "pako";
 
 type EChartsOption = echarts.EChartsOption;
@@ -12,19 +14,19 @@ type OptionsDictionary = Record<string, EChartsOption>;
 
 const Page: React.FC = () => {
   // =============================================================================
-  // REFS & DATA STRUCTURES
+  // REFS & STATE
   // =============================================================================
   const chartRef = useRef<ReactECharts | null>(null);
-  // Stores all possible chart options keyed by ID
+  // Holds all prebuilt chart options keyed by an ID
   const allOptions: OptionsDictionary = {};
-  // A stack to keep track of navigation history
+  // Keeps track of navigation history for going back/forward
   const optionStack: string[] = [];
 
   // =============================================================================
   // HELPER FUNCTIONS
   // =============================================================================
   /**
-   * Convert a number of seconds to an `h m s ms` string.
+   * Utility to format seconds into `Hh Mm Ss Msms`
    */
   const formatTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
@@ -35,7 +37,7 @@ const Page: React.FC = () => {
   };
 
   /**
-   * Fetch and decompress GZipped JSON data from a URL.
+   * Helper to fetch and decompress gzip JSON.
    */
   const fetchAndDecompress = async (url: string): Promise<any[]> => {
     try {
@@ -52,12 +54,12 @@ const Page: React.FC = () => {
   };
 
   // =============================================================================
-  // CHART NAVIGATION
+  // NAVIGATION LOGIC (ORIGINAL STYLE) + isSpecial CHECK
   // =============================================================================
 
   /**
-   * Move forward to a new chart option (push the current one onto the stack).
-   * This is where we preserve universal transitions by injecting seriesKey.
+   * Go forward to a new chart (push the current one onto the stack).
+   * Restores original logic from your first code version, with universal transitions.
    */
   const goForward = (nextOptionId: string) => {
     if (!allOptions[nextOptionId]) {
@@ -72,26 +74,21 @@ const Page: React.FC = () => {
     const currentOption = instance.getOption() as EChartsOption;
     const currentOptionId = currentOption.id as string;
 
-    // Push the current chart ID onto the stack so we can return via goBack()
+    // Push current chart ID so we can goBack() later
     optionStack.push(currentOptionId);
     console.log("Pushing current option onto stack:", currentOptionId);
     console.log(`Navigating forward to: ${nextOptionId}`);
 
-    // -------------------------------------------------------------------------
-    // 1) If we are transitioning between distribution <-> scatter,
-    //    we can add the seriesKey for universal transitions.
-    //    Adjust condition as needed (e.g. checking for "dist_", "scat_", etc.).
-    // -------------------------------------------------------------------------
-    const isDistributionOrScatter =
-      nextOptionId.startsWith("scat_") || nextOptionId.startsWith("dist_");
+    // If transitioning to scatter or distribution, we inject seriesKey
+    const isDistributionOrScatter = nextOptionId.startsWith("scat_");
 
     if (isDistributionOrScatter) {
-      // Create a safe copy of the current option if not already present
+      // Create a safe copy if not already stored
       const copyKey = currentOptionId + "_copy";
       if (!allOptions[copyKey]) {
         const safeCopy = JSON.parse(JSON.stringify(currentOption));
         safeCopy.id = copyKey;
-        // Ensure the "Back" graphic is preserved in the copy
+        // Ensure the "Back" graphic is preserved
         safeCopy.graphic = [
           {
             type: "text",
@@ -105,51 +102,41 @@ const Page: React.FC = () => {
             onclick: () => goBack(),
           },
         ];
-        // Store the safe copy
         allOptions[copyKey] = safeCopy;
       }
 
-      // Attempt to set or update the `seriesKey` for the current chart to ensure
-      // universal transitions.
+      // Attempt to set or update the `seriesKey`
       try {
-        // For example, if your dataset items have "child_identifier_per_bin"
-        // or something similar that you want to match from bar -> scatter
         const datasetObj = currentOption?.dataset?.[0];
         if (datasetObj?.source) {
           const l_child_identifiers = datasetObj.source.map(
             (item: any) => item.child_identifier_per_bin
           );
-          // For each series in the current chart, set the universalTransition key
-          if (currentOption.series) {
-            const seriesArr = Array.isArray(currentOption.series)
-              ? currentOption.series
-              : [currentOption.series];
+          const seriesArr = Array.isArray(currentOption.series)
+            ? currentOption.series
+            : [currentOption.series];
 
-            seriesArr.forEach((s: any) => {
-              s.universalTransition = s.universalTransition || {};
-              s.universalTransition.seriesKey = l_child_identifiers;
-            });
-          }
+          seriesArr.forEach((s: any) => {
+            s.universalTransition = s.universalTransition || {};
+            s.universalTransition.seriesKey = l_child_identifiers;
+          });
           // Update the instance with the modified current option
           instance.setOption(currentOption, { notMerge: false, silent: true });
-          // Store a “fresh” version of currentOption in allOptions
+          // Store a fresh copy of currentOption
           allOptions[currentOptionId] = instance.getOption() as EChartsOption;
         }
       } catch (error) {
-        console.error("Error injecting universalTransition:", error);
+        console.log("Error injecting universalTransition:", error);
       }
     }
 
-    // -------------------------------------------------------------------------
-    // 2) Finally, set the new chart option
-    // -------------------------------------------------------------------------
+    // Finally, navigate forward to the next chart
     try {
       instance.setOption(allOptions[nextOptionId], true);
     } catch (error) {
       console.error(
         "Error setting the new chart option. Trying fallback copy."
       );
-      // If something fails, we can try the copy
       const fallbackId = nextOptionId + "_copy";
       if (allOptions[fallbackId]) {
         instance.setOption(allOptions[fallbackId], true);
@@ -160,45 +147,45 @@ const Page: React.FC = () => {
   };
 
   /**
-   * Go back to the previous chart (pop from the stack).
-   * If needed, remove the `seriesKey` property to reset transitions.
+   * Go back (pop from the stack). This is the original logic, but we keep the `isSpecial` check.
+   * We also remove or re-inject seriesKey as in your older code.
    */
   const goBack = () => {
-    if (!chartRef.current) return;
-    if (optionStack.length === 0) return;
+    if (!chartRef.current) {
+      console.log("No chart reference available.");
+      return;
+    }
+    if (optionStack.length === 0) {
+      console.log("Already at the root chart. No previous chart in the stack.");
+      return;
+    }
 
     const instance = chartRef.current.getEchartsInstance();
     const currentOption = instance.getOption() as EChartsOption;
 
-    // The ID we're going to revert to:
+    // Pop from the stack => the previous chart we want to revert to
     const prevOptionId = optionStack.pop()!;
-    const optionToGoBackTo = allOptions[prevOptionId];
+    const prevOption = allOptions[prevOptionId];
 
-    if (!optionToGoBackTo) {
+    console.log("Going back from", currentOption.id, "to", prevOptionId);
+
+    if (!prevOption) {
       console.log("No stored option for", prevOptionId);
       return;
     }
 
-    // ----------------------------------------------------------
-    // 1) If this is a "scatter <-> distribution" transition,
-    //    inject seriesKey on the chart we’re going BACK to,
-    //    so ECharts can see matching keys for morphing.
-    // ----------------------------------------------------------
+    // Preserve your custom "isSpecial" logic (for the initial scatter->bar flow)
     const isSpecial = currentOption.id?.startsWith("scatspecial_");
-
     if (isSpecial) {
       try {
-        // For instance, if the distribution chart uses
-        // `child_identifier_per_bin` as the key. Adjust to match your data.
-        const datasetObj = optionToGoBackTo?.dataset;
+        const datasetObj = prevOption?.dataset;
         if (datasetObj?.source) {
           const l_child_identifiers = datasetObj.source.map(
             (item: any) => item.child_identifier_per_bin
           );
-
-          const seriesArr = Array.isArray(optionToGoBackTo.series)
-            ? optionToGoBackTo.series
-            : [optionToGoBackTo.series];
+          const seriesArr = Array.isArray(prevOption.series)
+            ? prevOption.series
+            : [prevOption.series];
 
           seriesArr.forEach((s: any) => {
             s.universalTransition = s.universalTransition || {};
@@ -210,14 +197,32 @@ const Page: React.FC = () => {
       }
     }
 
-    // ----------------------------------------------------------
-    // 2) Now finally set the “previous” option
-    // ----------------------------------------------------------
-    instance.setOption(optionToGoBackTo, true);
+    // The original code also removed the `seriesKey` if we return to certain charts
+    // Example: if (previousOptionId.endsWith("_submission") || previousOptionId.startsWith("dist_")) { ... }
+    // Or you can adapt it exactly as in your original code:
+    if (
+      prevOptionId.endsWith("_submission") ||
+      prevOptionId.startsWith("dist_")
+    ) {
+      const seriesArr = Array.isArray(currentOption.series)
+        ? currentOption.series
+        : [currentOption.series];
+      seriesArr.forEach((s: any) => {
+        if (s.universalTransition) {
+          delete s.universalTransition.seriesKey;
+        }
+      });
+      currentOption.series = seriesArr;
+      // Overwrite local copy
+      allOptions[currentOption.id as string] = currentOption;
+    }
+
+    // Finally, set the previous chart
+    instance.setOption(prevOption, true);
   };
 
   /**
-   * Handle chart click events to move forward if a child ID is available.
+   * If user clicks on a bar that has `child_identifier`, we goForward().
    */
   const onChartClick = (params: any) => {
     if (params.data?.child_identifier) {
@@ -226,139 +231,135 @@ const Page: React.FC = () => {
   };
 
   // =============================================================================
-  // EXAMPLE: FACTORY FUNCTIONS FOR CHART OPTIONS
+  // FACTORY FUNCTIONS (Same as your code)
   // =============================================================================
-
-  /**
-   * Returns a bar chart option for the "Most speedrunned games" data (game_counts).
-   */
-  const createOptionForGameCounts = (): EChartsOption => ({
-    id: game_counts[0]["identifier"],
-    title: { text: "Most speedrunned games" },
-    animation: true,
-    tooltip: {
-      trigger: "axis",
-      axisPointer: { type: "shadow" },
-      formatter: (params: any) => {
-        const item = params[0]?.data || {};
-        return [
-          "Game: " + item["name"],
-          "Total Submissions: " + item["count"],
-          "% of all submissions in 2023: " +
-            parseFloat(item["percent_2023"]).toFixed(1) +
-            "%",
-        ].join("<br/>");
-      },
-    },
-    grid: { left: 0 },
-    xAxis: {
-      type: "value",
-      name: "Submission count",
-      axisLabel: { formatter: "{value}" },
-    },
-    yAxis: {
-      type: "category",
-      inverse: true,
-      show: false,
-    },
-    animationDurationUpdate: 500,
-    dataset: {
-      dimensions: [
-        "name",
-        "count",
-        "identifier",
-        "child_identifier",
-        "percent_2023",
-      ],
-      source: game_counts,
-    },
-    dataZoom: [
-      {
-        type: "slider",
-        show: true,
-        yAxisIndex: [0],
-        start: 0,
-        end: 40,
-        filterMode: "filter",
-        brushSelect: false,
-      },
-      {
-        type: "inside",
-        start: 0,
-        end: 40,
-        yAxisIndex: [0],
-        filterMode: "empty",
-        zoomLock: true,
-        moveOnMouseWheel: true,
-        zoomOnMouseWheel: false,
-      },
-    ],
-    series: [
-      {
-        type: "bar",
-        encode: {
-          x: "count",
-          y: "name",
-          itemGroupId: "identifier",
-          itemChildGroupId: "child_identifier",
+  const createOptionForGameCounts = (): EChartsOption => {
+    // ... identical to your code ...
+    return {
+      id: game_counts[0].identifier,
+      title: { text: "Most speedrunned games" },
+      animation: true,
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        formatter: (params: any) => {
+          const item = params[0]?.data || {};
+          return [
+            "Game: " + item["name"],
+            "Total Submissions: " + item["count"],
+            "% of all submissions in 2023: " +
+              parseFloat(item["percent_2023"]).toFixed(1) +
+              "%",
+          ].join("<br/>");
         },
-        universalTransition: { enabled: true },
-        label: {
+      },
+      grid: { left: 0 },
+      xAxis: {
+        type: "value",
+        name: "Submission count",
+        axisLabel: { formatter: "{value}" },
+      },
+      yAxis: {
+        type: "category",
+        inverse: true,
+        show: false,
+      },
+      animationDurationUpdate: 500,
+      dataset: {
+        dimensions: [
+          "name",
+          "count",
+          "identifier",
+          "child_identifier",
+          "percent_2023",
+        ],
+        source: game_counts,
+      },
+      dataZoom: [
+        {
+          type: "slider",
           show: true,
-          position: "inside",
-          formatter: "{b}",
-          color: "#fff",
-          textShadowBlur: 3,
-          textShadowColor: "#000",
+          yAxisIndex: [0],
+          start: 0,
+          end: 40,
+          filterMode: "filter",
+          brushSelect: false,
         },
-        itemStyle: {
-          borderRadius: [5, 5, 5, 5],
-          borderWidth: 2,
-          borderColor: "#333",
-          color: {
-            type: "linear",
-            x: 0,
-            y: 0,
-            x2: 1,
-            y2: 0,
-            colorStops: [
-              { offset: 0, color: "#ff5733" },
-              { offset: 0.5, color: "#33c5ff" },
-              { offset: 1, color: "#ff33d4" },
-            ],
+        {
+          type: "inside",
+          start: 0,
+          end: 40,
+          yAxisIndex: [0],
+          filterMode: "empty",
+          zoomLock: true,
+          moveOnMouseWheel: true,
+          zoomOnMouseWheel: false,
+        },
+      ],
+      series: [
+        {
+          type: "bar",
+          encode: {
+            x: "count",
+            y: "name",
+            itemGroupId: "identifier",
+            itemChildGroupId: "child_identifier",
           },
-          shadowBlur: 10,
-          shadowColor: "rgba(0,0,0,0.5)",
-        },
-        emphasis: {
-          focus: "self",
+          universalTransition: { enabled: true },
+          label: {
+            show: true,
+            position: "inside",
+            formatter: "{b}",
+            color: "#fff",
+            textShadowBlur: 3,
+            textShadowColor: "#000",
+          },
           itemStyle: {
-            shadowBlur: 20,
-            shadowColor: "#fff",
+            borderRadius: [5, 5, 5, 5],
+            borderWidth: 2,
+            borderColor: "#333",
             color: {
-              type: "radial",
-              x: 0.5,
-              y: 0.5,
-              r: 1,
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 1,
+              y2: 0,
               colorStops: [
-                { offset: 0, color: "#ffcc33" },
-                { offset: 1, color: "#ff5733" },
+                { offset: 0, color: "#ff5733" },
+                { offset: 0.5, color: "#33c5ff" },
+                { offset: 1, color: "#ff33d4" },
               ],
+            },
+            shadowBlur: 10,
+            shadowColor: "rgba(0,0,0,0.5)",
+          },
+          emphasis: {
+            focus: "self",
+            itemStyle: {
+              shadowBlur: 20,
+              shadowColor: "#fff",
+              color: {
+                type: "radial",
+                x: 0.5,
+                y: 0.5,
+                r: 1,
+                colorStops: [
+                  { offset: 0, color: "#ffcc33" },
+                  { offset: 1, color: "#ff5733" },
+                ],
+              },
             },
           },
         },
-      },
-    ],
-  });
+      ],
+    };
+  };
 
-  /**
-   * Returns a scatter chart option for the Zelda data (scatterZelda).
-   */
   const createZeldaScatterOption = (): EChartsOption => {
+    // ... identical to your code ...
     const optionId = Object.keys(scatterZelda)[0];
     const [dic_per_bin, best_line] = scatterZelda[optionId];
 
-    // Build scatter series
     const l_series = Object.entries(dic_per_bin).map(
       ([bin_id, l_runs]: any) => ({
         type: "scatter",
@@ -372,7 +373,6 @@ const Page: React.FC = () => {
       })
     );
 
-    // Add the "best_line" series
     l_series.push({
       type: "line",
       data: best_line,
@@ -463,7 +463,7 @@ const Page: React.FC = () => {
   };
 
   // =============================================================================
-  // PREPARE ALL CHART OPTIONS (LOCAL + FETCHED)
+  // PREPARE ALL OPTIONS (LOCAL + FETCHED)
   // =============================================================================
   const prepareOptions = async () => {
     const option_counts = createOptionForGameCounts();
@@ -473,18 +473,15 @@ const Page: React.FC = () => {
     allOptions[option_counts.id!] = option_counts;
     allOptions[option_zelda.id!] = option_zelda;
 
-    // Option stack initially starts with one chart if you like, or empty if you prefer
+    // Initialize stack with the "Most speedrunned games" ID, etc.
     optionStack.push(option_counts.id as string);
     const title_zelda = option_zelda.id.split("_")[1];
     const type_zelda = option_zelda.id.split("_")[2];
     optionStack.push(title_zelda + "_type_submission");
     optionStack.push("dist_" + title_zelda + "_" + type_zelda);
 
-    // Function to prepare all others options
-
-    // Fetch additional data (compressed) if needed
+    // Load data from your server
     const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || "";
-
     const scatterData = await fetchAndDecompress(
       `${baseUrl}/data/scatter_data.json.gz`
     );
@@ -495,7 +492,7 @@ const Page: React.FC = () => {
       `${baseUrl}/data/distribution_types.json.gz`
     );
 
-    // Build and add more charts from submission_types
+    // Build options for submission types
     submissionTypes.forEach((dataSet: any[]) => {
       const optionId = dataSet[0]["identifier"];
       allOptions[optionId] = {
@@ -521,13 +518,18 @@ const Page: React.FC = () => {
           name: "Submission count per category",
           axisLabel: { formatter: "{value}" },
         },
-        yAxis: { type: "category", inverse: true },
+        yAxis: {
+          type: "category",
+          inverse: true,
+        },
         visualMap: {
           orient: "horizontal",
           left: "center",
           text: ["% of all submissions in 2023"],
           dimension: "percent_2023",
-          inRange: { color: ["#65B581", "#FFCE34", "#FD665F"] },
+          inRange: {
+            color: ["#65B581", "#FFCE34", "#FD665F"],
+          },
           min: 0,
           max: 100,
         },
@@ -568,7 +570,7 @@ const Page: React.FC = () => {
       };
     });
 
-    // Build and add more charts from distribution_types
+    // Build options for distribution types
     distributionTypes.forEach((dataSet: any[]) => {
       const optionId = dataSet[0]["identifier"];
       allOptions[optionId] = {
@@ -596,7 +598,9 @@ const Page: React.FC = () => {
           name: "Submission count per category",
           axisLabel: { formatter: "{value}" },
         },
-        yAxis: { type: "category" },
+        yAxis: {
+          type: "category",
+        },
         animationDurationUpdate: 500,
         dataset: {
           dimensions: [
@@ -652,10 +656,10 @@ const Page: React.FC = () => {
       };
     });
 
-    // Build scatter charts from the *fetched* scatterData (like the Zelda example)
+    // Build scatter charts (like zelda, but loaded dynamically)
     Object.entries(scatterData).forEach(
-      ([optionId, [dic_per_bin, best_line]]: any) => {
-        // Build scatter series
+      ([optionId, [dic_per_bin, best_line]]) => {
+        // Create multiple scatter series
         const l_series = Object.entries(dic_per_bin).map(
           ([bin_id, l_runs]: any) => ({
             type: "scatter",
@@ -759,7 +763,7 @@ const Page: React.FC = () => {
   };
 
   // =============================================================================
-  // REACT HOOKS
+  // LIFECYCLE
   // =============================================================================
   useEffect(() => {
     (async () => {
@@ -776,8 +780,6 @@ const Page: React.FC = () => {
   // RENDER
   // =============================================================================
   const onEvents = { click: onChartClick };
-
-  // By default, show the Zelda scatter or the "Most speedrunned games" bar chart
   const defaultZeldaOption = createZeldaScatterOption();
 
   return (
