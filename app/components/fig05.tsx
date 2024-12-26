@@ -4,18 +4,10 @@ import React, { useRef, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
 import scatterZelda from "../../public/data/scatter_zelda.json";
 type EChartsOption = echarts.EChartsOption;
+
 const Page: React.FC = () => {
-  // =============================================================================
-  // REFS & STATE
-  // =============================================================================
   const chartRef = useRef<ReactECharts | null>(null);
 
-  // =============================================================================
-  // HELPER FUNCTIONS
-  // =============================================================================
-  /**
-   * Utility to format seconds into `Hh Mm Ss Msms`
-   */
   const formatTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -25,7 +17,6 @@ const Page: React.FC = () => {
   };
 
   const createZeldaScatterOption = (): EChartsOption => {
-    // ... identical to your code ...
     const optionId = Object.keys(scatterZelda)[0];
     const [dic_per_bin, best_line] = scatterZelda[optionId];
 
@@ -67,22 +58,22 @@ const Page: React.FC = () => {
       title: {
         text: "Speedrun times for category 100% of game TheLegendofZelda: Breath of the Wild",
       },
-      dataZoom: [
-        {
-          type: "inside",
-          yAxisIndex: [0],
-          filterMode: "filter",
-          startValue: yMin,
-          endValue: yMax,
-        },
-        {
-          type: "inside",
-          xAxisIndex: [0],
-          startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
-          endValue: xMax,
-          filterMode: "filter",
-        },
-      ],
+      // dataZoom: [
+      //   {
+      //     type: "inside",
+      //     yAxisIndex: [0],
+      //     filterMode: "filter",
+      //     startValue: yMin,
+      //     endValue: yMax,
+      //   },
+      //   {
+      //     type: "inside",
+      //     xAxisIndex: [0],
+      //     startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
+      //     endValue: xMax,
+      //     filterMode: "filter",
+      //   },
+      // ],
       tooltip: {
         trigger: "item",
         axisPointer: { type: "shadow" },
@@ -97,14 +88,13 @@ const Page: React.FC = () => {
       },
       grid: { left: 200 },
       yAxis: {
-        type: "time",
+        type: "value", // Corrected type
         name: "Speedrun time",
         axisLabel: {
-          formatter: (value: string) => {
-            const timeInSeconds = new Date(value).getTime() / 1000;
-            return formatTime(timeInSeconds);
-          },
+          formatter: (value: number) => formatTime(value), // Directly formatting the seconds
         },
+        min: yMin,
+        max: yMax,
       },
       xAxis: {
         type: "time",

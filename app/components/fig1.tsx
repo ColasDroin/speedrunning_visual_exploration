@@ -589,14 +589,13 @@ const Page: React.FC = () => {
           },
           grid: { left: 200 },
           yAxis: {
-            type: "time",
+            type: "value", // Corrected type
             name: "Speedrun time",
             axisLabel: {
-              formatter: (value: string) => {
-                const timeInSeconds = new Date(value).getTime() / 1000;
-                return formatTime(timeInSeconds);
-              },
+              formatter: (value: number) => formatTime(value), // Directly formatting the seconds
             },
+            min: yMin,
+            max: yMax,
           },
           xAxis: {
             type: "time",
