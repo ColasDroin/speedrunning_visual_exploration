@@ -164,47 +164,55 @@ const Page: React.FC = () => {
    * If needed, remove the `seriesKey` property to reset transitions.
    */
   const goBack = () => {
-    if (!chartRef.current) {
-      console.log("No chart reference available.");
-      return;
-    }
-    if (optionStack.length === 0) {
-      console.log("Already at the root chart. No previous chart in the stack.");
-      return;
-    }
+    if (!chartRef.current) return;
+    if (optionStack.length === 0) return;
 
     const instance = chartRef.current.getEchartsInstance();
     const currentOption = instance.getOption() as EChartsOption;
-    const prevOptionId = optionStack.pop()!; // pop the last ID
-    console.log("Going back from", currentOption.id, "to", prevOptionId);
 
-    // Example: if you want to remove the seriesKey when going back from distribution
-    // (Adjust logic as needed.)
-    if (
-      prevOptionId.endsWith("_submission") ||
-      prevOptionId.startsWith("dist_")
-    ) {
-      if (currentOption.series) {
-        const seriesArray = Array.isArray(currentOption.series)
-          ? currentOption.series
-          : [currentOption.series];
-        seriesArray.forEach((s: any) => {
-          if (s.universalTransition) {
-            delete s.universalTransition.seriesKey;
-          }
-        });
-        currentOption.series = seriesArray;
-      }
-      // Overwrite the local allOptions copy with these changes if you like
-      allOptions[currentOption.id as string] = currentOption;
-    }
-
+    // The ID we're going to revert to:
+    const prevOptionId = optionStack.pop()!;
     const optionToGoBackTo = allOptions[prevOptionId];
+
     if (!optionToGoBackTo) {
       console.log("No stored option for", prevOptionId);
       return;
     }
 
+    // ----------------------------------------------------------
+    // 1) If this is a "scatter <-> distribution" transition,
+    //    inject seriesKey on the chart we’re going BACK to,
+    //    so ECharts can see matching keys for morphing.
+    // ----------------------------------------------------------
+    const isSpecial = currentOption.id?.startsWith("scatspecial_");
+
+    if (isSpecial) {
+      try {
+        // For instance, if the distribution chart uses
+        // `child_identifier_per_bin` as the key. Adjust to match your data.
+        const datasetObj = optionToGoBackTo?.dataset;
+        if (datasetObj?.source) {
+          const l_child_identifiers = datasetObj.source.map(
+            (item: any) => item.child_identifier_per_bin
+          );
+
+          const seriesArr = Array.isArray(optionToGoBackTo.series)
+            ? optionToGoBackTo.series
+            : [optionToGoBackTo.series];
+
+          seriesArr.forEach((s: any) => {
+            s.universalTransition = s.universalTransition || {};
+            s.universalTransition.seriesKey = l_child_identifiers;
+          });
+        }
+      } catch (error) {
+        console.log("Error injecting seriesKey on goBack:", error);
+      }
+    }
+
+    // ----------------------------------------------------------
+    // 2) Now finally set the “previous” option
+    // ----------------------------------------------------------
     instance.setOption(optionToGoBackTo, true);
   };
 
