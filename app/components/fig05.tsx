@@ -123,13 +123,13 @@ const Page: React.FC = () => {
       graphic: {
         type: "image",
         id: "background",
-        left: "42%", // Moved 10% right
+        left: "48%", // Moved 10% right
         top: "30%", // Moved 10% up
         z: 0, // Ensure it is behind all other elements
         style: {
           image: `images/${true_ID}_icon_rescaled.webp`,
-          width: 200,
-          height: 200,
+          width: 150,
+          height: 150,
           opacity: 0.3, // Makes it look subtle and carved
         },
       },

@@ -290,7 +290,7 @@ const Page: React.FC = () => {
             textShadowColor: "#000",
           },
           itemStyle: {
-            borderRadius: [5, 5, 5, 5],
+            borderRadius: [0, 20, 20, 0],
             borderWidth: 2,
             borderColor: "#333",
             color: {
