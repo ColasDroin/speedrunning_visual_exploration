@@ -8,6 +8,7 @@ type EChartsOption = echarts.EChartsOption;
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const [showBestLine, setShowBestLine] = useState(false);
+  const [showBestTimeBox, setShowBestTimeBox] = useState(false); // New state for Best Time box
   const [isPulsating, setIsPulsating] = useState(false);
 
   const formatTime = (seconds: number): string => {
@@ -144,12 +145,13 @@ const Page: React.FC = () => {
             opacity: 0.3, // Makes it look subtle and carved
           },
         },
-        // New graphic element for the Best Time box
-        {
+        // Conditionally render the Best Time box
+        showBestTimeBox && {
           type: "group",
           left: "20%", // Position at the bottom left
           bottom: "15%", // Adjust as needed
           z: 10, // Ensure it's above scatter points
+          silent: true, // Make the graphic non-clickable
           children: [
             {
               type: "rect",
@@ -163,8 +165,10 @@ const Page: React.FC = () => {
                 lineWidth: 2,
                 shadowBlur: 10,
                 shadowColor: "#00FF00",
+                // Optional: Add rounded corners
+                // Define borderRadius if desired
+                // borderRadius: [10, 10, 10, 10],
               },
-              // Optional: Add rounded corners
               z: 0,
             },
             {
@@ -187,7 +191,7 @@ const Page: React.FC = () => {
             },
           ],
         },
-      ],
+      ].filter(Boolean), // Remove falsey values
       animationDurationUpdate: 500,
       animationEasingUpdate: "linear",
       animationEasing: "linear",
@@ -250,15 +254,32 @@ const Page: React.FC = () => {
     );
 
     if (chartRef.current) {
-      observer.observe(chartRef.current.getEchartsInstance().getDom());
+      const dom = chartRef.current.getEchartsInstance().getDom();
+      observer.observe(dom);
     }
 
     return () => {
       if (chartRef.current) {
-        observer.unobserve(chartRef.current.getEchartsInstance().getDom());
+        const dom = chartRef.current.getEchartsInstance().getDom();
+        observer.unobserve(dom);
       }
     };
   }, []);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (showBestLine) {
+      // Set a timeout matching the line animation duration (3000ms)
+      timeoutId = setTimeout(() => {
+        setShowBestTimeBox(true);
+      }, 0);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [showBestLine]);
 
   const defaultZeldaOption = createZeldaScatterOption(showBestLine);
 
