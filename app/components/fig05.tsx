@@ -89,9 +89,13 @@ const Page: React.FC = () => {
     const xMin = Math.min(...xValues);
     const xMax = Math.max(...xValues);
 
+    // Calculate the best time (minimum time)
+    const bestTime = Math.min(...yValues);
+    const formattedBestTime = formatTime(bestTime);
+
     return {
       id: optionId,
-      backgroundColor: "transparent", // Changed to black for better contrast
+      backgroundColor: "transparent", // Changed to transparent for better integration
       title: {
         text: "Speedrun times for category 100% of game The Legend of Zelda: Breath of the Wild",
         textStyle: { color: "white" },
@@ -126,19 +130,64 @@ const Page: React.FC = () => {
         nameTextStyle: { color: "white" },
         axisLabel: { color: "white" },
       },
-      graphic: {
-        type: "image",
-        id: "background",
-        left: "48%", // Moved 10% right
-        top: "30%", // Moved 10% up
-        z: 0, // Ensure it is behind all other elements
-        style: {
-          image: `images/${true_ID}_icon_rescaled.webp`,
-          width: 150,
-          height: 150,
-          opacity: 0.3, // Makes it look subtle and carved
+      graphic: [
+        {
+          type: "image",
+          id: "background",
+          left: "48%", // Adjusted position
+          top: "30%", // Adjusted position
+          z: 0, // Ensure it is behind all other elements
+          style: {
+            image: `images/${true_ID}_icon_rescaled.webp`,
+            width: 150,
+            height: 150,
+            opacity: 0.3, // Makes it look subtle and carved
+          },
         },
-      },
+        // New graphic element for the Best Time box
+        {
+          type: "group",
+          left: "20%", // Position at the bottom left
+          bottom: "15%", // Adjust as needed
+          z: 10, // Ensure it's above scatter points
+          children: [
+            {
+              type: "rect",
+              shape: {
+                width: 200,
+                height: 50,
+              },
+              style: {
+                fill: "rgba(0, 0, 0, 0.6)", // Semi-transparent background
+                stroke: "#00FF00", // Green border for video game feel
+                lineWidth: 2,
+                shadowBlur: 10,
+                shadowColor: "#00FF00",
+              },
+              // Optional: Add rounded corners
+              z: 0,
+            },
+            {
+              type: "text",
+              style: {
+                text: `Best Time: ${formattedBestTime}`,
+                x: 100, // Center the text within the rectangle
+                y: 25, // Vertically center the text
+                textAlign: "center",
+                textVerticalAlign: "middle",
+                fill: "#00FF00", // Green text color
+                font: 'bold 16px "Press Start 2P", cursive', // Pixel-style font
+                // If "Press Start 2P" is not available, use a default monospace font
+                // font: 'bold 16px monospace',
+                // Add a glow effect using shadow
+                textShadowColor: "#00FF00",
+                textShadowBlur: 4,
+              },
+              z: 1,
+            },
+          ],
+        },
+      ],
       animationDurationUpdate: 500,
       animationEasingUpdate: "linear",
       animationEasing: "linear",
