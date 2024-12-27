@@ -32,18 +32,17 @@ export default function Home() {
         <Banner />
       </div>
 
-      {showSafariDisclaimer && (
-        <div className="mt-5 bg-yellow-100 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center">
-          <p>
-            <strong>Performance Notice:</strong> You are using Safari. For the
-            best experience, we recommend using a Chromium-based browser
-            (Chrome, Edge, etc.) or Firefox.
-          </p>
-        </div>
-      )}
-
       <div className="grid w-full lg:max-w-[80%] 2xl:max-w-[70%] mx-auto sm:max-w-full mt-15">
         <div className="grid-cols-1">
+          {showSafariDisclaimer && (
+            <div className="mt-5 bg-yellow-100 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center">
+              <p>
+                <strong>Performance Notice:</strong> You are using Safari. For
+                the best experience, we recommend using a Chromium-based browser
+                (Chrome, Edge, etc.) or Firefox.
+              </p>
+            </div>
+          )}
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-5`}
             data-text="INTRODUCTION"
