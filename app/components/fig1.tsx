@@ -209,7 +209,27 @@ const Page: React.FC = () => {
   // FACTORY FUNCTIONS (Same as your code)
   // =============================================================================
   const createOptionForGameCounts = (): EChartsOption => {
-    // ... identical to your code ...
+    // Suppose game_counts is available in this scope
+    // e.g., game_counts = [{ name: 'Super Mario', ID: '123', count: 200, ... }, ...]
+
+    // 1. Dynamically build a `rich` object for all games
+    //    Each key will look like:  "img_123" -> { backgroundColor: { image: "images/123_icon_rescaled.webp" } }
+    const richStyles: Record<string, TextStyle> = {};
+    game_counts.forEach((game) => {
+      const styleName = "img_" + game.ID;
+      richStyles[styleName] = {
+        // The "backgroundColor" can be a data URL or a URL string
+        backgroundColor: {
+          image: `images/${game.ID}_icon.webp`,
+        },
+        // control the size of the image
+        width: 18,
+        height: 18,
+        // optional alignment or offset
+        align: "left",
+      };
+    });
+
     return {
       id: game_counts[0].identifier,
       title: { text: "Most speedrunned games" },
@@ -244,6 +264,7 @@ const Page: React.FC = () => {
         dimensions: [
           "name",
           "count",
+          "ID",
           "identifier",
           "child_identifier",
           "percent_2023",
@@ -284,10 +305,17 @@ const Page: React.FC = () => {
           label: {
             show: true,
             position: "inside",
-            formatter: "{b}",
+            // 2. Use formatter to include the dynamic style: "img_<ID>"
+            formatter: (params) => {
+              // e.g. "Super Mario {img_123|}"
+              const { name, ID } = params.data;
+              return `{img_${ID}|} ${name} {img_${ID}|}`;
+            },
             color: "#fff",
             textShadowBlur: 3,
             textShadowColor: "#000",
+            // 3. Hook up the rich styles you computed earlier
+            rich: richStyles,
           },
           itemStyle: {
             borderRadius: [0, 20, 20, 0],
