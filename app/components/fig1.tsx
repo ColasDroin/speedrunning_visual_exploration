@@ -584,20 +584,58 @@ const Page: React.FC = () => {
 
     // Build scatter charts with flickering "stars" + a background logo
     Object.entries(scatterData).forEach(
-      ([optionId, [dic_per_bin, best_line]]) => {
+      ([optionId, [dic_per_bin, best_line, true_ID]]) => {
         // Create multiple scatter series
         const l_series = Object.entries(dic_per_bin).map(
           ([bin_id, l_runs]: any) => ({
             type: "scatter",
+            // 1) Diamond shape
+            symbol: "diamond",
+            // 2) Pulsating size (mild wave + random factor)
+            symbolSize: (data: any, params: any) => {
+              const baseSize = 8; // Base size
+              const randomFactor = Math.random() * 4; // Slight random flicker
+              const waveFrequency = 0.1; // Very gentle wave
+              const timeFactor = Date.now() / 1000; // Continually changes over time
+
+              return (
+                baseSize +
+                randomFactor +
+                Math.sin(waveFrequency * (params.dataIndex + timeFactor)) * 4
+              );
+            },
+            // 3) Radial glow itemStyle
+            itemStyle: {
+              color: {
+                type: "radial",
+                x: 0.5,
+                y: 0.5,
+                r: 0.8,
+                colorStops: [
+                  { offset: 0, color: "rgba(255, 255, 255, 1)" }, // bright center
+                  { offset: 0.5, color: "rgba(216, 206, 146, 0.8)" }, // golden glow
+                  { offset: 1, color: "rgba(255, 215, 0, 0)" }, // fade to transparent
+                ],
+              },
+            },
+            // 4) Strong white shadow on hover
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 30,
+                shadowColor: "rgba(255, 255, 255, 1)",
+              },
+            },
+            // 5) Some animation & z-index
+            animationDuration: 2000,
+            z: 2,
+
+            // The usual scatter data fields
             dimensions: ["date", "time", "player", "location"],
             data: l_runs,
             dataGroupId: bin_id,
             id: bin_id,
             encode: { x: "date", y: "time" },
             universalTransition: { enabled: true },
-            // We'll override symbolSize in flicker effect, but set a base here
-            symbolSize: 8,
-            z: 2,
           })
         );
 
@@ -679,10 +717,11 @@ const Page: React.FC = () => {
               id: "background",
               left: "center",
               top: "middle",
-              z: 0, // behind scatter points
+              z: 0,
               style: {
-                // Example: you can place a generic "logo.png" or any image
-                image: "images/logo.png",
+                // e.g. "images/scat_mario_icon_rescaled.webp"
+                // or you can define your own naming scheme
+                image: `images/${true_ID}_icon_rescaled.webp`,
                 width: 200,
                 height: 200,
                 opacity: 0.2,
