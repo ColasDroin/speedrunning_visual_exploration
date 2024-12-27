@@ -163,7 +163,7 @@ const Page: React.FC = () => {
 
                   return (
                     baseSize +
-                    randomFactor +
+                    //randomFactor +
                     Math.sin(waveFrequency * (params.dataIndex + timeFactor)) *
                       4
                   );
@@ -172,7 +172,7 @@ const Page: React.FC = () => {
             : series
         ),
       });
-    }, 50);
+    }, 100);
   };
 
   useEffect(() => {

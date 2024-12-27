@@ -51,7 +51,7 @@ const Page: React.FC = () => {
 
     const data = raceData.data;
     const yearMonth: string[] = [...new Set(data.map((d: string[]) => d[0]))];
-    const startIndex = 12;
+    const startIndex = 0;
     const startMonth = yearMonth[startIndex];
     const endMonth = yearMonth[yearMonth.length - 1];
 
