@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 // Example data
 import game_counts from "../../public/data/game_counts.json";
@@ -15,17 +15,75 @@ const Page: React.FC = () => {
   // REFS & STATE
   // =============================================================================
   const chartRef = useRef<ReactECharts | null>(null);
-  // Holds all prebuilt chart options keyed by an ID
   const allOptions: OptionsDictionary = {};
-  // Keeps track of navigation history for going back/forward
   const optionStack: string[] = [];
+
+  // NEW: We no longer use isPulsating in a useEffect that runs on mount.
+  // Instead, we store the setInterval ID in a ref and manually start/stop it.
+  const flickerIntervalRef = useRef<number | null>(null);
+
+  // -----------------------------------------------------------------------------
+  // Flicker Management
+  // -----------------------------------------------------------------------------
+  // We'll call these functions from goForward/goBack once we know if the chart is scatter or not.
+
+  const startFlicker = () => {
+    // If we're already flickering, skip
+    if (flickerIntervalRef.current !== null) return;
+
+    const chartInstance = chartRef.current?.getEchartsInstance();
+    if (!chartInstance) return;
+
+    flickerIntervalRef.current = window.setInterval(() => {
+      const currentOption = chartInstance.getOption();
+      if (!currentOption?.series) return;
+
+      // Recalculate symbolSize only on scatter series
+      const newSeries = currentOption.series.map((s: any) => {
+        if (s.type === "scatter") {
+          return {
+            ...s,
+            symbolSize: (data: any, params: any) => {
+              const baseSize = 6;
+              const randomFactor = Math.random() * 4;
+              const waveFrequency = 2;
+              const timeFactor = Date.now() / 1000;
+
+              return (
+                baseSize +
+                randomFactor +
+                Math.sin(waveFrequency * (params.dataIndex + timeFactor)) * 4
+              );
+            },
+          };
+        }
+        return s;
+      });
+
+      chartInstance.setOption({ series: newSeries }, false);
+    }, 500);
+
+    console.log("Flicker started");
+  };
+
+  const stopFlicker = () => {
+    if (flickerIntervalRef.current !== null) {
+      clearInterval(flickerIntervalRef.current);
+      flickerIntervalRef.current = null;
+      console.log("Flicker stopped");
+    }
+  };
+
+  // Helper to check if a chart ID should flicker
+  const chartIdIsScatter = (chartId?: string) => {
+    // Example logic: If your scatter IDs all start with "scat_"
+    // or if you want to flicker on distributions as well:
+    return chartId?.startsWith("scat_");
+  };
 
   // =============================================================================
   // HELPER FUNCTIONS
   // =============================================================================
-  /**
-   * Utility to format seconds into `Hh Mm Ss Msms`
-   */
   const formatTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -34,9 +92,6 @@ const Page: React.FC = () => {
     return `${h}h ${m}m ${s}s ${ms}ms`;
   };
 
-  /**
-   * Helper to fetch and decompress gzip JSON.
-   */
   const fetchAndDecompress = async (url: string): Promise<any[]> => {
     try {
       const response = await fetch(url);
@@ -52,13 +107,8 @@ const Page: React.FC = () => {
   };
 
   // =============================================================================
-  // NAVIGATION LOGIC (ORIGINAL STYLE) + isSpecial CHECK
+  // NAVIGATION LOGIC
   // =============================================================================
-
-  /**
-   * Go forward to a new chart (push the current one onto the stack).
-   * Restores original logic from your first code version, with universal transitions.
-   */
   const goForward = (nextOptionId: string) => {
     if (!allOptions[nextOptionId]) {
       console.error(
@@ -74,19 +124,18 @@ const Page: React.FC = () => {
 
     // Push current chart ID so we can goBack() later
     optionStack.push(currentOptionId);
-    console.log("Pushing current option onto stack:", currentOptionId);
-    console.log(`Navigating forward to: ${nextOptionId}`);
 
-    // If transitioning to scatter or distribution, we inject seriesKey
+    console.log(
+      `Navigating from ${currentOptionId} forward to: ${nextOptionId}`
+    );
+
     const isDistributionOrScatter = nextOptionId.startsWith("scat_");
 
     if (isDistributionOrScatter) {
-      // Create a safe copy if not already stored
       const copyKey = currentOptionId + "_copy";
       if (!allOptions[copyKey]) {
         const safeCopy = JSON.parse(JSON.stringify(currentOption));
         safeCopy.id = copyKey;
-        // Ensure the "Back" graphic is preserved
         safeCopy.graphic = [
           {
             type: "text",
@@ -103,7 +152,6 @@ const Page: React.FC = () => {
         allOptions[copyKey] = safeCopy;
       }
 
-      // Attempt to set or update the `seriesKey`
       try {
         const datasetObj = currentOption?.dataset?.[0];
         if (datasetObj?.source) {
@@ -118,9 +166,8 @@ const Page: React.FC = () => {
             s.universalTransition = s.universalTransition || {};
             s.universalTransition.seriesKey = l_child_identifiers;
           });
-          // Update the instance with the modified current option
+
           instance.setOption(currentOption, { notMerge: false, silent: true });
-          // Store a fresh copy of currentOption
           allOptions[currentOptionId] = instance.getOption() as EChartsOption;
         }
       } catch (error) {
@@ -128,7 +175,7 @@ const Page: React.FC = () => {
       }
     }
 
-    // Finally, navigate forward to the next chart
+    // Show the new chart
     try {
       instance.setOption(allOptions[nextOptionId], true);
     } catch (error) {
@@ -142,12 +189,15 @@ const Page: React.FC = () => {
         console.error("No fallback copy found for:", fallbackId);
       }
     }
+
+    // NEW: Decide if we should flicker based on the new chart's ID
+    if (chartIdIsScatter(nextOptionId)) {
+      startFlicker();
+    } else {
+      stopFlicker();
+    }
   };
 
-  /**
-   * Go back (pop from the stack). This is the original logic, but we keep the `isSpecial` check.
-   * We also remove or re-inject seriesKey as in your older code.
-   */
   const goBack = () => {
     if (!chartRef.current) {
       console.log("No chart reference available.");
@@ -160,8 +210,6 @@ const Page: React.FC = () => {
 
     const instance = chartRef.current.getEchartsInstance();
     const currentOption = instance.getOption() as EChartsOption;
-
-    // Pop from the stack => the previous chart we want to revert to
     const prevOptionId = optionStack.pop()!;
     const prevOption = allOptions[prevOptionId];
 
@@ -172,9 +220,6 @@ const Page: React.FC = () => {
       return;
     }
 
-    // The original code also removed the `seriesKey` if we return to certain charts
-    // Example: if (previousOptionId.endsWith("_submission") || previousOptionId.startsWith("dist_")) { ... }
-    // Or you can adapt it exactly as in your original code:
     if (
       prevOptionId.endsWith("_submission") ||
       prevOptionId.startsWith("dist_")
@@ -188,44 +233,44 @@ const Page: React.FC = () => {
         }
       });
       currentOption.series = seriesArr;
-      // Overwrite local copy
       allOptions[currentOption.id as string] = currentOption;
     }
 
-    // Finally, set the previous chart
     instance.setOption(prevOption, true);
+
+    // NEW: Now that we've gone back, check the ID of the displayed chart
+    const newId = prevOption.id as string;
+    if (chartIdIsScatter(newId)) {
+      startFlicker();
+    } else {
+      stopFlicker();
+    }
   };
 
-  /**
-   * If user clicks on a bar that has `child_identifier`, we goForward().
-   */
   const onChartClick = (params: any) => {
-    if (params.data?.child_identifier) {
-      goForward(params.data.child_identifier);
+    const nextId = params.data?.child_identifier;
+    if (!nextId) return;
+
+    if (allOptions[nextId]) {
+      goForward(nextId);
+    } else {
+      console.warn(`No data available for child_identifier: "${nextId}"`);
     }
   };
 
   // =============================================================================
-  // FACTORY FUNCTIONS (Same as your code)
+  // FACTORY FUNCTIONS
   // =============================================================================
   const createOptionForGameCounts = (): EChartsOption => {
-    // Suppose game_counts is available in this scope
-    // e.g., game_counts = [{ name: 'Super Mario', ID: '123', count: 200, ... }, ...]
-
-    // 1. Dynamically build a `rich` object for all games
-    //    Each key will look like:  "img_123" -> { backgroundColor: { image: "images/123_icon_rescaled.webp" } }
-    const richStyles: Record<string, TextStyle> = {};
+    const richStyles: Record<string, any> = {};
     game_counts.forEach((game) => {
       const styleName = "img_" + game.ID;
       richStyles[styleName] = {
-        // The "backgroundColor" can be a data URL or a URL string
         backgroundColor: {
           image: `images/${game.ID}_icon.webp`,
         },
-        // control the size of the image
         width: 18,
         height: 18,
-        // optional alignment or offset
         align: "left",
       };
     });
@@ -305,16 +350,13 @@ const Page: React.FC = () => {
           label: {
             show: true,
             position: "inside",
-            // 2. Use formatter to include the dynamic style: "img_<ID>"
             formatter: (params) => {
-              // e.g. "Super Mario {img_123|}"
               const { name, ID } = params.data;
               return `{img_${ID}|} ${name} {img_${ID}|}`;
             },
             color: "#fff",
             textShadowBlur: 3,
             textShadowColor: "#000",
-            // 3. Hook up the rich styles you computed earlier
             rich: richStyles,
           },
           itemStyle: {
@@ -362,16 +404,10 @@ const Page: React.FC = () => {
   // PREPARE ALL OPTIONS (LOCAL + FETCHED)
   // =============================================================================
   const option_counts = createOptionForGameCounts();
-
-  // Put them into the dictionary
   allOptions[option_counts.id!] = option_counts;
-
-  // Initialize stack with the "Most speedrunned games" ID, etc.
   optionStack.push(option_counts.id as string);
 
-  // Fetch and prepare the rest of the options
   const prepareOptions = async () => {
-    // Load data from your server
     const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || "";
     const scatterData = await fetchAndDecompress(
       `${baseUrl}/data/scatter_data.json.gz`
@@ -382,7 +418,6 @@ const Page: React.FC = () => {
     const distributionTypes = await fetchAndDecompress(
       `${baseUrl}/data/distribution_types.json.gz`
     );
-
     // Build options for submission types
     submissionTypes.forEach((dataSet: any[]) => {
       const optionId = dataSet[0]["identifier"];
@@ -547,7 +582,7 @@ const Page: React.FC = () => {
       };
     });
 
-    // Build scatter charts (like zelda, but loaded dynamically)
+    // Build scatter charts with flickering "stars" + a background logo
     Object.entries(scatterData).forEach(
       ([optionId, [dic_per_bin, best_line]]) => {
         // Create multiple scatter series
@@ -560,9 +595,12 @@ const Page: React.FC = () => {
             id: bin_id,
             encode: { x: "date", y: "time" },
             universalTransition: { enabled: true },
+            // We'll override symbolSize in flicker effect, but set a base here
+            symbolSize: 8,
             z: 2,
           })
         );
+
         // Add the line
         l_series.push({
           type: "line",
@@ -586,6 +624,7 @@ const Page: React.FC = () => {
 
         allOptions[optionId] = {
           id: optionId,
+          backgroundColor: "transparent", // For better integration
           title: { text: "Speedrun times for category X of game X" },
           dataZoom: [
             {
@@ -617,10 +656,10 @@ const Page: React.FC = () => {
           },
           grid: { left: 200 },
           yAxis: {
-            type: "value", // Corrected type
+            type: "value",
             name: "Speedrun time",
             axisLabel: {
-              formatter: (value: number) => formatTime(value), // Directly formatting the seconds
+              formatter: (value: number) => formatTime(value),
             },
             min: yMin,
             max: yMax,
@@ -633,8 +672,22 @@ const Page: React.FC = () => {
           animationThreshold: 20000,
           progressive: 20000,
           progressiveThreshold: 20000,
-          series: l_series,
+          // Add a subtle background logo
           graphic: [
+            {
+              type: "image",
+              id: "background",
+              left: "center",
+              top: "middle",
+              z: 0, // behind scatter points
+              style: {
+                // Example: you can place a generic "logo.png" or any image
+                image: "images/logo.png",
+                width: 200,
+                height: 200,
+                opacity: 0.2,
+              },
+            },
             {
               type: "text",
               left: 50,
@@ -647,6 +700,7 @@ const Page: React.FC = () => {
               onclick: () => goBack(),
             },
           ],
+          series: l_series,
         };
       }
     );
@@ -663,7 +717,6 @@ const Page: React.FC = () => {
         console.error("Error preparing options:", error);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // =============================================================================
