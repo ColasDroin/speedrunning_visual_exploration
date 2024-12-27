@@ -50,10 +50,16 @@ const Page: React.FC = () => {
             y: 0.5,
             r: 0.8,
             colorStops: [
-              { offset: 0, color: "white" }, // Center
-              { offset: 0.7, color: "lightblue" }, // Glow
-              { offset: 1, color: "transparent" }, // Fade to transparent
+              { offset: 0, color: "rgba(255, 255, 255, 1)" }, // Bright center
+              { offset: 0.5, color: "rgba(216, 206, 146, 0.8)" }, // Golden glow
+              { offset: 1, color: "rgba(255, 215, 0, 0)" }, // Fade to transparent
             ],
+          },
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 30,
+            shadowColor: "rgba(255, 255, 255, 1)",
           },
         },
         animationDuration: 2000,
@@ -85,9 +91,9 @@ const Page: React.FC = () => {
 
     return {
       id: optionId,
-      backgroundColor: "transparent",
+      backgroundColor: "transparent", // Changed to black for better contrast
       title: {
-        text: "Speedrun times for category 100% of game TheLegendofZelda: Breath of the Wild",
+        text: "Speedrun times for category 100% of game The Legend of Zelda: Breath of the Wild",
         textStyle: { color: "white" },
       },
       tooltip: {
@@ -213,7 +219,7 @@ const Page: React.FC = () => {
       option={defaultZeldaOption}
       style={{ height: "800px", width: "100%" }}
       opts={{ renderer: "canvas" }}
-      theme="light"
+      theme="dark" // Changed theme to dark for better contrast
     />
   );
 };
