@@ -106,38 +106,6 @@ const Page: React.FC = () => {
         borderColor: "#c23531",
       },
       series: [
-        // {
-        //   type: "tree",
-        //   name: "Super Mario 64",
-        //   data: [dataCategories["mario"]],
-        //   top: "20%",
-        //   bottom: "25%",
-        //   left: "1%",
-        //   right: "77%",
-        //   // orient: "vertical",
-        //   symbol: "emptyCircle",
-        //   layout: "radial",
-        //   symbolSize: 7,
-        //   initialTreeDepth: scrollDepth, // Adjust depth dynamically
-        //   animationDurationUpdate: 750,
-        //   expandAndCollapse: true,
-        //   emphasis: { focus: "descendant" },
-        //   // label: {
-        //   //   position: "top",
-        //   //   rotate: -90,
-        //   //   verticalAlign: "middle",
-        //   //   align: "right",
-        //   //   fontSize: 15,
-        //   // },
-        //   // leaves: {
-        //   //   label: {
-        //   //     position: "bottom",
-        //   //     rotate: -90,
-        //   //     verticalAlign: "middle",
-        //   //     align: "left",
-        //   //   },
-        //   // },
-        // },
         {
           type: "tree",
           name: "Portal",
@@ -169,36 +137,6 @@ const Page: React.FC = () => {
           //   },
           // },
         },
-        // {
-        //   type: "tree",
-        //   name: "MineCraft: Java Edition",
-        //   data: [dataCategories["minecraft"]],
-        //   top: "20%",
-        //   bottom: "52%",
-        //   left: "80%",
-        //   right: "1%",
-        //   orient: "vertical",
-        //   symbol: "emptyCircle",
-        //   symbolSize: 7,
-        //   initialTreeDepth: scrollDepth, // Adjust depth dynamically
-        //   animationDurationUpdate: 750,
-        //   emphasis: { focus: "descendant" },
-        //   label: {
-        //     position: "top",
-        //     rotate: -90,
-        //     verticalAlign: "middle",
-        //     align: "right",
-        //     fontSize: 15,
-        //   },
-        //   leaves: {
-        //     label: {
-        //       position: "bottom",
-        //       rotate: -90,
-        //       verticalAlign: "middle",
-        //       align: "left",
-        //     },
-        //   },
-        // },
       ],
     };
 
