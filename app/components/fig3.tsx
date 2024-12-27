@@ -33,6 +33,11 @@ const featuredGames = [
     name: "Seterra (Old Version)",
     desc: "A geography quiz game with surprising speedrun potential.",
   },
+
+  {
+    name: "And many others...",
+    desc: "",
+  },
 ];
 
 const CENTER_TOLERANCE = 50;
@@ -188,7 +193,7 @@ const Page: React.FC = () => {
       selected[g] = false;
     }
 
-    const totalFeatured = featuredGames.length;
+    const totalFeatured = featuredGames.length - 1;
 
     if (revealedCount <= totalFeatured) {
       // only reveal first `revealedCount` from featured
