@@ -362,7 +362,7 @@ const Page: React.FC = () => {
               {
                 type: "text",
                 style: {
-                  text: "Restart race",
+                  text: "(Re-)start race",
                   fontSize: 14,
                   fontWeight: "bold",
                   fill: "#FFFFFF",
