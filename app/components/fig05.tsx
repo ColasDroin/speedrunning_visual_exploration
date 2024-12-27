@@ -31,7 +31,18 @@ const Page: React.FC = () => {
         id: bin_id,
         encode: { x: "date", y: "time" },
         symbol: "diamond",
-        symbolSize: 8, // Base size for pulsating effect
+        symbolSize: (data, params) => {
+          const baseSize = 8; // Base size
+          const randomFactor = Math.random() * 4; // Randomize initial size
+          const waveFrequency = 0.1; // Wave frequency
+          const timeFactor = Date.now() / 1000; // Time-based oscillation
+
+          return (
+            baseSize +
+            randomFactor +
+            Math.sin(waveFrequency * (params.dataIndex + timeFactor)) * 4
+          );
+        },
         itemStyle: {
           color: {
             type: "radial",
@@ -124,22 +135,29 @@ const Page: React.FC = () => {
     if (!chartRef.current) return;
 
     const chartInstance = chartRef.current.getEchartsInstance();
-    let grow = true;
-    let currentSize = 4;
 
     setInterval(() => {
-      currentSize = grow ? currentSize + 4 : currentSize - 4;
-      if (currentSize >= 10) grow = false;
-      if (currentSize <= 2) grow = true;
-
       chartInstance.setOption({
-        series: chartInstance
-          .getOption()
-          .series.map((series: any) =>
-            series.type === "scatter"
-              ? { ...series, symbolSize: currentSize }
-              : series
-          ),
+        series: chartInstance.getOption().series.map((series: any) =>
+          series.type === "scatter"
+            ? {
+                ...series,
+                symbolSize: (data, params) => {
+                  const baseSize = 4; // Base size
+                  const randomFactor = Math.random() * 4; // Randomize initial size
+                  const waveFrequency = 2; // Wave frequency
+                  const timeFactor = Date.now() / 1000; // Time-based oscillation
+
+                  return (
+                    baseSize +
+                    randomFactor +
+                    Math.sin(waveFrequency * (params.dataIndex + timeFactor)) *
+                      4
+                  );
+                },
+              }
+            : series
+        ),
       });
     }, 50);
   };
