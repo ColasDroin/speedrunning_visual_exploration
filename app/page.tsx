@@ -1,3 +1,5 @@
+"use client";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTwitter,
@@ -15,11 +17,30 @@ import Fig4 from "./components/fig4";
 import styles from "./styles/banner.module.css";
 
 export default function Home() {
+  const [showSafariDisclaimer, setShowSafariDisclaimer] = useState(false);
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.includes("safari") && !userAgent.includes("chrome")) {
+      setShowSafariDisclaimer(true);
+    }
+  }, []);
+
   return (
     <div>
       <div className="h-[30vh]">
         <Banner />
       </div>
+
+      {showSafariDisclaimer && (
+        <div className="mt-5 bg-yellow-100 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center">
+          <p>
+            <strong>Performance Notice:</strong> You are using Safari. For the
+            best experience, we recommend using a Chromium-based browser
+            (Chrome, Edge, etc.) or Firefox.
+          </p>
+        </div>
+      )}
 
       <div className="grid w-full lg:max-w-[80%] 2xl:max-w-[70%] mx-auto sm:max-w-full mt-15">
         <div className="grid-cols-1">
