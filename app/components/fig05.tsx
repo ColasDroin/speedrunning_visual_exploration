@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import scatterZelda from "../../public/data/scatter_zelda.json";
 type EChartsOption = echarts.EChartsOption;
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
+  const [showBestLine, setShowBestLine] = useState(false);
 
   const formatTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
@@ -16,7 +17,7 @@ const Page: React.FC = () => {
     return `${h}h ${m}m ${s}s ${ms}ms`;
   };
 
-  const createZeldaScatterOption = (): EChartsOption => {
+  const createZeldaScatterOption = (showBestLine: boolean): EChartsOption => {
     const optionId = Object.keys(scatterZelda)[0];
     const [dic_per_bin, best_line] = scatterZelda[optionId];
 
@@ -33,16 +34,18 @@ const Page: React.FC = () => {
       })
     );
 
-    l_series.push({
-      type: "line",
-      data: best_line,
-      encode: { x: 0, y: 1 },
-      universalTransition: { enabled: true },
-      animationDuration: 3000,
-      symbol: "none",
-      tooltip: { show: false },
-      z: 1,
-    });
+    if (showBestLine) {
+      l_series.push({
+        type: "line",
+        data: best_line,
+        encode: { x: 0, y: 1 },
+        universalTransition: { enabled: true },
+        animationDuration: 5000,
+        symbol: "none",
+        tooltip: { show: false },
+        z: 1,
+      });
+    }
 
     const yValues = best_line.map((item: [string, number]) => item[1]);
     const xValues = best_line.map((item: [string]) =>
@@ -58,22 +61,6 @@ const Page: React.FC = () => {
       title: {
         text: "Speedrun times for category 100% of game TheLegendofZelda: Breath of the Wild",
       },
-      // dataZoom: [
-      //   {
-      //     type: "inside",
-      //     yAxisIndex: [0],
-      //     filterMode: "filter",
-      //     startValue: yMin,
-      //     endValue: yMax,
-      //   },
-      //   {
-      //     type: "inside",
-      //     xAxisIndex: [0],
-      //     startValue: Math.max(xMin, new Date("2012-02-01").getTime()),
-      //     endValue: xMax,
-      //     filterMode: "filter",
-      //   },
-      // ],
       tooltip: {
         trigger: "item",
         axisPointer: { type: "shadow" },
@@ -88,10 +75,10 @@ const Page: React.FC = () => {
       },
       grid: { left: 200 },
       yAxis: {
-        type: "value", // Corrected type
+        type: "value",
         name: "Speedrun time",
         axisLabel: {
-          formatter: (value: number) => formatTime(value), // Directly formatting the seconds
+          formatter: (value: number) => formatTime(value),
         },
         min: yMin,
         max: yMax,
@@ -105,22 +92,33 @@ const Page: React.FC = () => {
       progressive: 20000,
       progressiveThreshold: 20000,
       series: l_series,
-      graphic: [
-        {
-          type: "text",
-          left: 50,
-          top: 20,
-          style: {
-            text: "Back",
-            fontSize: 18,
-            fill: "grey",
-          },
-        },
-      ],
     };
   };
 
-  const defaultZeldaOption = createZeldaScatterOption();
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setShowBestLine(true);
+          }
+        });
+      },
+      { threshold: 0.5 } // Trigger when 50% of the chart is visible
+    );
+
+    if (chartRef.current) {
+      observer.observe(chartRef.current.getEchartsInstance().getDom());
+    }
+
+    return () => {
+      if (chartRef.current) {
+        observer.unobserve(chartRef.current.getEchartsInstance().getDom());
+      }
+    };
+  }, []);
+
+  const defaultZeldaOption = createZeldaScatterOption(showBestLine);
 
   return (
     <ReactECharts
