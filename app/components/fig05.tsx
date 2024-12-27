@@ -133,7 +133,7 @@ const Page: React.FC = () => {
           opacity: 0.3, // Makes it look subtle and carved
         },
       },
-      animationDurationUpdate: 100,
+      animationDurationUpdate: 500,
       animationEasingUpdate: "linear",
       animationEasing: "linear",
       animationDelay: 0,
@@ -156,14 +156,14 @@ const Page: React.FC = () => {
             ? {
                 ...series,
                 symbolSize: (data, params) => {
-                  const baseSize = 4; // Base size
+                  const baseSize = 6; // Base size
                   const randomFactor = Math.random() * 4; // Randomize initial size
                   const waveFrequency = 2; // Wave frequency
                   const timeFactor = Date.now() / 1000; // Time-based oscillation
 
                   return (
                     baseSize +
-                    //randomFactor +
+                    randomFactor +
                     Math.sin(waveFrequency * (params.dataIndex + timeFactor)) *
                       4
                   );
@@ -172,7 +172,7 @@ const Page: React.FC = () => {
             : series
         ),
       });
-    }, 100);
+    }, 500);
   };
 
   useEffect(() => {

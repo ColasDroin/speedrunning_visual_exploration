@@ -10,7 +10,6 @@ const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
   const [scrollDepth, setScrollDepth] = useState(0); // Track scroll depth
-  const previousDepthRef = useRef<number>(0); // Track the previous depth
 
   useEffect(() => {
     const handleScroll = throttle(() => {
@@ -24,8 +23,9 @@ const Page: React.FC = () => {
           (scrollPosition / (documentHeight - windowHeight)) * maxDepth * 4
         )
       );
-      setScrollDepth(newDepth); // Update the scroll depth
-    }, 1200); // Throttle to update at most every 100ms
+      // Update scrollDepth to the maximum of current and newDepth
+      setScrollDepth((prevDepth) => Math.max(prevDepth, newDepth));
+    }, 100); // Throttle to update at most every 100ms
 
     // Add scroll event listener
     window.addEventListener("scroll", handleScroll);
@@ -37,13 +37,8 @@ const Page: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Avoid redundant updates if scrollDepth hasn't changed
-    // if (scrollDepth === previousDepthRef.current) return;
-
-    // Update the reference to the current depth
-    previousDepthRef.current = scrollDepth;
-
     const chartOption: echarts.EChartsOption = {
+      backgroundColor: "transparent",
       tooltip: {
         trigger: "item",
         triggerOn: "mousemove",
