@@ -24,7 +24,7 @@ const Page: React.FC = () => {
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
   const updateFunctionsRef = useRef<Function[]>([]);
 
-  const prepareGraph = async () => {
+  const prepareGraph = async (startAnimation = false) => {
     const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
     let raceData: any[] = [];
     let worldJson: any = {};
@@ -160,7 +160,7 @@ const Page: React.FC = () => {
               // Restart the bar race with proper animations
               const chartInstance = chartRef.current?.getEchartsInstance();
               // Get mapOption and log it
-              const mapOptionCurrent = chartInstance.getOption();
+              const mapOptionCurrent = chartInstance?.getOption();
               if (chartInstance) {
                 const barOptionWithTransition = {
                   ...barOption,
@@ -178,7 +178,7 @@ const Page: React.FC = () => {
               }
 
               // Restart the bar race logic
-              prepareGraph();
+              prepareGraph(true); // <-- Start race here
             },
           },
         ],
@@ -218,6 +218,7 @@ const Page: React.FC = () => {
         animationDurationUpdate: 300,
       },
       dataset: {
+        // Show only the first month's data initially (no race yet)
         source: data.filter((d: string[]) => d[0] === startMonth),
         dimensions: ["month", "name", "value", "color"],
       },
@@ -250,7 +251,7 @@ const Page: React.FC = () => {
         },
       ],
 
-      // Updated graphic elements with the new "Restart Bar Race" button
+      // Graphic elements
       graphic: {
         elements: [
           {
@@ -398,17 +399,18 @@ const Page: React.FC = () => {
               }));
 
               // Start the bar race updates again
-              prepareGraph();
+              prepareGraph(true); // <-- Start race here
             },
           },
         ],
       },
     };
 
+    // Initialize chart with bar option for the current "startMonth"
     const clone = Object.assign({}, barOption);
     setOption(clone);
 
-    // Update function for the race
+    // Update function for each “frame” of the race
     const updateYear = (year: string) => {
       if (year === endMonth) {
         const chartInstance = chartRef.current?.getEchartsInstance();
@@ -437,20 +439,23 @@ const Page: React.FC = () => {
       }));
     };
 
-    // Store update functions in ref for cleanup
-    const updates: Function[] = [];
-    for (let i = startIndex; i < yearMonth.length - 1; ++i) {
-      const timeoutId = setTimeout(
-        () => updateYear(yearMonth[i + 1]),
-        (i - startIndex) * updateFrequency
-      );
-      updates.push(() => clearTimeout(timeoutId));
+    // Only start the timeouts (i.e., the “race”) if startAnimation is true
+    if (startAnimation) {
+      const updates: Function[] = [];
+      for (let i = startIndex; i < yearMonth.length - 1; ++i) {
+        const timeoutId = setTimeout(
+          () => updateYear(yearMonth[i + 1]),
+          (i - startIndex) * updateFrequency
+        );
+        updates.push(() => clearTimeout(timeoutId));
+      }
+      updateFunctionsRef.current = updates;
     }
-    updateFunctionsRef.current = updates;
   };
 
+  // On component mount, just display the initial bar chart at the first month (no race)
   useEffect(() => {
-    prepareGraph();
+    prepareGraph(false); // Pass false to avoid auto-race
     return () => {
       // Cleanup timeouts when component unmounts
       updateFunctionsRef.current.forEach((updateFn) => updateFn());
