@@ -30,7 +30,7 @@ const Page: React.FC = () => {
         dataGroupId: bin_id,
         id: bin_id,
         encode: { x: "date", y: "time" },
-        symbol: "circle",
+        symbol: "diamond",
         symbolSize: 8, // Base size for pulsating effect
         itemStyle: {
           color: {
@@ -109,7 +109,10 @@ const Page: React.FC = () => {
         nameTextStyle: { color: "white" },
         axisLabel: { color: "white" },
       },
-      animationDurationUpdate: 1000,
+      animationDurationUpdate: 100,
+      animationEasingUpdate: "linear",
+      animationEasing: "linear",
+      animationDelay: 0,
       animationThreshold: 20000,
       progressive: 20000,
       progressiveThreshold: 20000,
@@ -122,10 +125,10 @@ const Page: React.FC = () => {
 
     const chartInstance = chartRef.current.getEchartsInstance();
     let grow = true;
-    let currentSize = 2;
+    let currentSize = 4;
 
     setInterval(() => {
-      currentSize = grow ? currentSize + 1 : currentSize - 1;
+      currentSize = grow ? currentSize + 4 : currentSize - 4;
       if (currentSize >= 10) grow = false;
       if (currentSize <= 2) grow = true;
 
@@ -138,7 +141,7 @@ const Page: React.FC = () => {
               : series
           ),
       });
-    }, 500);
+    }, 50);
   };
 
   useEffect(() => {
