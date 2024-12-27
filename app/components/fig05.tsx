@@ -20,7 +20,7 @@ const Page: React.FC = () => {
 
   const createZeldaScatterOption = (showBestLine: boolean): EChartsOption => {
     const optionId = Object.keys(scatterZelda)[0];
-    const [dic_per_bin, best_line] = scatterZelda[optionId];
+    const [dic_per_bin, best_line, true_ID] = scatterZelda[optionId];
 
     const l_series = Object.entries(dic_per_bin).map(
       ([bin_id, l_runs]: any) => ({
@@ -85,7 +85,7 @@ const Page: React.FC = () => {
 
     return {
       id: optionId,
-      backgroundColor: "black", // Night-sky background
+      backgroundColor: "transparent",
       title: {
         text: "Speedrun times for category 100% of game TheLegendofZelda: Breath of the Wild",
         textStyle: { color: "white" },
@@ -119,6 +119,19 @@ const Page: React.FC = () => {
         name: "Date",
         nameTextStyle: { color: "white" },
         axisLabel: { color: "white" },
+      },
+      graphic: {
+        type: "image",
+        id: "background",
+        left: "42%", // Moved 10% right
+        top: "30%", // Moved 10% up
+        z: 0, // Ensure it is behind all other elements
+        style: {
+          image: `images/${true_ID}_icon_rescaled.webp`,
+          width: 200,
+          height: 200,
+          opacity: 0.3, // Makes it look subtle and carved
+        },
       },
       animationDurationUpdate: 100,
       animationEasingUpdate: "linear",
