@@ -1,18 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jersey+10&display=swap");
 
-/* Center the entire row in the banner */
 .heroContent {
-  /* position: absolute;
-  top: 50%; 
-  left: 50%;
-  transform: translate(-50%, -50%); */
   display: flex;
-  align-items: center; /* Vertically center items within the container */
-  justify-content: center; /* Horizontally center the entire row */
-  gap: 2rem; /* Space between coin, text, and star */
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
-  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 2vw, 3rem);
+  flex-wrap: nowrap;
 }
 
 .grid {
@@ -58,17 +52,13 @@
 
 .coin,
 .star {
-  width: 100px;
-  height: 100px;
-  /* Remove any existing top/right/left/bottom positioning */
-  margin: 0; /* Reset margins */
-  /* Ensure vertical alignment within Flexbox */
+  width: clamp(50px, 10vw, 100px);
+  height: clamp(50px, 10vw, 100px);
   display: flex;
   align-items: center;
   justify-content: center;
-  transform-origin: center center; /* or 50% 50% */
+  transform-origin: center center;
 }
-
 .star {
   background-color: gold;
   background-image: radial-gradient(circle, gold, darkgoldenrod);
@@ -166,7 +156,7 @@
   left: 0;
   top: 0;
   width: 100vw;
-  height: var(--background-height, 30vh);
+  height: clamp(15vh, 20vw, 30vh); /* Scales with viewport */
   z-index: -2;
   mask-image: linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
 }
@@ -247,7 +237,7 @@
 .outrun {
   font-family: "Road Rage";
   font-weight: normal;
-  font-size: 40px;
+  font-size: clamp(12px, 3vw, 40px);
   margin-top: -0.5rem;
 }
 
@@ -290,14 +280,14 @@
 .chrome {
   font-family: "Doto";
   font-weight: 900;
-  font-size: calc(30px + 10vh);
+  font-size: clamp(20px, 5vw, 60px);
   background-image: linear-gradient(#2989cc 0%, #d3e5ec 50%, #b3628d 100%);
   -webkit-background-clip: text;
   background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: rgba(255, 255, 255, 0.4);
+  -webkit-text-stroke-width: clamp(0.5px, 0.3vw, 1px);
   position: relative;
 }
 
