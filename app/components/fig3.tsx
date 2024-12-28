@@ -59,7 +59,7 @@ const Page: React.FC = () => {
   const [completed, setCompleted] = useState(false);
 
   // For expansions/folding
-  const [expandedIndex, setExpandedIndex] = useState<number>(-1); // we start expanded on the first
+  const [expandedIndex, setExpandedIndex] = useState<number>(0);
   const [appeared, setAppeared] = useState<boolean[]>([]);
 
   // For final folding
@@ -101,7 +101,7 @@ const Page: React.FC = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        const totalFeatured = featuredGames.length;
+        const totalFeatured = featuredGames.length - 1;
 
         // If we've revealed all featured plus "others"
         // i.e. revealedCount > totalFeatured => last stage
@@ -221,7 +221,10 @@ const Page: React.FC = () => {
     const newOption: echarts.EChartsOption = {
       title: {
         text: "Evolution of game popularity with time",
+        left: "center",
+        textStyle: { color: "white" },
       },
+      backgroundColor: "transparent",
       animation: "auto",
       animationDuration: 1000,
       animationDurationUpdate: 500,
@@ -276,8 +279,18 @@ const Page: React.FC = () => {
         {
           data: allGames,
           selected: selectedMap,
+          top: 30,
+          right: 30,
+          left: 0,
         },
       ],
+      // grid: {
+      //   top: 10, // Adjust the top margin
+      //   bottom: 30, // Adjust the bottom margin
+      //   left: 100, // Adjust the left margin
+      //   right: 100, // Adjust the right margin
+      // },
+
       singleAxis: {
         top: 50,
         bottom: 50,
@@ -376,9 +389,9 @@ const Page: React.FC = () => {
       <div
         ref={chartContainerRef}
         style={{
-          flex: "2",
+          flex: "3",
           aspectRatio: "1.2 / 1",
-          border: "1px solid #444",
+          // border: "1px solid #444",
           marginLeft: "1rem",
         }}
       >
@@ -387,7 +400,7 @@ const Page: React.FC = () => {
           option={option || {}}
           style={{
             width: "100%",
-            height: "100%",
+            height: "90vh",
           }}
           opts={{ renderer: "canvas" }}
           theme="dark"
@@ -399,7 +412,7 @@ const Page: React.FC = () => {
         style={{
           flex: "1",
           padding: "1rem",
-          borderLeft: "1px solid #444",
+          //borderLeft: "1px solid #444",
           position: "relative",
           overflow: "visible",
         }}
@@ -412,7 +425,7 @@ const Page: React.FC = () => {
             <div
               key={g.name}
               className={`game-wrapper ${hasAppeared ? "appeared" : ""}`}
-              style={{ marginBottom: "1rem" }}
+              style={{ marginBottom: "1rem", fontSize: "1.5rem" }}
             >
               {/* Title + tooltip if folded */}
               <div
@@ -428,7 +441,9 @@ const Page: React.FC = () => {
 
               {/* Folding container */}
               <div className={`game-container ${isExpanded ? "expanded" : ""}`}>
-                {isExpanded && <p style={{ margin: 0 }}>{g.desc}</p>}
+                {isExpanded && (
+                  <p style={{ margin: 0, fontSize: "1.2rem" }}>{g.desc}</p>
+                )}
               </div>
             </div>
           );

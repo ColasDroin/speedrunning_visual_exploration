@@ -58,6 +58,12 @@ const Page: React.FC = () => {
     const maxValue = Math.max(...data.map((d: string[]) => parseFloat(d[2])));
 
     const mapOption: echarts.EChartsOption = {
+      backgroundColor: "transparent",
+      title: {
+        text: "World map of scores in November 2023",
+        left: "center",
+        textStyle: { color: "white" },
+      },
       tooltip: {
         trigger: "item",
         formatter: function (params: any) {
@@ -187,8 +193,14 @@ const Page: React.FC = () => {
 
     // Bar race option
     const barOption: echarts.EChartsOption = {
+      backgroundColor: "transparent",
+      title: {
+        text: "Bar race of scores per country",
+        left: "center",
+        textStyle: { color: "white" },
+      },
       grid: {
-        top: 10,
+        top: 30,
         bottom: 30,
         left: 150,
         right: 80,
