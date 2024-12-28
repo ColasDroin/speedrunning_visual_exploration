@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTwitter,
@@ -11,7 +11,7 @@ import Banner from "./components/banner";
 import Fig0 from "./components/fig0";
 import Fig05 from "./components/fig05";
 import Fig1 from "./components/fig1";
-import Fig1_alt from "./components/fig1";
+//import Fig1_alt from "./components/fig1";
 import Fig2 from "./components/fig2";
 import Fig3 from "./components/fig3";
 import Fig4 from "./components/fig4";
@@ -31,6 +31,8 @@ export default function Home() {
       setShowSafariDisclaimer(true);
     }
   }, []);
+
+  const stableFig1 = useMemo(() => <Fig1 />, []);
 
   return (
     <div>
@@ -122,10 +124,7 @@ export default function Home() {
           <div className="mx-auto">
             <Fig05 />
           </div>
-          <div className="mx-auto">
-            if (safari) {<Fig1_alt />}
-            else {<Fig1 />}
-          </div>
+          <div className="mx-auto">{stableFig1}</div>
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
             data-text="GAMES COMMUNITIES"
