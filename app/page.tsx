@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className="h-[30vh]">
+      <div className="lg:h-[25vh] md:h-[20vh] sm:h-[15vh]">
         <Banner />
       </div>
 
