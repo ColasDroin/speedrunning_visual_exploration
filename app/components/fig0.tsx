@@ -39,6 +39,11 @@ const Page: React.FC = () => {
   useEffect(() => {
     const chartOption: echarts.EChartsOption = {
       backgroundColor: "transparent",
+      title: {
+        text: "Tree of categories for Portal",
+        left: "center",
+        textStyle: { color: "white" },
+      },
       tooltip: {
         trigger: "item",
         triggerOn: "mousemove",

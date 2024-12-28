@@ -285,7 +285,11 @@ const Page: React.FC = () => {
 
     return {
       id: game_counts[0].identifier,
-      title: { text: "Most speedrunned games" },
+      title: {
+        text: "Top 50 most speedrunned games",
+        left: "center",
+        textStyle: { color: "white" },
+      },
       animation: true,
       tooltip: {
         trigger: "axis",
@@ -429,9 +433,14 @@ const Page: React.FC = () => {
     // Build options for submission types
     submissionTypes.forEach((dataSet: any[]) => {
       const optionId = dataSet[0]["identifier"];
+      console.log("dataSet", dataSet);
       allOptions[optionId] = {
         id: optionId,
-        title: { text: "Most speedrunned category of game X" },
+        title: {
+          text: "Categories for " + dataSet[0]["name"],
+          left: "center",
+          textStyle: { color: "white" },
+        },
         tooltip: {
           trigger: "axis",
           axisPointer: { type: "shadow" },
@@ -510,8 +519,15 @@ const Page: React.FC = () => {
       allOptions[optionId] = {
         id: optionId,
         title: {
-          text: "Distribution of speedrun times for category X of game X",
+          text:
+            "Distribution of speedrun times for category " +
+            dataSet[0]["name_category"] +
+            " of game " +
+            dataSet[0]["game"],
+          left: "center",
+          textStyle: { color: "white" },
         },
+
         tooltip: {
           trigger: "item",
           axisPointer: { type: "shadow" },
@@ -592,7 +608,7 @@ const Page: React.FC = () => {
 
     // Build scatter charts with flickering "stars" + a background logo
     Object.entries(scatterData).forEach(
-      ([optionId, [dic_per_bin, best_line, true_ID]]) => {
+      ([optionId, [dic_per_bin, best_line, true_ID, game, category]]) => {
         // Create multiple scatter series
         const l_series = Object.entries(dic_per_bin).map(
           ([bin_id, l_runs]: any) => ({
@@ -675,7 +691,12 @@ const Page: React.FC = () => {
         allOptions[optionId] = {
           id: optionId,
           backgroundColor: "transparent", // For better integration
-          title: { text: "Speedrun times for category X of game X" },
+          title: {
+            text:
+              "Speedrun times for category " + category + " of game " + game,
+            textStyle: { color: "white" },
+            left: "center",
+          },
           dataZoom: [
             {
               type: "inside",
