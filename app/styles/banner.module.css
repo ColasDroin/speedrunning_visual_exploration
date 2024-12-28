@@ -1,6 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jersey+10&display=swap");
 
+/* Center the entire row in the banner */
+.heroContent {
+  /* position: absolute;
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%); */
+  display: flex;
+  align-items: center; /* Vertically center items within the container */
+  justify-content: center; /* Horizontally center the entire row */
+  gap: 2rem; /* Space between coin, text, and star */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  z-index: 10000;
+}
+
 .grid {
   --grid-size: 30px;
   --grid-color: rgb(164, 164, 164);
@@ -42,19 +56,24 @@
   }
 }
 
-.starWrap {
-  filter: drop-shadow(0px 0 20px rgba(0, 255, 0, 0.7));
-  position: absolute;
-  right: calc(27%);
-  top: 20%;
-}
-
+.coin,
 .star {
   width: 100px;
   height: 100px;
+  /* Remove any existing top/right/left/bottom positioning */
+  margin: 0; /* Reset margins */
+  /* Ensure vertical alignment within Flexbox */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center; /* or 50% 50% */
+}
+
+.star {
   background-color: gold;
   background-image: radial-gradient(circle, gold, darkgoldenrod);
   border-radius: 50%;
+  filter: drop-shadow(0px 0 20px rgba(0, 255, 0, 0.7));
   clip-path: polygon(
     50% 0%,
     61% 35%,
@@ -68,31 +87,32 @@
     39% 35%
   );
   animation: rotate-star 2s infinite linear;
+  /* center the 3D rotation pivot */
+  transform-style: preserve-3d;
 }
 
 @keyframes rotate-star {
   0% {
-    transform: translateX(-50%) rotateY(0deg);
+    transform: rotateY(0deg);
   }
   100% {
-    transform: translateX(-50%) rotateY(360deg);
+    transform: rotateY(360deg);
   }
 }
 
 .coin {
-  width: 100px;
-  height: 100px;
-  position: absolute;
+  /* remove position: absolute; */
+  position: relative;
   background-color: gold;
-  left: calc(30%);
-  top: 30%;
   background-image: radial-gradient(circle, gold, darkgoldenrod);
   border-radius: 50%;
   box-shadow: rgba(255, 215, 0, 0.7) 0px 0 20px;
   animation: rotate-coin 2s infinite linear;
+  /* center the 3D rotation pivot */
+  transform-style: preserve-3d;
 }
-
 .coin::before {
+  /* stays the same (centered within .coin) */
   content: "";
   position: absolute;
   top: 50%;
@@ -106,10 +126,10 @@
 
 @keyframes rotate-coin {
   0% {
-    transform: translate(-50%, -50%) rotateY(0deg);
+    transform: rotateY(0deg);
   }
   100% {
-    transform: translate(-50%, -50%) rotateY(360deg);
+    transform: rotateY(360deg);
   }
 }
 
@@ -211,19 +231,24 @@
   }
 }
 
-.text {
-  position: absolute;
-  left: 50%;
-  top: 45%;
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
+  margin: 0; /* Reset margins */
+}
+
+/* Optional: Ensure the text container doesn't have excessive padding/margin */
+.text {
+  margin: 0;
+  padding: 0;
 }
 .outrun {
   font-family: "Road Rage";
   font-weight: normal;
   font-size: 40px;
-  margin-top: 1rem;
+  margin-top: -0.5rem;
 }
 
 .glow {
@@ -289,3 +314,35 @@
   font-size: 4rem;
   text-decoration: underline dotted #d3e5ec;
 }
+
+/* @media (max-width: 1280px) {
+  .coin,
+  .star {
+    width: 60px;
+    height: 60px;
+  }
+
+  .chrome {
+    font-size: 2rem;
+  }
+
+  .outrun {
+    font-size: 1rem;
+  }
+} */
+
+/* @media (max-width: 480px) {
+  .coin,
+  .star {
+    width: 45px;
+    height: 45px;
+  }
+
+  .chrome {
+    font-size: 1.5rem;
+  }
+
+  .outrun {
+    font-size: 0.9rem;
+  }
+} */
