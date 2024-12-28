@@ -123,8 +123,8 @@ export default function Home() {
             <Fig05 />
           </div>
           <div className="mx-auto">
-            if (safari) {<Fig1 />}
-            else {<Fig1_alt />}
+            if (safari) {<Fig1_alt />}
+            else {<Fig1 />}
           </div>
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
