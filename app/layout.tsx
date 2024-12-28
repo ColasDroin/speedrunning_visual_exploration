@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Viewport } from "next/types";
 import "./globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
   title: "Speedrun",
   description: "A data viz short story",
 };
-
+export const viewport: Viewport = {
+  initialScale: 1,
+  width: "device-width",
+};
 export default function RootLayout({
   children,
 }: Readonly<{
