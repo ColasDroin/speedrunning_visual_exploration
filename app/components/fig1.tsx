@@ -10,6 +10,13 @@ import pako from "pako";
 type EChartsOption = echarts.EChartsOption;
 type OptionsDictionary = Record<string, EChartsOption>;
 
+// Helper to detect Safari
+function isSafari() {
+  if (typeof navigator === "undefined") return false; // SSR safety
+  const ua = navigator.userAgent.toLowerCase();
+  return ua.includes("safari") && !ua.includes("chrome");
+}
+
 const Page: React.FC = () => {
   // =============================================================================
   // REFS & STATE
@@ -18,16 +25,21 @@ const Page: React.FC = () => {
   const allOptions: OptionsDictionary = {};
   const optionStack: string[] = [];
 
-  // NEW: We no longer use isPulsating in a useEffect that runs on mount.
-  // Instead, we store the setInterval ID in a ref and manually start/stop it.
+  // Flicker code uses a setInterval
   const flickerIntervalRef = useRef<number | null>(null);
+
+  // If we detect Safari, skip flicker
+  const safari = isSafari();
 
   // -----------------------------------------------------------------------------
   // Flicker Management
   // -----------------------------------------------------------------------------
-  // We'll call these functions from goForward/goBack once we know if the chart is scatter or not.
-
   const startFlicker = () => {
+    // If user is on Safari, skip flicker to avoid performance issues
+    if (safari) {
+      console.log("Safari detected, flicker skipped.");
+      return;
+    }
     // If we're already flickering, skip
     if (flickerIntervalRef.current !== null) return;
 
@@ -63,7 +75,7 @@ const Page: React.FC = () => {
       chartInstance.setOption({ series: newSeries }, false);
     }, 500);
 
-    console.log("Flicker started");
+    console.log("Flicker started (non-Safari).");
   };
 
   const stopFlicker = () => {
@@ -76,8 +88,6 @@ const Page: React.FC = () => {
 
   // Helper to check if a chart ID should flicker
   const chartIdIsScatter = (chartId?: string) => {
-    // Example logic: If your scatter IDs all start with "scat_"
-    // or if you want to flicker on distributions as well:
     return chartId?.startsWith("scat_");
   };
 
@@ -124,13 +134,11 @@ const Page: React.FC = () => {
 
     // Push current chart ID so we can goBack() later
     optionStack.push(currentOptionId);
-
     console.log(
       `Navigating from ${currentOptionId} forward to: ${nextOptionId}`
     );
 
     const isDistributionOrScatter = nextOptionId.startsWith("scat_");
-
     if (isDistributionOrScatter) {
       const copyKey = currentOptionId + "_copy";
       if (!allOptions[copyKey]) {
@@ -190,7 +198,7 @@ const Page: React.FC = () => {
       }
     }
 
-    // NEW: Decide if we should flicker based on the new chart's ID
+    // Decide if we should flicker based on the new chart's ID
     if (chartIdIsScatter(nextOptionId)) {
       startFlicker();
     } else {
@@ -238,7 +246,7 @@ const Page: React.FC = () => {
 
     instance.setOption(prevOption, true);
 
-    // NEW: Now that we've gone back, check the ID of the displayed chart
+    // Now that we've gone back, check the ID of the displayed chart
     const newId = prevOption.id as string;
     if (chartIdIsScatter(newId)) {
       startFlicker();
