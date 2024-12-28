@@ -44,7 +44,7 @@ export default function Home() {
       <div className="container mx-auto px-4 overflow-x-hidden">
         <div className="grid mx-auto px-4 sm:px-6 lg:px-8 mt-9">
           {showSafariDisclaimer && (
-            <div className="mt-5 bg-yellow-100 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center break-words w-full">
+            <div className="mt-5 bg-yellow-100 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center break-words w-full max-w-5xl mx-auto">
               <strong>Performance Notice:</strong> You are using Safari. For the
               best experience, we recommend using a Chromium-based browser
               (Chrome, Edge, etc.) or Firefox.
@@ -55,7 +55,7 @@ export default function Home() {
           >
             INTRODUCTION
           </div>
-          <div className="mx-auto ">
+          <div className="mx-auto max-w-5xl">
             Speedrunning is the art of completing a video game as quickly as
             possible, often using optimized strategies, glitches, and
             exceptional skill to achieve record-breaking times. But speedrunning
@@ -64,7 +64,7 @@ export default function Home() {
             thought possible. It’s about taking a game you love, learning its
             every nuance, and pushing it to its absolute breaking point.
           </div>
-          <figure className="flex flex-col items-center m-9">
+          <figure className="flex flex-col items-center m-9 ">
             <div
               className="relative w-full max-w-[800px] h-auto"
               style={{
@@ -85,7 +85,7 @@ export default function Home() {
             </figcaption>
           </figure>
 
-          <p>
+          <p className="max-w-5xl mx-auto">
             Nowadays, runs are often shared on streaming platforms like Twitch
             or in charity events like <i>Games Done Quick</i>. Speedrunning has
             been around pretty much since the beginning of video games, and
@@ -125,7 +125,7 @@ export default function Home() {
             </a>
           </figure>
 
-          <div className="mx-auto mt-2">
+          <div className="mx-auto mt-2 max-w-5xl">
             Let&apos;s analyze some data gathered from the{" "}
             <span className={`${styles.subtleGlow}`}>
               <a
@@ -150,10 +150,11 @@ export default function Home() {
           >
             UNDERSTANDING SPEEDRUNNING
           </div>
-          <div className="mx-auto">
+          <p className="max-w-5xl mx-auto"> Blableblbl</p>
+          <div className="mx-auto w-full mt-5">
             <Fig0bis />
           </div>
-          <p>
+          <p className="max-w-5xl mx-auto">
             Speedrunning has tons of categories, so it’s not always easy to
             follow everything. There’s the popular "Any%" category, where you do
             whatever it takes to finish fast, and "100%" where you aim to do
@@ -164,7 +165,7 @@ export default function Home() {
             competitive. The figure belows illustrate the main categories and
             their rules for for the top 10 games with the most submissions.
           </p>
-          <div className="mx-auto">
+          <div className="mx-auto w-full mt-5">
             <Fig0 />
           </div>
           <div
@@ -172,40 +173,52 @@ export default function Home() {
           >
             THE MOST SPEEDRUNNED GAMES
           </div>
-          <div className="mx-auto">
+          <p className="mx-auto max-w-5xl">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.{" "}
+          </p>
+          <div className="mx-auto w-full mt-5 mb-5">
             <Fig05 />
           </div>
-          <div className="mx-auto">{stableFig1}</div>
+          <p className="mx-auto max-w-5xl">
+            Now you can explore the data by yourself!
+          </p>
+          <div className="mx-auto  w-full mt-5 mb-5">{stableFig1}</div>
           <div
-            className={`${styles.chrome} ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome} ${styles.titleDecorated} mt-9 mb-9`}
           >
             GAMES COMMUNITIES
           </div>
-          <div className="mx-auto">
+          <p className="mx-auto max-w-5xl">Test test test</p>
+          <div className="mx-auto w-full mt-5 mb-5">
             <Fig2 />
           </div>
           <div
-            className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome}  ${styles.titleDecorated} mt-9 mb-9`}
           >
             EVOLUTION OF GAME POPULARITY
           </div>
-          <div className="mx-auto">
+          <p className="mx-auto max-w-5xl">Test test test</p>
+
+          <div className="mx-auto w-full mt-5 mb-5">
             <Fig3 />
           </div>
           <div
-            className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome}  ${styles.titleDecorated} mt-9 mb-9`}
           >
             MOST COMPETITIVE COUNTRIES
           </div>
-          <div className="mx-auto">
+          <p className="mx-auto max-w-5xl">Test test test</p>
+
+          <div className="mx-auto w-full mt-5 mb-5">
             <Fig4 />
           </div>
           <div
-            className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome}  ${styles.titleDecorated} mt-9 mb-9`}
           >
             ABOUT THIS WORK
           </div>
-          <div className="mt-15 bg-gray-100 border border-gray-300 rounded-lg p-5 flex">
+
+          <div className="mt-9 bg-gray-100 border border-gray-300 rounded-lg p-5 flex max-w-2xl mx-auto w-full">
             <div className="flex-shrink-0 mr-5">
               <img
                 src="images/my_photo.jpg"
@@ -274,7 +287,7 @@ export default function Home() {
           </div>
 
           {/* Disclaimer */}
-          <div className="mt-10 bg-gray-200 border border-gray-300 rounded-lg p-5">
+          <div className="mt-9 mb-9 bg-gray-200 border border-gray-300 rounded-lg p-5 max-w-2xl mx-auto w-full">
             <p className="text-sm text-gray-600">
               <strong>Disclaimer:</strong> All trademarks, logos, and images
               displayed on this website are the property of their respective
