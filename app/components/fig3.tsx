@@ -292,8 +292,8 @@ const Page: React.FC = () => {
       // },
 
       singleAxis: {
-        top: 50,
-        bottom: 50,
+        top: "20%",
+        bottom: "1%",
         axisTick: {
           interval: 1, // Add ticks every month
         },

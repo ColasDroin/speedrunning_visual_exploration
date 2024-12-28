@@ -20,7 +20,7 @@ const Page: React.FC = () => {
       const newDepth = Math.min(
         maxDepth,
         Math.floor(
-          (scrollPosition / (documentHeight - windowHeight)) * maxDepth * 3
+          (scrollPosition / (documentHeight - windowHeight)) * maxDepth * 2
         )
       );
       // Update scrollDepth to the maximum of current and newDepth
@@ -40,7 +40,7 @@ const Page: React.FC = () => {
     const chartOption: echarts.EChartsOption = {
       backgroundColor: "transparent",
       title: {
-        text: "Tree of categories for Portal",
+        text: "Tree of categories for MineCraft: Java Edition",
         left: "center",
         textStyle: { color: "white" },
       },
@@ -100,18 +100,18 @@ const Page: React.FC = () => {
         orient: "vertical",
         data: [
           { name: "Super Mario 64", icon: "rectangle" },
-          { name: "Portal", icon: "rectangle" },
-          { name: "MineCraft: Java Edition", icon: "rectangle" },
+          //{ name: "Portal", icon: "rectangle" },
+          //{ name: "MineCraft: Java Edition", icon: "rectangle" },
         ],
         borderColor: "#c23531",
       },
       series: [
         {
           type: "tree",
-          name: "Portal",
-          data: [dataCategories["portal"]],
-          top: "15%",
-          bottom: "15%",
+          name: "MineCraft: Java Edition",
+          data: [dataCategories["minecraft"]],
+          top: "25%",
+          bottom: "25%",
           left: "10%",
           right: "10%",
           // orient: "vertical",

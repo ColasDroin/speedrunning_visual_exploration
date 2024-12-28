@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import Banner from "./components/banner";
 import Fig0 from "./components/fig0";
+import Fig0bis from "./components/fig0bis";
 import Fig05 from "./components/fig05";
 import Fig1 from "./components/fig1";
 import Fig2 from "./components/fig2";
@@ -115,6 +116,9 @@ export default function Home() {
               and their rules for for the top 10 games with the most
               submissions.
             </p>
+            <div className="mx-auto">
+              <Fig0bis />
+            </div>
             <div className="mx-auto">
               <Fig0 />
             </div>
