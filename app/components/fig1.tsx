@@ -29,7 +29,7 @@ const Page: React.FC = () => {
   const flickerIntervalRef = useRef<number | null>(null);
 
   // If we detect Safari, skip flicker
-  const safari = isSafari();
+  const safari = true; //isSafari();
 
   // -----------------------------------------------------------------------------
   // Flicker Management
@@ -617,7 +617,7 @@ const Page: React.FC = () => {
             symbol: "diamond",
             // 2) Pulsating size (mild wave + random factor)
             symbolSize: (data: any, params: any) => {
-              const baseSize = 4; // Base size
+              const baseSize = 8; // Base size
               const randomFactor = Math.random() * 4; // Slight random flicker
               const waveFrequency = 0.1; // Very gentle wave
               const timeFactor = Date.now() / 1000; // Continually changes over time

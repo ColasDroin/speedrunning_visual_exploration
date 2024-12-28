@@ -144,6 +144,7 @@ const Page: React.FC = () => {
                   shadowOffsetX: 1,
                   shadowOffsetY: 1,
                   cursor: "pointer",
+                  z: 109,
                 },
               },
               {
@@ -156,6 +157,7 @@ const Page: React.FC = () => {
                   textAlign: "center",
                   textVerticalAlign: "middle",
                   cursor: "pointer",
+                  z: 110,
                 },
               },
             ],
@@ -300,6 +302,7 @@ const Page: React.FC = () => {
                   shadowOffsetX: 1,
                   shadowOffsetY: 1,
                   cursor: "pointer",
+                  z: 109,
                 },
               },
               {
@@ -312,6 +315,7 @@ const Page: React.FC = () => {
                   textAlign: "center",
                   textVerticalAlign: "middle",
                   cursor: "pointer",
+                  z: 110,
                 },
               },
             ],
@@ -370,6 +374,7 @@ const Page: React.FC = () => {
                   shadowOffsetX: 1,
                   shadowOffsetY: 1,
                   cursor: "pointer",
+                  z: 109,
                 },
               },
               {
@@ -382,6 +387,7 @@ const Page: React.FC = () => {
                   textAlign: "center",
                   textVerticalAlign: "middle",
                   cursor: "pointer",
+                  z: 110,
                 },
               },
             ],
