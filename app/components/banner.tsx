@@ -17,14 +17,11 @@ const Banner = () => {
 
           {/* Text in the Center */}
           <div className={styles.heroText}>
-            <div
-              className={`${styles.chrome} ${styles.shine}`}
-              data-text="SPEEDRUNNING"
-            >
+            <div className={`${styles.chrome}`} data-text="SPEEDRUNNING">
               SPEEDRUNNING
             </div>
             <div className={`${styles.outrun} ${styles.glow}`}>
-              How a community has pushed the limits of what was thought possible
+              How a community has kept pushing the limits of gaming
             </div>
           </div>
 

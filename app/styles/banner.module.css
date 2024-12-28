@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jersey+10&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
 .heroContent {
   display: flex;
   align-items: center;
@@ -156,7 +156,7 @@
   left: 0;
   top: 0;
   width: 100vw;
-  height: clamp(15vh, 20vw, 30vh); /* Scales with viewport */
+  height: clamp(25vh, 20vw, 30vh); /* Scales with viewport */
   z-index: -2;
   mask-image: linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
 }
@@ -237,7 +237,7 @@
 .outrun {
   font-family: "Road Rage";
   font-weight: normal;
-  font-size: clamp(12px, 3vw, 40px);
+  font-size: clamp(8px, 3vw, 40px);
   margin-top: -0.5rem;
 }
 
@@ -280,7 +280,7 @@
 .chrome {
   font-family: "Doto";
   font-weight: 900;
-  font-size: clamp(20px, 5vw, 60px);
+  font-size: clamp(90px, 5vw, 60px);
   background-image: linear-gradient(#2989cc 0%, #d3e5ec 50%, #b3628d 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -302,8 +302,13 @@
 }
 .titleDecorated {
   font-size: 4rem;
-  text-decoration: underline dotted #d3e5ec;
+  /* text-decoration: underline dotted #d3e5ec; */
+  text-align: center;
 }
+
+/* .titleLarge {
+  font-size: clamp(120px, 5vw, 60px);
+} */
 
 /* @media (max-width: 1280px) {
   .coin,

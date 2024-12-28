@@ -37,7 +37,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className="lg:h-[25vh] md:h-[20vh] sm:h-[15vh]">
+      <div className="lg:h-[25vh] md:h-[20vh] sm:h-[18vh]">
         <Banner />
       </div>
 
@@ -55,7 +55,6 @@ export default function Home() {
             )}
             <div
               className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-5`}
-              data-text="INTRODUCTION"
             >
               INTRODUCTION
             </div>
