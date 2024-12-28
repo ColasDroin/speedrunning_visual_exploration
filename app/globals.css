@@ -14,6 +14,8 @@ body {
   font-family: "Jersey 10", sans-serif;
   color: #d3e5ec;
   font-size: 1.8rem;
+  word-wrap: break-word; /* Forces text to break onto the next line */
+  white-space: normal; /* Prevents single long words from causing overflow */
 }
 
 html {

@@ -44,42 +44,32 @@ const categoryDescriptions = [
   {
     id: 0,
     title: "Indie and Challenging",
-    text: "Tough indie titles that push your skills to the limit.",
+    text: "Games like 'Celeste', 'Hollow Knight', and 'Portal' that demand precision and skill.",
   },
   {
     id: 1,
     title: "Casual and Mobile",
-    text: "Quick, accessible games perfect for on-the-go or laid-back runs.",
+    text: "Accessible games including 'Subway Surfers' and 'Hill Climb Racing' for quick fun.",
   },
   {
     id: 2,
     title: "Classic and Retro",
-    text: "Timeless hits from older consoles that still captivate speedrunners.",
+    text: "Beloved classics like 'Super Mario 64' and 'The Legend of Zelda: Ocarina of Time'.",
   },
   {
     id: 3,
-    title: "3D Platformers and Open World",
-    text: "Sprawling adventures demanding dexterity and route planning.",
+    title: "2D Platformers and Classics",
+    text: "Timeless 2D games such as 'Super Mario Bros.' and 'Super Metroid'.",
   },
   {
     id: 4,
-    title: "Action",
-    text: "Fast-paced titles emphasizing combat and split-second reflexes.",
+    title: "3D Adventures and Racing",
+    text: "Sprawling 3D adventures like 'The Legend of Zelda: Breath of the Wild' and 'Mario Kart Wii'.",
   },
   {
     id: 5,
     title: "Minecraft Versions",
-    text: "Different Minecraft editions, each with unique quirks and speedrun tactics.",
-  },
-  {
-    id: 6,
-    title: "Racing and Sports",
-    text: "High-speed competitive games driven by precision and practice.",
-  },
-  {
-    id: 7,
-    title: "Classic 3D Platformers",
-    text: "Beloved 3D icons requiring tight movement and nostalgic prowess.",
+    text: "Different 'Minecraft' editions, including 'Java' and 'Bedrock', for varied speedrun tactics.",
   },
 ];
 

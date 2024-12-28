@@ -100,6 +100,7 @@ const Page: React.FC = () => {
       title: {
         text: "Speedrun times for category 100% of game The Legend of Zelda: Breath of the Wild",
         textStyle: { color: "white" },
+        left: "center",
       },
       tooltip: {
         trigger: "item",
@@ -180,7 +181,7 @@ const Page: React.FC = () => {
                 textAlign: "center",
                 textVerticalAlign: "middle",
                 fill: "#00FF00", // Green text color
-                font: 'bold 16px "Press Start 2P", cursive', // Pixel-style font
+                font: 'bold 0.5em "Press Start 2P", cursive', // Pixel-style font
                 // If "Press Start 2P" is not available, use a default monospace font
                 // font: 'bold 16px monospace',
                 // Add a glow effect using shadow

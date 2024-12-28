@@ -754,7 +754,7 @@ const Page: React.FC = () => {
               type: "group",
               left: "20%", // Position at the bottom left
               bottom: "15%", // Adjust as needed
-              z: 10, // Ensure it's above scatter points
+              z: 100000, // Ensure it's above scatter points
               silent: true, // Make the graphic non-clickable
               children: [
                 {
@@ -764,7 +764,7 @@ const Page: React.FC = () => {
                     height: 50,
                   },
                   style: {
-                    fill: "rgba(0, 0, 0, 0.6)", // Semi-transparent background
+                    fill: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
                     stroke: "#00FF00", // Green border for video game feel
                     lineWidth: 2,
                     shadowBlur: 10,
@@ -773,7 +773,7 @@ const Page: React.FC = () => {
                     // Define borderRadius if desired
                     // borderRadius: [10, 10, 10, 10],
                   },
-                  z: 0,
+                  z: 1000001,
                 },
                 {
                   type: "text",
@@ -784,14 +784,14 @@ const Page: React.FC = () => {
                     textAlign: "center",
                     textVerticalAlign: "middle",
                     fill: "#00FF00", // Green text color
-                    font: 'bold 16px "Press Start 2P", cursive', // Pixel-style font
+                    font: 'bold 0.5em "Press Start 2P", cursive', // Pixel-style font
                     // If "Press Start 2P" is not available, use a default monospace font
                     // font: 'bold 16px monospace',
                     // Add a glow effect using shadow
                     textShadowColor: "#00FF00",
                     textShadowBlur: 4,
                   },
-                  z: 1,
+                  z: 1000002,
                 },
               ],
             },
