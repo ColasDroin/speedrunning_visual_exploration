@@ -54,7 +54,7 @@ export default function Home() {
               </div>
             )}
             <div
-              className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-5`}
+              className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-5`}
             >
               INTRODUCTION
             </div>
@@ -71,7 +71,7 @@ export default function Home() {
             <figure className="flex flex-col items-center m-9">
               <div className="relative w-full max-w-[800px] h-[500px]">
                 <Image
-                  src="/images/speedrun_mario.gif"
+                  src={`${process.env.NEXT_PUBLIC_BASE_PATH_ASSETS}/images/speedrun_mario.gif`}
                   alt="Speedrun Mario"
                   fill
                   style={{ objectFit: "contain" }}
@@ -103,7 +103,7 @@ export default function Home() {
               >
                 <div className="relative w-full max-w-[500px] h-[150px]">
                   <Image
-                    src="/images/speedrun_com.png"
+                    src={`${process.env.NEXT_PUBLIC_BASE_PATH_ASSETS}/images/speedrun_com.png`}
                     alt="Speedrun.com"
                     fill
                     style={{ objectFit: "contain" }}
@@ -141,7 +141,6 @@ export default function Home() {
             </div>
             <div
               className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
-              data-text="UNDERSTANDING SPEEDRUNNING"
             >
               UNDERSTANDING SPEEDRUNNING
             </div>
@@ -165,7 +164,6 @@ export default function Home() {
             </div>
             <div
               className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
-              data-text="THE MOST SPEEDRUNNED GAMES"
             >
               THE MOST SPEEDRUNNED GAMES
             </div>
@@ -175,7 +173,6 @@ export default function Home() {
             <div className="mx-auto">{stableFig1}</div>
             <div
               className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
-              data-text="GAMES COMMUNITIES"
             >
               GAMES COMMUNITIES
             </div>
@@ -184,7 +181,6 @@ export default function Home() {
             </div>
             <div
               className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
-              data-text="EVOLUTION OF GAME POPULARITY"
             >
               EVOLUTION OF GAME POPULARITY
             </div>
@@ -193,7 +189,6 @@ export default function Home() {
             </div>
             <div
               className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
-              data-text="MOST COMPETITIVE COUNTRIES"
             >
               MOST COMPETITIVE COUNTRIES
             </div>
@@ -202,7 +197,6 @@ export default function Home() {
             </div>
             <div
               className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
-              data-text="ABOUT THIS WORK"
             >
               ABOUT THIS WORK
             </div>
