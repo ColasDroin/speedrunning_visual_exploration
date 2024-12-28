@@ -16,6 +16,7 @@ import Fig2 from "./components/fig2";
 import Fig3 from "./components/fig3";
 import Fig4 from "./components/fig4";
 import styles from "./styles/banner.module.css";
+import Image from "next/image";
 
 export default function Home() {
   const [showSafariDisclaimer, setShowSafariDisclaimer] = useState(false);
@@ -68,6 +69,22 @@ export default function Home() {
               love, learning its every nuance, and pushing it to its absolute
               breaking point.
             </div>
+            <figure className="flex flex-col items-center m-9">
+              <div className="relative w-full max-w-[800px] h-[500px]">
+                <Image
+                  src="/images/speedrun_mario.gif"
+                  alt="Speedrun Mario"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  className="rounded-lg shadow-md"
+                  priority
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xl ">
+                The kind of skill it takes to be a speedrunner.
+              </figcaption>
+            </figure>
+
             <p>
               Nowadays, runs are often shared on streaming platforms like Twitch
               or in charity events like <i>Games Done Quick</i>. Speedrunning
@@ -77,6 +94,31 @@ export default function Home() {
               older systems on newer hardware. This opens up more possibilities,
               but there are rules to make sure it’s still a fair competition.
             </p>
+
+            <figure className="flex flex-col items-center m-1">
+              <a
+                href="https://www.speedrun.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <div className="relative w-full max-w-[500px] h-[150px]">
+                  <Image
+                    src="/images/speedrun_com.png"
+                    alt="Speedrun.com"
+                    fill
+                    style={{ objectFit: "contain" }}
+                    className="rounded-lg shadow-md"
+                    priority
+                  />
+                </div>
+
+                <figcaption className="mt-1 text-center text-xl ">
+                  speedrun.com, where all the magic happens nowadays.
+                </figcaption>
+              </a>
+            </figure>
+
             <div className="mx-auto mt-2">
               Let&apos;s analyze some data gathered from the{" "}
               <span className={`${styles.subtleGlow}`}>
@@ -104,6 +146,9 @@ export default function Home() {
             >
               UNDERSTANDING SPEEDRUNNING
             </div>
+            <div className="mx-auto">
+              <Fig0bis />
+            </div>
             <p>
               Speedrunning has tons of categories, so it’s not always easy to
               follow everything. There’s the popular "Any%" category, where you
@@ -116,9 +161,6 @@ export default function Home() {
               and their rules for for the top 10 games with the most
               submissions.
             </p>
-            <div className="mx-auto">
-              <Fig0bis />
-            </div>
             <div className="mx-auto">
               <Fig0 />
             </div>
