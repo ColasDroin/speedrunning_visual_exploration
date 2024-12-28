@@ -58,17 +58,17 @@ export default function Home() {
           <div className="mx-auto max-w-5xl">
             Speedrunning is the art of completing a video game as quickly as
             possible, often using optimized strategies, glitches, and
-            exceptional skill to achieve record-breaking times. But speedrunning
-            is more than just rushing a game: it’s a battle against the clock,
-            against the game, and sometimes, against the limits of what was
-            thought possible. It’s about taking a game you love, learning its
-            every nuance, and pushing it to its absolute breaking point.
+            exceptional skill to achieve record-breaking times. Speedrunning
+            isn’t just about rushing through a game; it’s a challenge against
+            the clock, the game, and even the boundaries of what’s thought
+            possible. It’s about deep mastery, creative problem-solving, and
+            innovation, all within the context of beloved video games.
           </div>
           <figure className="flex flex-col items-center m-9 ">
             <div
               className="relative w-full max-w-[800px] h-auto"
               style={{
-                aspectRatio: "16 / 10", // Adjust as per your image's aspect ratio
+                aspectRatio: "16 / 10",
               }}
             >
               <Image
@@ -81,18 +81,34 @@ export default function Home() {
               />
             </div>
             <figcaption className="mt-2 text-center text-sm ">
-              The kind of skill it takes to be a speedrunner.
+              Speedrunning takes practice, precision, and passion.
             </figcaption>
           </figure>
 
           <p className="max-w-5xl mx-auto">
-            Nowadays, runs are often shared on streaming platforms like Twitch
-            or in charity events like <i>Games Done Quick</i>. Speedrunning has
-            been around pretty much since the beginning of video games, and
-            while a lot of people keep running games on original consoles or PC,
-            some also use emulators, which let you play games from older systems
-            on newer hardware. This opens up more possibilities, but there are
-            rules to make sure it’s still a fair competition.
+            In today’s world, speedrunning thrives on streaming platforms like{" "}
+            <a
+              href="https://www.twitch.tv"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600"
+            >
+              Twitch
+            </a>{" "}
+            or events like{" "}
+            <a
+              href="https://gamesdonequick.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600"
+            >
+              Games Done Quick
+            </a>
+            . These events raise millions for charity while showcasing
+            incredible gaming feats. Speedrunning has evolved from playing on
+            original consoles or PCs to using emulators that enable retro gaming
+            on modern systems. While this expands accessibility, strict rules
+            ensure fair competition.
           </p>
 
           <figure className="flex flex-col items-center m-9">
@@ -105,7 +121,7 @@ export default function Home() {
               <div
                 className="relative w-full max-w-[500px] max-h-[100px] h-auto"
                 style={{
-                  aspectRatio: "16 / 10", // Adjust as per your image's aspect ratio
+                  aspectRatio: "16 / 10",
                 }}
               >
                 {" "}
@@ -120,7 +136,7 @@ export default function Home() {
               </div>
 
               <figcaption className="mt-0 text-center text-sm ">
-                speedrun.com, where all the magic happens nowadays.
+                speedrun.com, the ultimate hub for the speedrunning community.
               </figcaption>
             </a>
           </figure>
@@ -136,14 +152,15 @@ export default function Home() {
                 speedrun.com
               </a>
             </span>{" "}
-            API to better understand the amazing feats of speedrunners. A WORD
-            ABOUT THE DATA Since the number of submitted runs easily exceed the
-            4M mark, I decided to mainly focus only on the top 50 games with the
-            most submissions, only keeping verified runs for full-game
-            categories (per-level categories are not considered). Also, the data
-            only goes back to 2012, and speedrunning is a practice that has been
-            around for much longer... but we have to start somewhere, and
-            speedrun.com is nowadays considered the main hub for speedrunning.
+            API to uncover the amazing feats of speedrunners.
+            <div className="mt-5 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center break-words w-full max-w-5xl mx-auto">
+              <strong>Data disclaimer:</strong> This analysis focuses on the top
+              50 games with the most submissions, only considering verified runs
+              for full-game categories. Unfortunately, the dataset only goes up
+              to November 2023. While it misses speedrunning’s earlier history,
+              it highlights key trends from recent years. I plan to scrape and
+              update the data myself in the future!
+            </div>
           </div>
           <div
             className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
