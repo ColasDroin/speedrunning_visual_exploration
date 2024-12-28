@@ -301,43 +301,7 @@
   z-index: -1;
 }
 .titleDecorated {
-  font-size: 4rem;
+  font-size: 2.5rem;
   /* text-decoration: underline dotted #d3e5ec; */
   text-align: center;
 }
-
-/* .titleLarge {
-  font-size: clamp(120px, 5vw, 60px);
-} */
-
-/* @media (max-width: 1280px) {
-  .coin,
-  .star {
-    width: 60px;
-    height: 60px;
-  }
-
-  .chrome {
-    font-size: 2rem;
-  }
-
-  .outrun {
-    font-size: 1rem;
-  }
-} */
-
-/* @media (max-width: 480px) {
-  .coin,
-  .star {
-    width: 45px;
-    height: 45px;
-  }
-
-  .chrome {
-    font-size: 1.5rem;
-  }
-
-  .outrun {
-    font-size: 0.9rem;
-  }
-} */

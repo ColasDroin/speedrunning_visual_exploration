@@ -65,7 +65,12 @@ export default function Home() {
             every nuance, and pushing it to its absolute breaking point.
           </div>
           <figure className="flex flex-col items-center m-9">
-            <div className="relative w-full max-w-[800px] h-[500px]">
+            <div
+              className="relative w-full max-w-[800px] h-auto"
+              style={{
+                aspectRatio: "16 / 10", // Adjust as per your image's aspect ratio
+              }}
+            >
               <Image
                 src={`${process.env.NEXT_PUBLIC_BASE_PATH_ASSETS}/images/speedrun_mario.gif`}
                 alt="Speedrun Mario"
@@ -75,7 +80,7 @@ export default function Home() {
                 priority
               />
             </div>
-            <figcaption className="mt-2 text-center text-xl ">
+            <figcaption className="mt-2 text-center text-sm ">
               The kind of skill it takes to be a speedrunner.
             </figcaption>
           </figure>
@@ -90,14 +95,20 @@ export default function Home() {
             rules to make sure it’s still a fair competition.
           </p>
 
-          <figure className="flex flex-col items-center m-1">
+          <figure className="flex flex-col items-center m-9">
             <a
               href="https://www.speedrun.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="block"
             >
-              <div className="relative w-full max-w-[500px] h-[150px]">
+              <div
+                className="relative w-full max-w-[500px] max-h-[100px] h-auto"
+                style={{
+                  aspectRatio: "16 / 10", // Adjust as per your image's aspect ratio
+                }}
+              >
+                {" "}
                 <Image
                   src={`${process.env.NEXT_PUBLIC_BASE_PATH_ASSETS}/images/speedrun_com.png`}
                   alt="Speedrun.com"
@@ -108,7 +119,7 @@ export default function Home() {
                 />
               </div>
 
-              <figcaption className="mt-1 text-center text-xl ">
+              <figcaption className="mt-0 text-center text-sm ">
                 speedrun.com, where all the magic happens nowadays.
               </figcaption>
             </a>
@@ -135,7 +146,7 @@ export default function Home() {
             speedrun.com is nowadays considered the main hub for speedrunning.
           </div>
           <div
-            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
           >
             UNDERSTANDING SPEEDRUNNING
           </div>
@@ -157,7 +168,7 @@ export default function Home() {
             <Fig0 />
           </div>
           <div
-            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
           >
             THE MOST SPEEDRUNNED GAMES
           </div>
@@ -166,7 +177,7 @@ export default function Home() {
           </div>
           <div className="mx-auto">{stableFig1}</div>
           <div
-            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome} ${styles.titleDecorated} mt-11 mb-10`}
           >
             GAMES COMMUNITIES
           </div>
@@ -174,7 +185,7 @@ export default function Home() {
             <Fig2 />
           </div>
           <div
-            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
           >
             EVOLUTION OF GAME POPULARITY
           </div>
@@ -182,7 +193,7 @@ export default function Home() {
             <Fig3 />
           </div>
           <div
-            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
           >
             MOST COMPETITIVE COUNTRIES
           </div>
@@ -190,7 +201,7 @@ export default function Home() {
             <Fig4 />
           </div>
           <div
-            className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
+            className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
           >
             ABOUT THIS WORK
           </div>
