@@ -58,12 +58,12 @@ const categoryDescriptions = [
   },
   {
     id: 3,
-    title: "2D Platformers and Classics",
+    title: "2D Platformers",
     text: "Timeless 2D games such as 'Super Mario Bros.' and 'Super Metroid'.",
   },
   {
     id: 4,
-    title: "3D Adventures and Racing",
+    title: "3D Adventures",
     text: "Sprawling 3D adventures like 'The Legend of Zelda: Breath of the Wild' and 'Mario Kart Wii'.",
   },
   {
@@ -347,7 +347,9 @@ const Fig2WithPortal: React.FC = () => {
       const newOption: echarts.EChartsOption = {
         title: {
           text: "Game communities",
+          left: "center",
         },
+        backgroundColor: "transparent",
         animationDurationUpdate: 1500,
         animationEasingUpdate: "quinticInOut",
         tooltip: {},
@@ -362,8 +364,14 @@ const Fig2WithPortal: React.FC = () => {
                 },
               };
             }),
+            bottom: 0, // the size of title + margin
+            left: "left", //or 0 or '0%'
           },
         ],
+        // grid: {
+        //   top: 80, // the size of title + legend + margin
+        // },
+
         series: [
           {
             type: "graph",
@@ -531,7 +539,7 @@ const Fig2WithPortal: React.FC = () => {
         style={{
           flex: "1",
           padding: "1rem",
-          borderRight: "1px solid #444",
+          //borderRight: "1px solid #444",
           position: "relative",
           zIndex: 9999,
           overflow: "visible",
@@ -549,7 +557,11 @@ const Fig2WithPortal: React.FC = () => {
             >
               {/* Title: we track hover events for tooltip */}
               <div
-                style={{ fontWeight: "bold", display: "inline-block" }}
+                style={{
+                  fontWeight: "bold",
+                  display: "inline-block",
+                  fontSize: "1.5rem",
+                }}
                 onMouseEnter={(e) => onTitleMouseEnter(e, desc.id)}
                 onMouseLeave={onTitleMouseLeave}
                 onMouseMove={onTitleMouseMove}
@@ -560,7 +572,7 @@ const Fig2WithPortal: React.FC = () => {
               {/* Folding container */}
               <div
                 className={`category-container ${isExpanded ? "expanded" : ""}`}
-                style={{ marginTop: "0.5rem" }}
+                style={{ marginTop: "0.5rem", fontSize: "1.2rem" }}
               >
                 {isExpanded && <p style={{ margin: 0 }}>{desc.text}</p>}
               </div>
@@ -573,9 +585,9 @@ const Fig2WithPortal: React.FC = () => {
       <div
         ref={chartContainerRef}
         style={{
-          flex: "2",
-          aspectRatio: "1.2 / 1",
-          border: "1px solid #444",
+          flex: "3",
+          aspectRatio: "1.7 / 1",
+          // border: "1px solid #444",
           marginLeft: "1rem",
         }}
       >
@@ -584,7 +596,7 @@ const Fig2WithPortal: React.FC = () => {
           option={option || {}}
           style={{
             width: "100%",
-            height: "100%",
+            height: "90vh",
           }}
           opts={{ renderer: "canvas" }}
           theme="dark"

@@ -56,10 +56,10 @@ const Page: React.FC = () => {
           return {
             ...s,
             symbolSize: (data: any, params: any) => {
-              const baseSize = 6;
-              const randomFactor = Math.random() * 4;
-              const waveFrequency = 2;
-              const timeFactor = Date.now() / 1000;
+              const baseSize = 8; // Base size
+              const randomFactor = Math.random() * 4; // Randomize initial size
+              const waveFrequency = 0.1; // Wave frequency
+              const timeFactor = Date.now() / 1000; // Time-based oscillation
 
               return (
                 baseSize +
@@ -334,14 +334,14 @@ const Page: React.FC = () => {
           show: true,
           yAxisIndex: [0],
           start: 0,
-          end: 40,
+          end: 30,
           filterMode: "filter",
           brushSelect: false,
         },
         {
           type: "inside",
           start: 0,
-          end: 40,
+          end: 30,
           yAxisIndex: [0],
           filterMode: "empty",
           zoomLock: true,
@@ -617,7 +617,7 @@ const Page: React.FC = () => {
             symbol: "diamond",
             // 2) Pulsating size (mild wave + random factor)
             symbolSize: (data: any, params: any) => {
-              const baseSize = 8; // Base size
+              const baseSize = 4; // Base size
               const randomFactor = Math.random() * 4; // Slight random flicker
               const waveFrequency = 0.1; // Very gentle wave
               const timeFactor = Date.now() / 1000; // Continually changes over time
@@ -739,7 +739,7 @@ const Page: React.FC = () => {
             type: "time",
             name: "Date",
           },
-          animationDurationUpdate: 1000,
+          animationDurationUpdate: 500,
           animationThreshold: 20000,
           progressive: 20000,
           progressiveThreshold: 20000,
@@ -773,8 +773,8 @@ const Page: React.FC = () => {
             },
             {
               type: "group",
-              left: "20%", // Position at the bottom left
-              bottom: "15%", // Adjust as needed
+              right: "20%", // Position at the bottom left
+              top: "15%", // Adjust as needed
               z: 100000, // Ensure it's above scatter points
               silent: true, // Make the graphic non-clickable
               children: [
