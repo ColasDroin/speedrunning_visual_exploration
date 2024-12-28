@@ -76,7 +76,7 @@ const categoryDescriptions = [
 const CENTER_TOLERANCE = 50;
 const DEBOUNCE_INTERVAL = 1000;
 const STARTING_CATEGORIES = 1;
-const FINAL_GRACE_PERIOD = 1000; // ms (1.5 seconds) for the last fold
+const FINAL_GRACE_PERIOD = 1000; // ms (1 second) for the last fold
 
 const predefinedColors = [
   "#FF5733",
@@ -100,6 +100,7 @@ const Fig2WithPortal: React.FC = () => {
   );
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
 
+  // Reveal state
   const [revealedCategories, setRevealedCategories] =
     useState(STARTING_CATEGORIES);
   const [scrollLocked, setScrollLocked] = useState(false);
@@ -128,23 +129,81 @@ const Fig2WithPortal: React.FC = () => {
 
   const lastRevealRef = useRef<number>(0);
 
+  // For mobile touch
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+
   /****************************************************
-   * handleWheel
+   * Shared reveal logic
+   ****************************************************/
+  const triggerReveal = useCallback(() => {
+    if (!allNetworkData) return;
+    const totalCategories = allNetworkData.categories.length;
+
+    // If we've revealed all categories
+    if (revealedCategories >= totalCategories) {
+      if (!hasFoldedLast) {
+        const now = Date.now();
+
+        // Record reveal time if missing
+        if (!timeLastCategoryReveal) {
+          setTimeLastCategoryReveal(now);
+          return;
+        }
+
+        // Wait for grace period
+        if (now - timeLastCategoryReveal < FINAL_GRACE_PERIOD) {
+          return;
+        }
+
+        // fold last category
+        setHasFoldedLast(true);
+        setExpandedIndex(-1);
+        return;
+      } else {
+        // finalize
+        setCompleted(true);
+        setScrollLocked(false);
+        document.body.style.overflow = "auto";
+        return;
+      }
+    }
+
+    // Otherwise normal reveal
+    const now = Date.now();
+    if (now - lastRevealRef.current >= DEBOUNCE_INTERVAL) {
+      lastRevealRef.current = now;
+      setRevealedCategories((prev) => {
+        const newVal = prev + 1;
+        setExpandedIndex(newVal - 1);
+        return newVal;
+      });
+    }
+  }, [
+    revealedCategories,
+    hasFoldedLast,
+    timeLastCategoryReveal,
+    allNetworkData,
+  ]);
+
+  /****************************************************
+   * Wheel Handler (desktop) — only reveal on upward scroll
    ****************************************************/
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       if (!allNetworkData || !chartContainerRef.current) return;
       if (completed) return; // done
 
-      const { categories } = allNetworkData;
-      const totalCategories = categories.length;
+      // Only trigger if the user is scrolling "up" => e.deltaY > 0
+      if (e.deltaY <= 0) {
+        // This means user scrolled down or no movement => do nothing
+        return;
+      }
 
       const rect = chartContainerRef.current.getBoundingClientRect();
       const chartCenter = rect.top + rect.height / 2;
       const viewportCenter = window.innerHeight / 2;
       const distance = Math.abs(chartCenter - viewportCenter);
 
-      // If not locked yet
       if (!scrollLocked) {
         if (distance < CENTER_TOLERANCE) {
           setScrollLocked(true);
@@ -158,67 +217,81 @@ const Fig2WithPortal: React.FC = () => {
       if (scrollLocked) {
         e.preventDefault();
         e.stopPropagation();
+        triggerReveal();
+      }
+    },
+    [allNetworkData, chartContainerRef, completed, triggerReveal, scrollLocked]
+  );
 
-        // If we've revealed all categories
-        if (revealedCategories >= totalCategories) {
-          if (!hasFoldedLast) {
-            const now = Date.now();
+  /****************************************************
+   * Touch Handlers (mobile) — only reveal on upward swipe
+   ****************************************************/
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    setTouchStartY(e.touches[0].clientY);
+  }, []);
 
-            // record reveal time if missing
-            if (!timeLastCategoryReveal) {
-              setTimeLastCategoryReveal(now);
-              return;
-            }
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (!allNetworkData || !chartContainerRef.current) return;
+      if (completed) return;
+      if (touchStartY === null) return;
 
-            // wait for grace period
-            if (now - timeLastCategoryReveal < FINAL_GRACE_PERIOD) {
-              return;
-            }
+      // Calculate the swipe distance
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStartY - currentY;
 
-            // fold last category
-            setHasFoldedLast(true);
-            setExpandedIndex(-1);
-            return;
-          } else {
-            // finalize
-            setCompleted(true);
-            setScrollLocked(false);
-            document.body.style.overflow = "auto";
-            return;
-          }
+      // Only proceed if user swipes upward => deltaY > 0
+      if (deltaY <= 0) {
+        return;
+      }
+
+      const rect = chartContainerRef.current.getBoundingClientRect();
+      const chartCenter = rect.top + rect.height / 2;
+      const viewportCenter = window.innerHeight / 2;
+      const distance = Math.abs(chartCenter - viewportCenter);
+
+      if (!scrollLocked) {
+        if (distance < CENTER_TOLERANCE) {
+          setScrollLocked(true);
+          document.body.style.overflow = "hidden";
+          e.preventDefault();
+          e.stopPropagation();
+          return;
         }
+      }
 
-        // Otherwise normal reveal
-        const now = Date.now();
-        if (now - lastRevealRef.current >= DEBOUNCE_INTERVAL) {
-          lastRevealRef.current = now;
-          setRevealedCategories((prev) => {
-            const newVal = prev + 1;
-            setExpandedIndex(newVal - 1);
-            return newVal;
-          });
-        }
+      if (scrollLocked) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerReveal();
       }
     },
     [
-      scrollLocked,
-      revealedCategories,
-      completed,
-      hasFoldedLast,
-      timeLastCategoryReveal,
       allNetworkData,
+      chartContainerRef,
+      completed,
+      scrollLocked,
+      triggerReveal,
+      touchStartY,
     ]
   );
 
   /****************************************************
-   * useLayoutEffect: attach wheel
+   * Attach/detach wheel & touch listeners
    ****************************************************/
   useLayoutEffect(() => {
+    // Desktop
     window.addEventListener("wheel", handleWheel, { passive: false });
+    // Mobile
+    window.addEventListener("touchstart", handleTouchStart, { passive: false });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+
     return () => {
       window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [handleWheel]);
+  }, [handleWheel, handleTouchStart, handleTouchMove]);
 
   /****************************************************
    * Fetch data
@@ -365,13 +438,9 @@ const Fig2WithPortal: React.FC = () => {
               };
             }),
             bottom: 0, // the size of title + margin
-            left: "left", //or 0 or '0%'
+            left: "left", // or 0 or '0%'
           },
         ],
-        // grid: {
-        //   top: 80, // the size of title + legend + margin
-        // },
-
         series: [
           {
             type: "graph",
@@ -472,7 +541,7 @@ const Fig2WithPortal: React.FC = () => {
   );
 
   /****************************************************
-   * Watch revealedCategories
+   * Watch revealedCategories => update chart & side panel
    ****************************************************/
   useEffect(() => {
     if (!allNetworkData) return;
@@ -481,7 +550,7 @@ const Fig2WithPortal: React.FC = () => {
     // Update the chart to show up to `revealedCategories`
     getPartialOption(allNetworkData, revealedCategories);
 
-    // Mark revealed categories as appeared
+    // Mark revealed categories as appeared (fade-in)
     setAppeared((prev) => {
       const newState = [...prev];
       for (let i = 0; i < revealedCategories; i++) {
@@ -539,7 +608,6 @@ const Fig2WithPortal: React.FC = () => {
         style={{
           flex: "1",
           padding: "1rem",
-          //borderRight: "1px solid #444",
           position: "relative",
           zIndex: 9999,
           overflow: "visible",
@@ -587,7 +655,6 @@ const Fig2WithPortal: React.FC = () => {
         style={{
           flex: "3",
           aspectRatio: "1.7 / 1",
-          // border: "1px solid #444",
           marginLeft: "1rem",
         }}
       >

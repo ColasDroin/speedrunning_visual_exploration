@@ -73,13 +73,78 @@ const Page: React.FC = () => {
   const [hoveringIndex, setHoveringIndex] = useState<number | null>(null);
   const [hoverCoords, setHoverCoords] = useState({ x: 0, y: 0 });
 
+  // Touch tracking
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+
   /****************************************************
-   * 1) Wheel Handler
+   * Reveal logic (shared by wheel and touch)
+   ****************************************************/
+  const triggerReveal = useCallback(() => {
+    const totalFeatured = featuredGames.length - 1;
+
+    // If we've revealed all featured plus "others"
+    // i.e. revealedCount > totalFeatured => last stage
+    if (revealedCount > totalFeatured) {
+      // Wait for grace period to fold last
+      if (!hasFoldedLast) {
+        const now = Date.now();
+        if (!timeLastReveal) {
+          setTimeLastReveal(now);
+          return;
+        }
+        if (now - timeLastReveal < FINAL_GRACE_PERIOD) {
+          return;
+        }
+        // fold
+        setHasFoldedLast(true);
+        setExpandedIndex(-1); // or no expanded
+        return;
+      } else {
+        // finalize
+        setCompleted(true);
+        setScrollLocked(false);
+        document.body.style.overflow = "auto";
+        return;
+      }
+    }
+
+    // Otherwise, normal partial reveal
+    const now = Date.now();
+    if (now - lastRevealRef.current >= DEBOUNCE_INTERVAL) {
+      lastRevealRef.current = now;
+      setRevealedCount((prev) => {
+        const newVal = prev + 1;
+        // Expand the newly revealed item
+        if (newVal <= totalFeatured) {
+          setExpandedIndex(newVal - 1);
+        } else {
+          // newVal == totalFeatured+1 => all others
+          setTimeLastReveal(Date.now());
+        }
+        return newVal;
+      });
+    }
+  }, [
+    revealedCount,
+    hasFoldedLast,
+    timeLastReveal,
+    setTimeLastReveal,
+    setHasFoldedLast,
+  ]);
+
+  /****************************************************
+   * 1) Wheel Handler (desktop)
    ****************************************************/
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       if (completed) return;
       if (!chartContainerRef.current) return;
+
+      // We only want to trigger if user scrolls upward => e.deltaY > 0
+      if (e.deltaY <= 0) {
+        // deltaY negative => user is scrolling down, do nothing
+        return;
+      }
 
       const rect = chartContainerRef.current.getBoundingClientRect();
       const chartCenter = rect.top + rect.height / 2;
@@ -100,65 +165,78 @@ const Page: React.FC = () => {
       if (scrollLocked) {
         e.preventDefault();
         e.stopPropagation();
-
-        const totalFeatured = featuredGames.length - 1;
-
-        // If we've revealed all featured plus "others"
-        // i.e. revealedCount > totalFeatured => last stage
-        if (revealedCount > totalFeatured) {
-          // Wait for grace period to fold last
-          if (!hasFoldedLast) {
-            const now = Date.now();
-            if (!timeLastReveal) {
-              setTimeLastReveal(now);
-              return;
-            }
-            if (now - timeLastReveal < FINAL_GRACE_PERIOD) {
-              return;
-            }
-            // fold
-            setHasFoldedLast(true);
-            setExpandedIndex(-1); // or no expanded
-            return;
-          } else {
-            // finalize
-            setCompleted(true);
-            setScrollLocked(false);
-            document.body.style.overflow = "auto";
-            return;
-          }
-        }
-
-        // Otherwise, normal partial reveal
-        const now = Date.now();
-        if (now - lastRevealRef.current >= DEBOUNCE_INTERVAL) {
-          lastRevealRef.current = now;
-          setRevealedCount((prev) => {
-            const newVal = prev + 1;
-            // Expand the newly revealed item
-            if (newVal <= totalFeatured) {
-              setExpandedIndex(newVal - 1);
-            } else {
-              // newVal == totalFeatured+1 => all others
-              setTimeLastReveal(Date.now());
-            }
-            return newVal;
-          });
-        }
+        triggerReveal();
       }
     },
-    [scrollLocked, revealedCount, completed, hasFoldedLast, timeLastReveal]
+    [scrollLocked, completed, triggerReveal]
   );
 
-  useLayoutEffect(() => {
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-    };
-  }, [handleWheel]);
+  /****************************************************
+   * 2) Touch Handlers (mobile)
+   ****************************************************/
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    setTouchStartY(e.touches[0].clientY);
+  }, []);
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (completed) return;
+      if (!chartContainerRef.current) return;
+      if (touchStartY === null) return;
+
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStartY - currentY;
+      // We only trigger if user swipes upward => deltaY > 0
+      if (deltaY <= 0) {
+        // user is swiping downward or not moving enough, do nothing
+        return;
+      }
+
+      const rect = chartContainerRef.current.getBoundingClientRect();
+      const chartCenter = rect.top + rect.height / 2;
+      const viewportCenter = window.innerHeight / 2;
+      const distance = Math.abs(chartCenter - viewportCenter);
+
+      if (!scrollLocked) {
+        if (distance < CENTER_TOLERANCE) {
+          setScrollLocked(true);
+          document.body.style.overflow = "hidden";
+          // We MUST preventDefault if we do not want the page to bounce/scroll
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
+
+      if (scrollLocked) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerReveal();
+      }
+    },
+    [completed, chartContainerRef, scrollLocked, triggerReveal, touchStartY]
+  );
 
   /****************************************************
-   * 2) Fetch popularity_data.json.gz
+   * 3) Attach/detach scroll/touch listeners
+   ****************************************************/
+  useLayoutEffect(() => {
+    // Wheel for desktop
+    window.addEventListener("wheel", handleWheel, { passive: false });
+
+    // Touch for mobile
+    window.addEventListener("touchstart", handleTouchStart, { passive: false });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [handleWheel, handleTouchStart, handleTouchMove]);
+
+  /****************************************************
+   * 4) Fetch popularity_data.json.gz (your existing code)
    ****************************************************/
   const prepareGraph = useCallback(async () => {
     const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
@@ -182,7 +260,7 @@ const Page: React.FC = () => {
   }, [prepareGraph]);
 
   /****************************************************
-   * 3) Build the "selected" object for partial reveal
+   * 5) Build the "selected" object for partial reveal
    ****************************************************/
   const buildSelectedObject = useCallback(() => {
     // We have 5 featured items. If revealedCount=1 => show first only
@@ -202,7 +280,7 @@ const Page: React.FC = () => {
         selected[gameName] = true;
       }
     } else {
-      // revealedCount> 5 => all
+      // revealedCount > 5 => all
       for (const g of allGames) {
         selected[g] = true;
       }
@@ -211,7 +289,7 @@ const Page: React.FC = () => {
   }, [allGames, revealedCount]);
 
   /****************************************************
-   * 4) Rebuild ECharts Option whenever data changes
+   * 6) Rebuild ECharts Option whenever data changes
    ****************************************************/
   useEffect(() => {
     if (!allGames.length || !riverData.length) return;
@@ -284,13 +362,6 @@ const Page: React.FC = () => {
           left: 0,
         },
       ],
-      // grid: {
-      //   top: 10, // Adjust the top margin
-      //   bottom: 30, // Adjust the bottom margin
-      //   left: 100, // Adjust the left margin
-      //   right: 100, // Adjust the right margin
-      // },
-
       singleAxis: {
         top: "20%",
         bottom: "1%",
@@ -343,7 +414,7 @@ const Page: React.FC = () => {
   }, [allGames, riverData, revealedCount, buildSelectedObject]);
 
   /****************************************************
-   * 5) Watch revealedCount => animate the side panel
+   * 7) Watch revealedCount => animate the side panel
    ****************************************************/
   useEffect(() => {
     // Step 1: Add the item to the DOM, but don’t apply `.appeared` yet.
@@ -366,7 +437,7 @@ const Page: React.FC = () => {
   }, [revealedCount]);
 
   /****************************************************
-   * 6) Tooltip events for side panel
+   * 8) Tooltip events for side panel
    ****************************************************/
   const onTitleMouseEnter = (e: MouseEvent<HTMLDivElement>, index: number) => {
     setHoveringIndex(index);
@@ -391,7 +462,6 @@ const Page: React.FC = () => {
         style={{
           flex: "3",
           aspectRatio: "1.2 / 1",
-          // border: "1px solid #444",
           marginLeft: "1rem",
         }}
       >
@@ -412,7 +482,6 @@ const Page: React.FC = () => {
         style={{
           flex: "1",
           padding: "1rem",
-          //borderLeft: "1px solid #444",
           position: "relative",
           overflow: "visible",
         }}
@@ -450,7 +519,7 @@ const Page: React.FC = () => {
         })}
       </div>
 
-      {/* OPTIONAL: Portal-based floating tooltip (if you prefer a pointer-follow approach) */}
+      {/* OPTIONAL: Portal-based floating tooltip (pointer-follow style) */}
       <Portal>
         {hoveringIndex !== null && (
           <div
