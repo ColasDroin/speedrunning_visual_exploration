@@ -37,14 +37,14 @@ export default function Home() {
 
   return (
     <div>
-      <div className="lg:h-[25vh] md:h-[20vh] sm:h-[18vh]">
+      <div className="lg:h-[25vh] md:h-[20vw] sm:h-[18vh]">
         <Banner />
       </div>
 
       <div className="container mx-auto px-4">
         <div className="grid w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 mt-15">
           <div className="grid-cols-1">
-            {showSafariDisclaimer && (
+            {/* {showSafariDisclaimer && (
               <div className="mt-5 bg-yellow-100 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center">
                 <p>
                   <strong>Performance Notice:</strong> You are using Safari. For
@@ -52,7 +52,7 @@ export default function Home() {
                   browser (Chrome, Edge, etc.) or Firefox.
                 </p>
               </div>
-            )}
+            )} */}
             <div
               className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-5`}
             >

@@ -2,7 +2,7 @@ import styles from "../styles/banner.module.css";
 
 const Banner = () => {
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-screen min-h-[18vh]">
       <div
         className={`${styles.background80s} ${styles.animatedclouds} ${styles.stars}`}
       >
