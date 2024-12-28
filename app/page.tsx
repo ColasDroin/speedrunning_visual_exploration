@@ -11,6 +11,7 @@ import Banner from "./components/banner";
 import Fig0 from "./components/fig0";
 import Fig05 from "./components/fig05";
 import Fig1 from "./components/fig1";
+import Fig1_alt from "./components/fig1";
 import Fig2 from "./components/fig2";
 import Fig3 from "./components/fig3";
 import Fig4 from "./components/fig4";
@@ -19,9 +20,14 @@ import styles from "./styles/banner.module.css";
 export default function Home() {
   const [showSafariDisclaimer, setShowSafariDisclaimer] = useState(false);
 
+  function isSafari() {
+    if (typeof navigator === "undefined") return false; // SSR safety
+    const ua = navigator.userAgent.toLowerCase();
+    return ua.includes("safari") && !ua.includes("chrome");
+  }
+  const safari = isSafari();
   useEffect(() => {
-    const userAgent = navigator.userAgent.toLowerCase();
-    if (userAgent.includes("safari") && !userAgent.includes("chrome")) {
+    if (safari) {
       setShowSafariDisclaimer(true);
     }
   }, []);
@@ -117,7 +123,8 @@ export default function Home() {
             <Fig05 />
           </div>
           <div className="mx-auto">
-            <Fig1 />
+            if (safari) {<Fig1 />}
+            else {<Fig1_alt />}
           </div>
           <div
             className={`${styles.chrome} ${styles.shine} ${styles.titleDecorated} mt-11 mb-10`}
