@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Speedrunning: A Visual Exploration
 
-## Getting Started
+A single-page application built with **React**, **Next.js**, and **ECharts.js** to explore a dataset of speedrunning records scraped from the API of [speedrun.com](https://www.speedrun.com). This project is intended to provide an interactive and visual exploration of the data for the general public while serving as a private-use project for the developer.
 
-First, run the development server:
+The application is live and accessible at: [Speedrunning: A Visual Exploration](https://colasdroin.github.io/speedrunning_visual_exploration/).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Table of Contents
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- [Speedrunning: A Visual Exploration](#speedrunning-a-visual-exploration)
+  - [Table of Contents](#table-of-contents)
+  - [Installation and Setup](#installation-and-setup)
+    - [Prerequisites](#prerequisites)
+    - [Steps](#steps)
+  - [Contributing](#contributing)
+  - [License](#license)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Installation and Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prerequisites
 
-## Learn More
+- **Node.js**: v23.3.0
+- **pnpm**: v9.14.4
 
-To learn more about Next.js, take a look at the following resources:
+### Steps
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Clone the repository:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   git clone https://github.com/<your-repo>/speedrunning_visual_exploration.git
+   cd speedrunning_visual_exploration
+    ```
 
-## Deploy on Vercel
+2. Install the dependencies:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   pnpm install
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. Start the development server:
+
+   ```bash
+    pnpm dev
+    ```
+
+    The application should now be running on `http://localhost:3000`.
+
+## Contributing
+
+Contributions are welcome! If you encounter bugs while running the page or notice issues with the analysis, feel free to open an issue or submit a pull request.
+
+When contributing:
+
+- Ensure that your changes don’t break the application.
+- Follow best practices for clean and readable code.
+- Cite any additional sources or data you include.
+
+## License
+
+This project is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0).
+You are free to use, modify, and share this project as long as you provide proper attribution with a link to the original project.
+
+For details, see the full license text.
