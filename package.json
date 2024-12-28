@@ -19,12 +19,15 @@
     "@types/lodash": "^4.17.13",
     "echarts": "^5.5.1",
     "echarts-for-react": "^3.0.2",
+    "katex": "^0.16.18",
     "lodash": "^4.17.21",
     "marked": "^15.0.4",
     "next": "15.0.3",
     "pako": "^2.1.0",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
+    "react-katex": "^3.0.1",
+    "react-latex-next": "^3.0.0",
     "styled-jsx": "^5.1.6"
   },
   "devDependencies": {

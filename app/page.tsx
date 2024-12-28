@@ -17,6 +17,8 @@ import Fig3 from "./components/fig3";
 import Fig4 from "./components/fig4";
 import styles from "./styles/banner.module.css";
 import Image from "next/image";
+import { BlockMath, InlineMath } from "react-katex";
+import "katex/dist/katex.min.css";
 
 export default function Home() {
   const [showSafariDisclaimer, setShowSafariDisclaimer] = useState(false);
@@ -167,68 +169,231 @@ export default function Home() {
           >
             UNDERSTANDING SPEEDRUNNING
           </div>
-          <p className="max-w-5xl mx-auto"> Blableblbl</p>
+          <p className="max-w-5xl mx-auto">
+            Speedrunning is incredibly diverse, with categories for every type
+            of player and game. Each game has its own set of rules and
+            categories that challenge runners in unique ways. Two popular
+            category types include:
+          </p>
+          <ul className="list-disc list-inside max-w-5xl mx-auto">
+            <li>
+              <strong>Any%</strong>: The goal is to finish the game as fast as
+              possible, using any tricks, skips, or glitches allowed.
+            </li>
+            <li>
+              <strong>100%</strong>: Players must complete every task or collect
+              every item, making it a more comprehensive and often lengthier
+              challenge.
+            </li>
+          </ul>
+
+          <p className="max-w-5xl mx-auto mt-5">
+            Below are two examples of category trees, showcasing how games
+            differ in structure and speedrunning possibilities.
+          </p>
+
           <div className="mx-auto w-full mt-5">
+            <p className="max-w-5xl mx-auto">
+              <strong>Minecraft: Java Edition</strong> has a relatively simple
+              category tree, as the game is not divided into levels. Its
+              categories focus on goals like defeating the Ender Dragon as fast
+              as possible. Since there are no per-level runs, the tree is
+              straightforward compared to other games.
+            </p>
             <Fig0bis />
           </div>
-          <p className="max-w-5xl mx-auto">
-            Speedrunning has tons of categories, so it’s not always easy to
-            follow everything. There’s the popular "Any%" category, where you do
-            whatever it takes to finish fast, and "100%" where you aim to do
-            everything in the game. Some speedruns are even broken down by
-            level, where players focus on beating individual stages as fast as
-            they can. With all these different categories, there's something for
-            every kind of speedrunner, and it keeps the community fresh and
-            competitive. The figure belows illustrate the main categories and
-            their rules for for the top 10 games with the most submissions.
-          </p>
+
           <div className="mx-auto w-full mt-5">
+            <p className="max-w-5xl mx-auto">
+              In contrast, <strong>Portal</strong> has a much more complex
+              category tree. The game features both full-game and per-level
+              categories, which greatly expand its scope for speedrunners. While
+              per-level runs offer fascinating insights into specific parts of
+              the game, they were excluded from this analysis due to the sheer
+              volume of data they would introduce.
+            </p>
             <Fig0 />
           </div>
+
+          <p className="max-w-5xl mx-auto mt-5">
+            These examples highlight the endless variety of speedrunning
+            category trees, as every game presents unique challenges, rules, and
+            opportunities for creativity. Whether a game is open-ended like
+            Minecraft or structured like Portal, the diversity in speedrunning
+            reflects the ingenuity of its community.
+          </p>
           <div
             className={`${styles.chrome}  ${styles.titleDecorated} mt-11 mb-10`}
           >
             THE MOST SPEEDRUNNED GAMES
           </div>
-          <p className="mx-auto max-w-5xl">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.{" "}
+          <p className="max-w-5xl mx-auto">
+            Speedrunning popularity varies across games, with some titles
+            standing out for their active communities and high submission
+            counts. These games often feature unique mechanics, competitive
+            leaderboards, or nostalgia that drives runners to perfect their
+            craft.
           </p>
           <div className="mx-auto w-full mt-5 mb-5">
             <Fig05 />
           </div>
-          <p className="mx-auto max-w-5xl">
-            Now you can explore the data by yourself!
+          <p className="max-w-5xl mx-auto">
+            Above, a scatter plot of 100% runs in{" "}
+            <strong>The Legend of Zelda: Breath of the Wild (BotW)</strong>{" "}
+            shows how run times have evolved over time. Each point represents a
+            completed run, with faster times indicating significant
+            breakthroughs, new strategies, or the discovery of game-breaking
+            glitches.
           </p>
+
+          <div className="mx-auto max-w-5xl mt-5 mb-5">
+            <p className="max-w-5xl mx-auto">
+              The figure below is an interactive visualization that allows you
+              to explore the dataset of runs by game and category in depth. Have
+              a try!
+            </p>
+          </div>
           <div className="mx-auto  w-full mt-5 mb-5">{stableFig1}</div>
           <div
             className={`${styles.chrome} ${styles.titleDecorated} mt-9 mb-9`}
           >
             GAMES COMMUNITIES
           </div>
-          <p className="mx-auto max-w-5xl">Test test test</p>
+          <p className="max-w-5xl mx-auto">
+            Speedrunning is more than an individual pursuit—it thrives on
+            collaboration, shared knowledge, and competition. Communities form
+            around specific games, helping runners discover tricks, refine
+            strategies, and improve their times.
+          </p>
           <div className="mx-auto w-full mt-5 mb-5">
             <Fig2 />
           </div>
+          <p className="max-w-5xl mx-auto">
+            The network graph above shows connections between the top 50 games,
+            grouped by clusters. These clusters were identified using a{" "}
+            <a
+              href="https://en.wikipedia.org/wiki/Modularity_(networks)"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600"
+            >
+              greedy modularity algorithm
+            </a>
+            , which detects closely linked communities. Nodes represent games,
+            while edges indicate shared runners. The thicker the edge, the more
+            players have submitted runs for both games.
+          </p>
           <div
             className={`${styles.chrome}  ${styles.titleDecorated} mt-9 mb-9`}
           >
             EVOLUTION OF GAME POPULARITY
           </div>
-          <p className="mx-auto max-w-5xl">Test test test</p>
-
+          <p className="max-w-5xl mx-auto">
+            Speedrunning trends change over time, influenced by new releases,
+            rediscovered classics, or viral moments on streaming platforms. The
+            river plot below illustrates the monthly submission trends for the
+            top 20 games in terms of run counts.
+          </p>
           <div className="mx-auto w-full mt-5 mb-5">
             <Fig3 />
           </div>
+          <p className="max-w-5xl mx-auto">
+            Each stream represents a game, with its width corresponding to the
+            number of runs submitted that month. Scroll through to watch the
+            evolution of popularity for individual games, culminating in a full
+            view of all 20 games. Notice how certain titles surge during
+            specific periods, often tied to cultural events, game updates, or
+            charity marathons like{" "}
+            <a
+              href="https://gamesdonequick.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600"
+            >
+              Games Done Quick
+            </a>
+            .
+          </p>
           <div
             className={`${styles.chrome}  ${styles.titleDecorated} mt-9 mb-9`}
           >
             MOST COMPETITIVE COUNTRIES
           </div>
-          <p className="mx-auto max-w-5xl">Test test test</p>
+          <p className="max-w-5xl mx-auto">
+            Speedrunning is a global phenomenon, with players from around the
+            world competing for top times. But which countries are the most
+            competitive? To answer this question, we created a scoring system
+            based on the positions of runners on the leaderboards.
+          </p>
+          <p className="max-w-5xl mx-auto">
+            For each run, the position of the runner at the time of submission
+            determines the score they contribute to their country. The scoring
+            system assigns points as follows:
+          </p>
+          <ul className="list-disc list-inside max-w-5xl mx-auto">
+            <li>1st place: 10 points</li>
+            <li>2nd place: 5 points</li>
+            <li>3rd place: 3 points</li>
+            <li>4th place: 2 points</li>
+            <li>5th place: 1 point</li>
+          </ul>
+          <p className="max-w-5xl mx-auto">
+            Scores are calculated monthly and summed across all games to give
+            each country a total score. The scoring system can be formalized as:
+          </p>
+          <div className="max-w-5xl mx-auto text-center mt-4 mb-4">
+            <BlockMath
+              math={`S_c = \\sum_{g \\in G} \\sum_{r \\in R_g} \\text{points}(r)`}
+            />
+          </div>
+          <p className="max-w-5xl mx-auto">Where:</p>
+          <ul className="list-disc list-inside max-w-5xl mx-auto">
+            <li>
+              <strong>
+                <InlineMath math="S_c" />:
+              </strong>{" "}
+              Total score for country <InlineMath math="c" />.
+            </li>
+            <li>
+              <strong>
+                <InlineMath math="G" />:
+              </strong>{" "}
+              The set of all games.
+            </li>
+            <li>
+              <strong>
+                <InlineMath math="R_g" />:
+              </strong>{" "}
+              The set of runners from country <InlineMath math="c" /> for game{" "}
+              <InlineMath math="g" />.
+            </li>
+            <li>
+              <strong>
+                <InlineMath math="\text{points}(r)" />:
+              </strong>{" "}
+              A function mapping the position of runner <InlineMath math="r" />{" "}
+              to a score, based on their position.
+            </li>
+          </ul>
+
+          <p className="max-w-5xl mx-auto">
+            The animated bar race below visualizes how country scores evolve
+            over time, highlighting key shifts in competitiveness. Afterward,
+            the colored world map shows the cumulative scores as of November
+            2023, revealing which countries dominate the global speedrunning
+            scene.
+          </p>
 
           <div className="mx-auto w-full mt-5 mb-5">
             <Fig4 />
           </div>
+          <p className="max-w-5xl mx-auto">
+            Unsurprisingly, countries with larger player bases, such as the
+            United States, Japan, and Germany, tend to score highly. However,
+            smaller countries with passionate communities often punch above
+            their weight, making the competition even more exciting!
+          </p>
+
           <div
             className={`${styles.chrome}  ${styles.titleDecorated} mt-9 mb-9`}
           >
@@ -246,11 +411,10 @@ export default function Home() {
             <div>
               <h2 className="text-xl font-bold">Hi there, I'm Colas!</h2>
               <p className="mt-2 text-gray-700">
-                I'm currently transitioning from academia in the hope of living
-                from my data visualization work. This is my first project, and
-                I'm thrilled to share it with you! Your support means the world
-                to me, whether it's by buying me a coffee, sharing my work on
-                social media, or simply spreading the word.
+                I'm transitioning from academia to pursue my passion for data
+                visualization. This is my first project, and I’m excited to
+                share it with you! Your support means everything, whether it’s
+                through a donation, sharing my work, or spreading the word.
               </p>
               <div className="mt-4">
                 <a
