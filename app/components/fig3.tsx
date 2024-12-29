@@ -11,7 +11,7 @@ import ReactECharts from "echarts-for-react";
 import pako from "pako";
 import Portal from "./Portal";
 
-// 1) Our five featured games (in reveal order):
+// 1) Our five featured games (in reveal order) + "And many others..."
 const featuredGames = [
   {
     name: "Super Mario 64",
@@ -33,7 +33,6 @@ const featuredGames = [
     name: "Seterra (Old Version)",
     desc: "A geography quiz game with surprising speedrun potential.",
   },
-
   {
     name: "And many others...",
     desc: "",
@@ -45,8 +44,136 @@ const DEBOUNCE_INTERVAL = 1000;
 const STARTING_REVEALED = 1;
 const FINAL_GRACE_PERIOD = 1000; // ms
 
+// 2) Ten gradients for the chart (plotGradients)
+const plotGradients = [
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(128, 255, 165)" }, // 0: SM64
+      { offset: 1, color: "rgb(1, 191, 236)" },
+    ],
+  },
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(0, 221, 255)" }, // 1: SM Odyssey
+      { offset: 1, color: "rgb(77, 119, 255)" },
+    ],
+  },
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(55, 162, 255)" }, // 2: RE2
+      { offset: 1, color: "rgb(116, 21, 219)" },
+    ],
+  },
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(255, 0, 135)" }, // 3: Minecraft
+      { offset: 1, color: "rgb(135, 0, 157)" },
+    ],
+  },
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(255, 191, 0)" }, // 4: Seterra
+      { offset: 1, color: "rgb(224, 62, 76)" },
+    ],
+  },
+  // 5..9 are for "others" or any additional categories
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(238,130,238)" }, // 5
+      { offset: 1, color: "rgb(255,99,71)" },
+    ],
+  },
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(189, 202, 162)" }, // 6
+      { offset: 1, color: "rgb(50,205,50)" },
+    ],
+  },
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(255, 251, 0)" }, // 7
+      { offset: 1, color: "rgb(255,140,0)" },
+    ],
+  },
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(123,104,238)" }, // 8
+      { offset: 1, color: "rgb(72,61,139)" },
+    ],
+  },
+  {
+    type: "linear",
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: "rgb(218,112,214)" }, // 9
+      { offset: 1, color: "rgb(199,21,133)" },
+    ],
+  },
+];
+
+// 3) Six colors for the side-panel titles (titleColors):
+//    We only need the top color for each featured game, plus white for "others".
+const titleColors = [
+  "rgb(255, 157, 0)", // 0: SM64
+  "rgb(168, 102, 190)", // 1: SM Odyssey
+  "rgb(230, 103, 164)", // 2: RE2
+  "rgb(255, 0, 135)", // 3: Minecraft
+  "rgb(128, 255, 165)", // 4: Seterra
+  "#ffffff", // 5: "And many others..."
+];
+
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
+  const chartContainerRef = useRef<HTMLDivElement | null>(null);
+
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
 
   // Data from the server:
@@ -66,7 +193,6 @@ const Page: React.FC = () => {
   const [hasFoldedLast, setHasFoldedLast] = useState(false);
   const [timeLastReveal, setTimeLastReveal] = useState<number | null>(null);
 
-  const chartContainerRef = useRef<HTMLDivElement | null>(null);
   const lastRevealRef = useRef<number>(0);
 
   // Tooltip states (for the side panel titles)
@@ -76,11 +202,10 @@ const Page: React.FC = () => {
   // Touch tracking
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
 
+  // Detect screen size
   let isSmallScreen = false;
   if (typeof window !== "undefined") {
     isSmallScreen = window.innerWidth < 768;
-  } else {
-    console.error("Window object is not available.");
   }
   const fontSize = isSmallScreen ? 12 : 18;
 
@@ -91,7 +216,6 @@ const Page: React.FC = () => {
     const totalFeatured = featuredGames.length - 1;
 
     // If we've revealed all featured plus "others"
-    // i.e. revealedCount > totalFeatured => last stage
     if (revealedCount > totalFeatured) {
       // Wait for grace period to fold last
       if (!hasFoldedLast) {
@@ -105,7 +229,7 @@ const Page: React.FC = () => {
         }
         // fold
         setHasFoldedLast(true);
-        setExpandedIndex(-1); // or no expanded
+        setExpandedIndex(-1);
         return;
       } else {
         // finalize
@@ -126,19 +250,13 @@ const Page: React.FC = () => {
         if (newVal <= totalFeatured) {
           setExpandedIndex(newVal - 1);
         } else {
-          // newVal == totalFeatured+1 => all others
+          // newVal == totalFeatured+1 => all "others"
           setTimeLastReveal(Date.now());
         }
         return newVal;
       });
     }
-  }, [
-    revealedCount,
-    hasFoldedLast,
-    timeLastReveal,
-    setTimeLastReveal,
-    setHasFoldedLast,
-  ]);
+  }, [revealedCount, hasFoldedLast, timeLastReveal]);
 
   /****************************************************
    * 1) Wheel Handler (desktop)
@@ -148,9 +266,8 @@ const Page: React.FC = () => {
       if (completed) return;
       if (!chartContainerRef.current) return;
 
-      // We only want to trigger if user scrolls upward => e.deltaY > 0
+      // Only if user scrolls upward => e.deltaY > 0
       if (e.deltaY <= 0) {
-        // deltaY negative => user is scrolling down, do nothing
         return;
       }
 
@@ -159,7 +276,6 @@ const Page: React.FC = () => {
       const viewportCenter = window.innerHeight / 2;
       const distance = Math.abs(chartCenter - viewportCenter);
 
-      // if not locked
       if (!scrollLocked) {
         if (distance < CENTER_TOLERANCE) {
           setScrollLocked(true);
@@ -196,7 +312,6 @@ const Page: React.FC = () => {
       const deltaY = touchStartY - currentY;
       // We only trigger if user swipes upward => deltaY > 0
       if (deltaY <= 0) {
-        // user is swiping downward or not moving enough, do nothing
         return;
       }
 
@@ -209,7 +324,6 @@ const Page: React.FC = () => {
         if (distance < CENTER_TOLERANCE) {
           setScrollLocked(true);
           document.body.style.overflow = "hidden";
-          // We MUST preventDefault if we do not want the page to bounce/scroll
           e.preventDefault();
           e.stopPropagation();
           return;
@@ -222,7 +336,7 @@ const Page: React.FC = () => {
         triggerReveal();
       }
     },
-    [completed, chartContainerRef, scrollLocked, triggerReveal, touchStartY]
+    [completed, scrollLocked, triggerReveal, touchStartY]
   );
 
   /****************************************************
@@ -244,7 +358,7 @@ const Page: React.FC = () => {
   }, [handleWheel, handleTouchStart, handleTouchMove]);
 
   /****************************************************
-   * 4) Fetch popularity_data.json.gz (your existing code)
+   * 4) Fetch popularity_data.json.gz (same as original)
    ****************************************************/
   const prepareGraph = useCallback(async () => {
     const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
@@ -255,6 +369,9 @@ const Page: React.FC = () => {
         to: "string",
       });
       const popularityData = JSON.parse(decompressed);
+
+      // If needed, ensure it's sorted by time (not mandatory if server is correct)
+      // popularityData.data.sort((a, b) => +new Date(a[0]) - +new Date(b[0]));
 
       setAllGames(popularityData.games || []);
       setRiverData(popularityData.data || []);
@@ -271,24 +388,18 @@ const Page: React.FC = () => {
    * 5) Build the "selected" object for partial reveal
    ****************************************************/
   const buildSelectedObject = useCallback(() => {
-    // We have 5 featured items. If revealedCount=1 => show first only
-    // If revealedCount=5 => show all five
-    // If revealedCount=6 => show everything else too
     const selected: Record<string, boolean> = {};
     for (const g of allGames) {
       selected[g] = false;
     }
-
     const totalFeatured = featuredGames.length - 1;
 
     if (revealedCount <= totalFeatured) {
-      // only reveal first `revealedCount` from featured
       for (let i = 0; i < revealedCount; i++) {
-        const gameName = featuredGames[i].name;
-        selected[gameName] = true;
+        selected[featuredGames[i].name] = true;
       }
     } else {
-      // revealedCount > 5 => all
+      // revealedCount > 5 => show all
       for (const g of allGames) {
         selected[g] = true;
       }
@@ -304,13 +415,21 @@ const Page: React.FC = () => {
 
     const selectedMap = buildSelectedObject();
 
+    // Let's keep the original approach: we define a single "color" array of length 10
+    // and rely on colorBy: "seriesName" so that each category uses the correct index
+    // ECharts picks the color by matching the category's position in legend.data.
+    // We'll do legend.data = allGames, or everything
     const newOption: echarts.EChartsOption = {
+      color: plotGradients,
+      colorBy: "seriesName",
+
       title: {
         text: "Mensual run submissions per game",
         left: "center",
         textStyle: { color: "#CBE4DE", fontSize: fontSize },
       },
       backgroundColor: "transparent",
+
       animation: "auto",
       animationDuration: 1000,
       animationDurationUpdate: 500,
@@ -324,6 +443,7 @@ const Page: React.FC = () => {
         duration: 300,
         easing: "cubicOut",
       },
+
       tooltip: {
         trigger: "axis",
         axisPointer: {
@@ -335,7 +455,6 @@ const Page: React.FC = () => {
           },
           label: {
             show: false,
-            // formatter: "{value|YYYY-MM (submissions/month)} ",
           },
         },
         position: function (point, params, dom, rect, size) {
@@ -348,12 +467,9 @@ const Page: React.FC = () => {
               : 10;
           let y = point[1] - 200;
 
-          // Ensure tooltip does not go below the lower limit of the graph
           if (y + tooltipHeight > chartHeight) {
             y = chartHeight - tooltipHeight - 10;
           }
-
-          // Ensure tooltip does not go above the upper limit of the graph
           if (y < 0) {
             y = 10;
           }
@@ -361,6 +477,7 @@ const Page: React.FC = () => {
           return [x, y];
         },
       },
+
       legend: [
         {
           data: allGames,
@@ -368,13 +485,27 @@ const Page: React.FC = () => {
           top: 30,
           right: 30,
           left: 0,
+          // Force "And many others..." white
+          formatter: (name) => {
+            if (name === "And many others...") {
+              return "{white|" + name + "}";
+            }
+            return name;
+          },
+          textStyle: {
+            color: "#CBE4DE",
+            rich: {
+              white: { color: "#ffffff" },
+            },
+          },
         },
       ],
+
       singleAxis: {
         top: "20%",
         bottom: "1%",
         axisTick: {
-          interval: 1, // Add ticks every month
+          interval: 1, // monthly
         },
         axisLabel: {
           formatter: (value: string) =>
@@ -391,55 +522,48 @@ const Page: React.FC = () => {
         },
         splitLine: {
           show: true,
-          lineStyle: {
-            type: "dashed",
-            opacity: 0.5,
-          },
+          lineStyle: { type: "dashed", opacity: 0.5 },
         },
       },
+
       series: [
         {
           type: "themeRiver",
           data: riverData,
+          encode: { x: 0, y: 1, seriesName: 2 },
           emphasis: {
             focus: "series",
             itemStyle: {
               shadowBlur: 20,
               shadowColor: "rgba(0, 0, 0, 0.8)",
             },
-            label: {
-              show: false, // Hide series labels
-            },
+            label: { show: false },
           },
-          label: {
-            show: false, // Hide series labels
-          },
+          label: { show: false },
         },
       ],
     };
 
     setOption(newOption);
-  }, [allGames, riverData, revealedCount, buildSelectedObject]);
+  }, [allGames, riverData, revealedCount, buildSelectedObject, fontSize]);
 
   /****************************************************
-   * 7) Watch revealedCount => animate the side panel
+   * 7) Watch revealedCount => animate side panel
    ****************************************************/
   useEffect(() => {
-    // Step 1: Add the item to the DOM, but don’t apply `.appeared` yet.
     setAppeared((prev) => {
       const newArr = [...prev];
-      newArr[revealedCount - 1] = false; // Explicitly set as "not appeared"
+      newArr[revealedCount - 1] = false;
       return newArr;
     });
 
-    // Step 2: Apply `.appeared` in the next render (or after a short delay)
     const timer = setTimeout(() => {
       setAppeared((prev) => {
         const newArr = [...prev];
-        newArr[revealedCount - 1] = true; // Trigger the transition
+        newArr[revealedCount - 1] = true;
         return newArr;
       });
-    }, 50); // Adjust timing as needed
+    }, 50);
 
     return () => clearTimeout(timer);
   }, [revealedCount]);
@@ -464,7 +588,6 @@ const Page: React.FC = () => {
   return (
     <div style={{ display: "flex", maxWidth: "1200px", margin: "0 auto" }}>
       {/* LEFT: Chart container */}
-
       <div
         ref={chartContainerRef}
         style={{
@@ -495,8 +618,12 @@ const Page: React.FC = () => {
         }}
       >
         {featuredGames.slice(0, revealedCount).map((g, idx) => {
-          const hasAppeared = appeared[idx] || false; // Controls fade-in
-          const isExpanded = idx === expandedIndex; // Controls description expand/fold
+          const hasAppeared = appeared[idx] || false;
+          const isExpanded = idx === expandedIndex;
+
+          // For the side-panel text color, we use titleColors[i]
+          // If i<5 => actual gradient top color. If i=5 => "others" => white
+          const textColor = titleColors[idx] || "#fff";
 
           return (
             <div
@@ -513,6 +640,7 @@ const Page: React.FC = () => {
                 style={{
                   fontWeight: "bold",
                   marginTop: isSmallScreen ? "0.2rem" : "3rem",
+                  color: textColor,
                 }}
                 onMouseEnter={(e) => onTitleMouseEnter(e, idx)}
                 onMouseLeave={onTitleMouseLeave}
@@ -529,6 +657,7 @@ const Page: React.FC = () => {
                     style={{
                       margin: 0,
                       fontSize: isSmallScreen ? "0.7rem" : "1.1rem",
+                      color: textColor,
                     }}
                   >
                     {g.desc}
