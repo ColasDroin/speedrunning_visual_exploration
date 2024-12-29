@@ -79,16 +79,12 @@ const STARTING_CATEGORIES = 1;
 const FINAL_GRACE_PERIOD = 1000; // ms (1 second) for the last fold
 
 const predefinedColors = [
-  "#FF5733",
-  "#33FF57",
-  "#3357FF",
-  "#FF33A6",
-  "#FFFF33",
-  "#33FFF7",
-  "#FF9333",
-  "#9B33FF",
-  "#FF5733",
-  "#7FFF33",
+  "#FFB3AB",
+  "#FFAD75",
+  "#FFD97B",
+  "#A8E6CF",
+  "#A0D8EF",
+  "#C9A7EB",
 ];
 
 const Fig2WithPortal: React.FC = () => {

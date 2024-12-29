@@ -177,7 +177,7 @@ const Page: React.FC = () => {
             image: `images/${true_ID}_icon_rescaled.webp`,
             width: 100,
             height: 100,
-            opacity: 0.3, // Makes it look subtle and carved
+            opacity: 0.4, // Makes it look subtle and carved
           },
         },
         // Conditionally render the Best Time box

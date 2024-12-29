@@ -298,6 +298,7 @@ const Page: React.FC = () => {
         left: "center",
         textStyle: { color: "#CBE4DE", fontSize: fontSize },
       },
+      backgroundColor: "transparent",
       animation: true,
       tooltip: {
         trigger: "axis",
@@ -317,12 +318,14 @@ const Page: React.FC = () => {
       xAxis: {
         type: "value",
         name: "Submission count",
-        axisLabel: { formatter: "{value}" },
+        axisLabel: { formatter: "{value}", color: "white" },
       },
       yAxis: {
         type: "category",
         inverse: true,
         show: false,
+        nameTextStyle: { color: "white" },
+        axisLabel: { color: "white" },
       },
       animationDurationUpdate: 500,
       dataset: {
@@ -443,6 +446,7 @@ const Page: React.FC = () => {
       const optionId = dataSet[0]["identifier"];
       allOptions[optionId] = {
         id: optionId,
+        backgroundColor: "transparent",
         title: {
           text: "Categories for " + dataSet[0]["name"],
           left: "center",
@@ -466,11 +470,13 @@ const Page: React.FC = () => {
         xAxis: {
           type: "value",
           name: "Submission count per category",
-          axisLabel: { formatter: "{value}" },
+          axisLabel: { formatter: "{value}", color: "white" },
         },
         yAxis: {
           type: "category",
           inverse: true,
+          nameTextStyle: { color: "white" },
+          axisLabel: { color: "white" },
         },
         // visualMap: {
         //   orient: "horizontal",
@@ -545,6 +551,7 @@ const Page: React.FC = () => {
       const optionId = dataSet[0]["identifier"];
       allOptions[optionId] = {
         id: optionId,
+        backgroundColor: "transparent",
         title: {
           text:
             "Distribution of speedrun times for category " +
@@ -570,10 +577,12 @@ const Page: React.FC = () => {
         xAxis: {
           type: "value",
           name: "Submission count per category",
-          axisLabel: { formatter: "{value}" },
+          axisLabel: { formatter: "{value}", color: "white" },
         },
         yAxis: {
           type: "category",
+          nameTextStyle: { color: "white" },
+          axisLabel: { color: "white" },
         },
         animationDurationUpdate: 500,
         dataset: {
@@ -672,14 +681,16 @@ const Page: React.FC = () => {
                 x: 0.5,
                 y: 0.5,
                 r: 0.8,
+
                 colorStops: [
-                  { offset: 0, color: "rgba(255, 255, 255, 1)" }, // bright center
-                  { offset: 0.5, color: "rgba(216, 206, 146, 0.8)" }, // golden glow
-                  { offset: 1, color: "rgba(255, 215, 0, 0)" }, // fade to transparent
+                  { offset: 0, color: "rgba(255, 255, 255, 1)" }, // Bright center
+                  { offset: 0.5, color: "#CBE4DE" }, // Golden glow
+                  { offset: 1, color: "rgba(255, 215, 0, 0)" }, // Fade to transparent
                 ],
               },
+              shadowBlur: 10,
+              shadowColor: "rgba(255, 255, 255, 1)",
             },
-            // 4) Strong white shadow on hover
             emphasis: {
               itemStyle: {
                 shadowBlur: 30,
@@ -709,6 +720,12 @@ const Page: React.FC = () => {
           animationDuration: 3000,
           symbol: "none",
           tooltip: { show: false },
+          lineStyle: {
+            color: "#CBE4DE",
+            width: 2,
+            shadowBlur: 10,
+            shadowColor: "#CBE4DE",
+          },
           z: 1,
         });
 
@@ -792,9 +809,9 @@ const Page: React.FC = () => {
                 // e.g. "images/scat_mario_icon_rescaled.webp"
                 // or you can define your own naming scheme
                 image: `images/${true_ID}_icon_rescaled.webp`,
-                width: 200,
-                height: 200,
-                opacity: 0.2,
+                width: 100,
+                height: 100,
+                opacity: 0.4,
               },
             },
             {
@@ -810,10 +827,9 @@ const Page: React.FC = () => {
             },
             {
               type: "group",
-              left: isSmallScreen ? "40%" : "20%", // Position at the right 20% if small screen
-              top: isSmallScreen ? "15%" : "auto", // Position at the top 15% if small screen
-              bottom: isSmallScreen ? "auto" : "15%", // Adjust as needed
-              z: 100000, // Ensure it's above scatter points
+              left: isSmallScreen ? "40%" : "60%", // Position at the right 20% if small screen
+              top: isSmallScreen ? "15%" : "10%", // Position at the top 15% if small screen
+              z: 1000, // Ensure it's above scatter points
               silent: true, // Make the graphic non-clickable
               children: [
                 {
@@ -823,16 +839,16 @@ const Page: React.FC = () => {
                     height: isSmallScreen ? 30 : 50,
                   },
                   style: {
-                    fill: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-                    stroke: "#00FF00", // Green border for video game feel
+                    fill: "rgb(255, 255, 255)", // Semi-transparent background
+                    stroke: "#CBE4DE", // Green border for video game feel
                     lineWidth: 2,
                     shadowBlur: 10,
-                    shadowColor: "#00FF00",
+                    shadowColor: "#CBE4DE",
                     // Optional: Add rounded corners
                     // Define borderRadius if desired
                     // borderRadius: [10, 10, 10, 10],
                   },
-                  z: 1000001,
+                  z: 1000,
                 },
                 {
                   type: "text",
@@ -842,15 +858,15 @@ const Page: React.FC = () => {
                     y: isSmallScreen ? 15 : 25, // Center the text
                     textAlign: "center",
                     textVerticalAlign: "middle",
-                    fill: "#00FF00", // Green text color
-                    font: 'bold 0.5em "Press Start 2P", cursive', // Pixel-style font
+                    fill: "#2E4F4F", // Green text color
+                    fontSize: isSmallScreen ? 8 : 12, // Adjust font size
                     // If "Press Start 2P" is not available, use a default monospace font
                     // font: 'bold 16px monospace',
                     // Add a glow effect using shadow
-                    textShadowColor: "#00FF00",
-                    textShadowBlur: 4,
+                    //textShadowColor: "#CBE4DE",
+                    //textShadowBlur: 4,
                   },
-                  z: 1000002,
+                  z: 1001,
                 },
               ],
             },
@@ -885,7 +901,7 @@ const Page: React.FC = () => {
       option={option_counts}
       style={{ height: heightGraph, width: "100%" }}
       opts={{ renderer: "canvas" }}
-      theme="light"
+      theme="dark"
       onEvents={onEvents}
     />
   );
