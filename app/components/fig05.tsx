@@ -27,7 +27,7 @@ const Page: React.FC = () => {
   const [showBestLine, setShowBestLine] = useState(false);
   const [showBestTimeBox, setShowBestTimeBox] = useState(false); // New state for Best Time box
   const [isPulsating, setIsPulsating] = useState(false);
-  const fontSize = isSmallScreen ? 12 : 16;
+  const fontSize = isSmallScreen ? 12 : 18;
   const heightGraph = isSmallScreen ? "500px" : "700px";
 
   const formatTime = (seconds: number): string => {
@@ -118,8 +118,8 @@ const Page: React.FC = () => {
       backgroundColor: "transparent", // Changed to transparent for better integration
       title: {
         text: isSmallScreen
-          ? "Speedrun times for category 100% of game\nThe Legend of Zelda: Breath of the Wild"
-          : "Speedrun times for category 100% of game The Legend of Zelda: Breath of the Wild",
+          ? "Speedrun times for category 100% of \nThe Legend of Zelda: Breath of the Wild"
+          : "Speedrun times for category 100% of The Legend of Zelda: Breath of the Wild",
         textStyle: {
           color: "white",
           width: "90%",

@@ -91,6 +91,25 @@ const Page: React.FC = () => {
     return chartId?.startsWith("scat_");
   };
 
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    // Check if running in the browser
+    if (typeof window !== "undefined") {
+      const handleResize = () => {
+        setIsSmallScreen(window.innerWidth < 768);
+      };
+
+      handleResize(); // Run initially to set the correct size
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+  }, []);
+  const fontSize = isSmallScreen ? 12 : 18;
+
   // =============================================================================
   // HELPER FUNCTIONS
   // =============================================================================
@@ -288,7 +307,7 @@ const Page: React.FC = () => {
       title: {
         text: "Top 50 most speedrunned games",
         left: "center",
-        textStyle: { color: "white" },
+        textStyle: { color: "white", fontSize: fontSize },
       },
       animation: true,
       tooltip: {
@@ -439,7 +458,7 @@ const Page: React.FC = () => {
         title: {
           text: "Categories for " + dataSet[0]["name"],
           left: "center",
-          textStyle: { color: "white" },
+          textStyle: { color: "white", fontSize: fontSize },
         },
         tooltip: {
           trigger: "axis",
@@ -525,7 +544,7 @@ const Page: React.FC = () => {
             " of game " +
             dataSet[0]["game"],
           left: "center",
-          textStyle: { color: "white" },
+          textStyle: { color: "white", fontSize: fontSize },
         },
 
         tooltip: {
@@ -694,7 +713,7 @@ const Page: React.FC = () => {
           title: {
             text:
               "Speedrun times for category " + category + " of game " + game,
-            textStyle: { color: "white" },
+            textStyle: { color: "white", fontSize: fontSize },
             left: "center",
           },
           dataZoom: [
@@ -840,12 +859,12 @@ const Page: React.FC = () => {
   // RENDER
   // =============================================================================
   const onEvents = { click: onChartClick };
-
+  const heightGraph = isSmallScreen ? "600px" : "800px";
   return (
     <ReactECharts
       ref={chartRef}
       option={option_counts}
-      style={{ height: "800px", width: "100%" }}
+      style={{ height: heightGraph, width: "100%" }}
       opts={{ renderer: "canvas" }}
       theme="light"
       onEvents={onEvents}
