@@ -3,11 +3,6 @@
 @tailwind utilities;
 
 body {
-  background: radial-gradient(
-    circle at 24.1% 68.8%,
-    rgb(50, 50, 50) 0%,
-    rgb(0, 0, 0) 99.4%
-  );
   font-family: Arial, Helvetica, sans-serif;
   min-height: 100%;
   margin: 0;
@@ -17,6 +12,27 @@ body {
   font-size: 1.2rem;
   word-wrap: break-word; /* Forces text to break onto the next line */
   white-space: normal; /* Prevents single long words from causing overflow */
+  background: linear-gradient(-45deg, #2c3333, #1a1a1a, #2c3333);
+  background-size: 600% 600%;
+  animation: gradientAnimation 20s ease infinite;
+  /* Ensure the background covers the entire viewport */
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* Keyframes for gradient animation */
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 html {
