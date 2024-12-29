@@ -202,10 +202,8 @@ const Page: React.FC = () => {
         textStyle: { color: "white" },
       },
       grid: {
-        top: 30,
-        bottom: 30,
-        left: 150,
-        right: 80,
+        left: 70,
+        right: 10,
       },
       xAxis: {
         max: "dataMax",

@@ -76,6 +76,14 @@ const Page: React.FC = () => {
   // Touch tracking
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
 
+  let isSmallScreen = false;
+  if (typeof window !== "undefined") {
+    isSmallScreen = window.innerWidth < 768;
+  } else {
+    console.error("Window object is not available.");
+  }
+  const fontSize = isSmallScreen ? 12 : 18;
+
   /****************************************************
    * Reveal logic (shared by wheel and touch)
    ****************************************************/
@@ -300,7 +308,7 @@ const Page: React.FC = () => {
       title: {
         text: "Evolution of game popularity with time",
         left: "center",
-        textStyle: { color: "white" },
+        textStyle: { color: "white", fontSize: fontSize },
       },
       backgroundColor: "transparent",
       animation: "auto",
@@ -470,7 +478,7 @@ const Page: React.FC = () => {
           option={option || {}}
           style={{
             width: "100%",
-            height: "90vh",
+            height: isSmallScreen ? "800px" : "450px",
           }}
           opts={{ renderer: "canvas" }}
           theme="dark"
@@ -481,7 +489,7 @@ const Page: React.FC = () => {
       <div
         style={{
           flex: "1",
-          padding: "1rem",
+          padding: "0.2rem",
           position: "relative",
           overflow: "visible",
         }}
@@ -494,7 +502,10 @@ const Page: React.FC = () => {
             <div
               key={g.name}
               className={`game-wrapper ${hasAppeared ? "appeared" : ""}`}
-              style={{ marginBottom: "1rem", fontSize: "1.5rem" }}
+              style={{
+                marginBottom: "1rem",
+                fontSize: isSmallScreen ? "0.8rem" : "1.2rem",
+              }}
             >
               {/* Title + tooltip if folded */}
               <div
@@ -511,7 +522,14 @@ const Page: React.FC = () => {
               {/* Folding container */}
               <div className={`game-container ${isExpanded ? "expanded" : ""}`}>
                 {isExpanded && (
-                  <p style={{ margin: 0, fontSize: "1.2rem" }}>{g.desc}</p>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: isSmallScreen ? "0.7rem" : "1.1rem",
+                    }}
+                  >
+                    {g.desc}
+                  </p>
                 )}
               </div>
             </div>

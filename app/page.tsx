@@ -295,18 +295,16 @@ export default function Home() {
             Speedrunning trends change over time, influenced by new releases,
             rediscovered classics, or viral moments on streaming platforms. The
             river plot below illustrates the monthly submission trends for the
-            top 20 games in terms of run counts.
+            top 10 games in terms of run counts.
           </p>
           <div className="mx-auto w-full mt-5 mb-5">
             <Fig3 />
           </div>
           <p className="max-w-5xl mx-auto">
             Each stream represents a game, with its width corresponding to the
-            number of runs submitted that month. Scroll through to watch the
-            evolution of popularity for individual games, culminating in a full
-            view of all 20 games. Notice how certain titles surge during
-            specific periods, often tied to cultural events, game updates, or
-            charity marathons like{" "}
+            number of runs submitted that month. Notice how certain titles surge
+            during specific periods, often tied to cultural events, game
+            updates, or charity marathons like{" "}
             <a
               href="https://gamesdonequick.com/"
               target="_blank"
@@ -392,9 +390,9 @@ export default function Home() {
           </div>
           <p className="max-w-5xl mx-auto">
             Unsurprisingly, countries with larger player bases, such as the
-            United States, Japan, and Germany, tend to score highly. However,
-            smaller countries with passionate communities often punch above
-            their weight, making the competition even more exciting!
+            United States or Japan tend to score highly. However, smaller
+            countries like Canada or the UK, with passionate communities, often
+            punch above their weight, making the competition even more exciting!
           </p>
 
           <div

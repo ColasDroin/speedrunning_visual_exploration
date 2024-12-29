@@ -94,6 +94,13 @@ const predefinedColors = [
 const Fig2WithPortal: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
+  let isSmallScreen = false;
+  if (typeof window !== "undefined") {
+    isSmallScreen = window.innerWidth < 768;
+  } else {
+    console.error("Window object is not available.");
+  }
+  const fontSize = isSmallScreen ? 12 : 18;
 
   const [allNetworkData, setAllNetworkData] = useState<NetworkData | null>(
     null
@@ -330,6 +337,8 @@ const Fig2WithPortal: React.FC = () => {
 
         const image = new Image();
         image.onload = () => {
+          // Set canvas size depending on screen size and image size
+
           canvas.width = size + 10;
           canvas.height = size + 10;
 
@@ -421,6 +430,7 @@ const Fig2WithPortal: React.FC = () => {
         title: {
           text: "Game communities",
           left: "center",
+          textStyle: { color: "white", fontSize: fontSize },
         },
         backgroundColor: "transparent",
         animationDurationUpdate: 1500,
@@ -456,7 +466,7 @@ const Fig2WithPortal: React.FC = () => {
               id: node.id,
               name: node.id,
               symbol: customImages[index],
-              symbolSize: node.size / 10,
+              symbolSize: isSmallScreen ? node.size / 40 : node.size / 10,
               x: node.x,
               y: node.y,
               category: node.category,
@@ -607,7 +617,7 @@ const Fig2WithPortal: React.FC = () => {
       <div
         style={{
           flex: "1",
-          padding: "1rem",
+          padding: "0.2rem",
           position: "relative",
           zIndex: 9999,
           overflow: "visible",
@@ -628,7 +638,7 @@ const Fig2WithPortal: React.FC = () => {
                 style={{
                   fontWeight: "bold",
                   display: "inline-block",
-                  fontSize: "1.5rem",
+                  fontSize: isSmallScreen ? "0.8rem" : "1.2rem",
                 }}
                 onMouseEnter={(e) => onTitleMouseEnter(e, desc.id)}
                 onMouseLeave={onTitleMouseLeave}
@@ -640,7 +650,10 @@ const Fig2WithPortal: React.FC = () => {
               {/* Folding container */}
               <div
                 className={`category-container ${isExpanded ? "expanded" : ""}`}
-                style={{ marginTop: "0.5rem", fontSize: "1.2rem" }}
+                style={{
+                  marginTop: "0.5rem",
+                  fontSize: isSmallScreen ? "0.7rem" : "1.1rem",
+                }}
               >
                 {isExpanded && <p style={{ margin: 0 }}>{desc.text}</p>}
               </div>
@@ -654,8 +667,8 @@ const Fig2WithPortal: React.FC = () => {
         ref={chartContainerRef}
         style={{
           flex: "3",
-          aspectRatio: "1.7 / 1",
-          marginLeft: "1rem",
+          aspectRatio: "1.2 / 1",
+          marginLeft: isSmallScreen ? "0.1rem" : "1rem",
         }}
       >
         <ReactECharts
@@ -663,7 +676,7 @@ const Fig2WithPortal: React.FC = () => {
           option={option || {}}
           style={{
             width: "100%",
-            height: "90vh",
+            height: isSmallScreen ? "800px" : "450px",
           }}
           opts={{ renderer: "canvas" }}
           theme="dark"
