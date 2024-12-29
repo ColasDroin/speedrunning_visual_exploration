@@ -12,7 +12,7 @@ body {
   font-size: 1.2rem;
   word-wrap: break-word; /* Forces text to break onto the next line */
   white-space: normal; /* Prevents single long words from causing overflow */
-  background: linear-gradient(-45deg, #2c3333, #1a1a1a, #2c3333);
+  background: linear-gradient(-45deg, #242a2a, #1a1a1a, #242a2a);
   background-size: 600% 600%;
   animation: gradientAnimation 20s ease infinite;
   /* Ensure the background covers the entire viewport */
