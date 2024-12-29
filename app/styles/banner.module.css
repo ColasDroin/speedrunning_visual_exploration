@@ -16,7 +16,7 @@
   --grid-color: var(--secondary-color);
   --grid-blur: 1px;
   position: absolute;
-  bottom: -30%;
+  bottom: -20%;
   left: 0;
   margin-left: -50%;
   width: 200%;
@@ -150,7 +150,7 @@
       var(--secondary-color) 45%,
       var(--accent-color) 60%,
       var(--primary-color) 70%,
-      #343434 95%
+      /* #343434 95% */
     )
     fixed;
   background-size: 100% var(--background-height, 30vh);
@@ -236,7 +236,7 @@
   font-family: "Play";
   font-weight: normal;
   font-size: clamp(9px, 3vw, 30px);
-  margin-top: 0rem;
+  margin-top: 1rem;
   color: var(--text-color);
 }
 
