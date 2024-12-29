@@ -24,6 +24,14 @@ const Page: React.FC = () => {
   const [option, setOption] = useState<echarts.EChartsOption | null>(null);
   const updateFunctionsRef = useRef<Function[]>([]);
 
+  let isSmallScreen = false;
+  if (typeof window !== "undefined") {
+    isSmallScreen = window.innerWidth < 768;
+  } else {
+    console.error("Window object is not available.");
+  }
+  const fontSize = isSmallScreen ? 12 : 18;
+
   const prepareGraph = async (startAnimation = false) => {
     const baseUrl = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}`;
     let raceData: any[] = [];
@@ -62,7 +70,8 @@ const Page: React.FC = () => {
       title: {
         text: "World map of scores in November 2023",
         left: "center",
-        textStyle: { color: "white" },
+        top: 80,
+        textStyle: { color: "white", fontSize: fontSize },
       },
       tooltip: {
         trigger: "item",
@@ -199,17 +208,23 @@ const Page: React.FC = () => {
       title: {
         text: "Bar race of scores per country",
         left: "center",
-        textStyle: { color: "white" },
+        textStyle: { color: "white", fontSize: fontSize },
       },
       grid: {
         left: 70,
-        right: 10,
+        right: 40,
       },
       xAxis: {
         max: "dataMax",
         axisLabel: {
           formatter: (n: number) => Math.round(n).toString(),
         },
+        splitLine: {
+          show: false,
+        },
+
+        // z: 1,
+        // zlevel: 1,
       },
       yAxis: {
         type: "category",
@@ -226,6 +241,8 @@ const Page: React.FC = () => {
             },
           },
         },
+        z: 1,
+        zlevel: 1,
         animationDuration: 300,
         animationDurationUpdate: 300,
       },
@@ -282,6 +299,7 @@ const Page: React.FC = () => {
             right: "10%",
             bottom: "50%",
             z: 110,
+            zlevel: 10,
             children: [
               {
                 type: "rect",
@@ -482,7 +500,7 @@ const Page: React.FC = () => {
     <ReactECharts
       ref={chartRef}
       option={option || {}}
-      style={{ height: "800px", width: "100%" }}
+      style={{ height: isSmallScreen ? "800px" : "500px", width: "100%" }}
       opts={{ renderer: "canvas" }}
       theme="dark"
     />

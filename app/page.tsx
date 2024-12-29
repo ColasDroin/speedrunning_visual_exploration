@@ -190,7 +190,9 @@ export default function Home() {
 
           <p className="max-w-5xl mx-auto mt-5">
             Below are two examples of category trees, showcasing how games
-            differ in structure and speedrunning possibilities.
+            differ in structure and speedrunning possibilities. Hover over the
+            nodes to see the rules of the corresponding category (if they are
+            defined on speedrun.com).
           </p>
 
           <div className="mx-auto w-full mt-5">
