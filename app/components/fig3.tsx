@@ -504,7 +504,7 @@ const Page: React.FC = () => {
               className={`game-wrapper ${hasAppeared ? "appeared" : ""}`}
               style={{
                 marginBottom: "1rem",
-                fontSize: isSmallScreen ? "0.8rem" : "1.2rem",
+                fontSize: isSmallScreen ? "0.8rem" : "0.8rem",
               }}
             >
               {/* Title + tooltip if folded */}

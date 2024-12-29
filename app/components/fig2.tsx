@@ -638,7 +638,7 @@ const Fig2WithPortal: React.FC = () => {
                 style={{
                   fontWeight: "bold",
                   display: "inline-block",
-                  fontSize: isSmallScreen ? "0.8rem" : "1.2rem",
+                  fontSize: isSmallScreen ? "0.8rem" : "0.8rem",
                   marginTop: isSmallScreen ? "0.1rem" : "1rem",
                 }}
                 onMouseEnter={(e) => onTitleMouseEnter(e, desc.id)}
@@ -668,7 +668,7 @@ const Fig2WithPortal: React.FC = () => {
         ref={chartContainerRef}
         style={{
           flex: "3",
-          aspectRatio: "1.2 / 1",
+          //aspectRatio: "1.2 / 1",
           marginLeft: isSmallScreen ? "0.1rem" : "1rem",
         }}
       >
