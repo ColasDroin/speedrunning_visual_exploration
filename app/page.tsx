@@ -86,7 +86,6 @@ export default function Home() {
               Speedrunning takes practice, precision, and passion.
             </figcaption>
           </figure>
-
           <p className="max-w-5xl mx-auto">
             In today’s world, speedrunning thrives on streaming platforms like{" "}
             <a
@@ -110,7 +109,6 @@ export default function Home() {
             on modern systems. While this expands accessibility, strict rules
             ensure fair competition.
           </p>
-
           <figure className="flex flex-col items-center m-9">
             <a
               href="https://www.speedrun.com/"
@@ -140,7 +138,6 @@ export default function Home() {
               </figcaption>
             </a>
           </figure>
-
           <div className="mx-auto mt-2 max-w-5xl">
             Let&apos;s analyze some data gathered from the{" "}
             <span className={`${styles.subtleGlow}`}>
@@ -185,14 +182,12 @@ export default function Home() {
               challenge.
             </li>
           </ul>
-
           <p className="max-w-5xl mx-auto mt-5">
             Below are two examples of category trees, showcasing how games
             differ in structure and speedrunning possibilities. Hover over the
             nodes to see the rules of the corresponding category (if they are
             defined on speedrun.com).
           </p>
-
           <div className="mx-auto w-full mt-5">
             <p className="max-w-5xl mx-auto mb-9">
               In <strong>Minecraft: Java Edition</strong>, the tree has a
@@ -203,7 +198,6 @@ export default function Home() {
             </p>
             <Fig0bis />
           </div>
-
           <div className="mx-auto w-full mt-5">
             <p className="max-w-5xl mx-auto mb-9">
               In contrast, <strong>Portal</strong> has a much more complex
@@ -215,7 +209,6 @@ export default function Home() {
             </p>
             <Fig0 />
           </div>
-
           <p className="max-w-5xl mx-auto mt-5">
             These examples highlight the endless variety of speedrunning
             category trees, as every game presents unique challenges, rules, and
@@ -246,7 +239,6 @@ export default function Home() {
             breakthroughs, new strategies, or the discovery of game-breaking
             glitches.
           </p>
-
           <div className="mx-auto max-w-5xl mt-5 mb-5">
             <p className="max-w-5xl mx-auto">
               The figure below is an interactive visualization that allows you
@@ -278,7 +270,6 @@ export default function Home() {
               href="https://en.wikipedia.org/wiki/Modularity_(networks)"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600"
             >
               greedy modularity algorithm
             </a>
@@ -383,7 +374,6 @@ export default function Home() {
               to a score, based on their position.
             </li>
           </ul>
-
           <p className="max-w-5xl mx-auto mt-5">
             The animated bar race below visualizes how country scores evolve
             over time, highlighting key shifts in competitiveness. Afterward,
@@ -391,7 +381,6 @@ export default function Home() {
             2023, revealing which countries dominate the global speedrunning
             scene.
           </p>
-
           <div className="mx-auto w-full mt-5 mb-5 lg:max-w-[80%]">
             <Fig4 />
           </div>
@@ -401,42 +390,73 @@ export default function Home() {
             countries like Canada or the UK, with passionate communities, often
             punch above their weight, making the competition even more exciting!
           </p>
-
           <div
             className={`${styles.chrome}  ${styles.titleDecorated} mt-9 mb-9`}
           >
-            ABOUT THIS WORK
+            {" "}
+            About the Project{" "}
           </div>
 
-          <div className="mt-9 bg-gray-100 border border-gray-300 rounded-lg p-5 flex max-w-2xl mx-auto w-full">
-            <div className="flex-shrink-0 mr-5">
-              <img
-                src="images/my_photo.jpg"
-                alt="Picture of Colas"
-                className="w-36 h-36 rounded-full border border-gray-300 object-cover"
-              />
-            </div>
+          <p className="max-w-5xl mx-auto">
+            The dataset has mainly been obtained from the{" "}
+            <a
+              href="https://github.com/alexmerren/speedruncom-scraper"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              fantastic work of Alex Merren
+            </a>
+            , although some additional data (game logo, game covers, game
+            platforms) has been scraped by me using the public API of{" "}
+            <a
+              href="https://www.speedrun.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              speedrun.com
+            </a>
+            . The data has been wrangled and analyzed with Python and the
+            visuals are made with{" "}
+            <a
+              href="https://echarts.apache.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ECharts
+            </a>{" "}
+            (and a lot of sweat).
+          </p>
+          <div className="mt-9 bg-gray-200 border border-gray-300 rounded-lg p-5 max-w-2xl mx-auto w-full relative">
+            {/* Content Section */}
             <div>
-              <h2 className="text-xl font-bold">Hi there, I'm Colas!</h2>
+              <h2 className="text-xl font-bold text-teal-900">
+                Hi there, I'm Colas!
+              </h2>
               <p className="mt-2 text-gray-700">
                 I'm transitioning from academia to pursue my passion for data
                 visualization. This is my first project, and I’m excited to
                 share it with you! Your support means everything, whether it’s
                 through a donation, sharing my work, or spreading the word.
               </p>
+
+              {/* Call to Action Buttons */}
               <div className="mt-4">
                 <a
                   href="https://buymeacoffee.com/colasdroin"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-yellow-400 text-black py-2 px-4 rounded-md font-semibold"
                 >
                   Buy Me a Coffee
                 </a>
               </div>
+
+              {/* Social Media Icons */}
               <div className="flex space-x-3 mt-4">
                 <a
                   href="https://twitter.com/intent/tweet?text=Check+out+Colas%27+amazing+data+viz+work!&url=https://colasdroin.github.io/speedrunning_visual_exploration/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-gray-700 hover:text-gray-900"
                 >
                   <FontAwesomeIcon icon={faTwitter} size="lg" />
@@ -444,6 +464,7 @@ export default function Home() {
                 <a
                   href="https://mastodon.social/share?text=Check+out+Colas%27+amazing+data+viz+work!&url=https://colasdroin.github.io/speedrunning_visual_exploration/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-gray-700 hover:text-gray-900"
                 >
                   <FontAwesomeIcon icon={faMastodon} size="lg" />
@@ -451,6 +472,7 @@ export default function Home() {
                 <a
                   href="https://www.facebook.com/sharer/sharer.php?u=https://colasdroin.github.io/speedrunning_visual_exploration/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-gray-700 hover:text-gray-900"
                 >
                   <FontAwesomeIcon icon={faFacebook} size="lg" />
@@ -458,38 +480,49 @@ export default function Home() {
                 <a
                   href="https://www.linkedin.com/shareArticle?mini=true&url=https://colasdroin.github.io/speedrunning_visual_exploration/&title=Check+out+Colas%27+data+visualization+work!"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-gray-700 hover:text-gray-900"
                 >
                   <FontAwesomeIcon icon={faLinkedin} size="lg" />
                 </a>
               </div>
+
+              {/* LinkedIn Connection Link */}
               <div className="mt-4">
                 <a
                   href="https://www.linkedin.com/in/colas-droin/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-blue-600 font-semibold"
                 >
                   Connect with me on LinkedIn
                 </a>
               </div>
             </div>
-          </div>
 
+            {/* Profile Image Positioned at Bottom Right */}
+            <div className="absolute bottom-5 right-5">
+              <img
+                src="images/my_photo.jpg" // Ensure this path is correct
+                alt="Picture of Colas"
+                className="w-36 h-36 rounded-full border border-gray-300 object-cover mr-9"
+              />
+            </div>
+          </div>
           {/* Disclaimer */}
-          <div className="mt-9 mb-9 bg-gray-200 border border-gray-300 rounded-lg p-5 max-w-2xl mx-auto w-full">
-            <p className="text-sm text-gray-600">
-              <strong>Disclaimer:</strong> All trademarks, logos, and images
-              displayed on this website are the property of their respective
-              owners. They are used here for informational purposes and to
-              facilitate a better experience for visitors. This website is not
-              affiliated with, endorsed, sponsored, or specifically approved by
-              any video game company or its licensors. All data, including
-              images, has been sourced from the public API of{" "}
+          <div className="mt-9 mb-9 border border-gray-300 rounded-lg p-5 max-w-2xl mx-auto w-full">
+            <p className="text-sm">
+              Disclaimer: All trademarks, logos, and images displayed on this
+              website are the property of their respective owners. They are used
+              here for informational purposes and to facilitate a better
+              experience for visitors. This website is not affiliated with,
+              endorsed, sponsored, or specifically approved by any video game
+              company or its licensors. All data, including images, has been
+              sourced from the public API of{" "}
               <a
                 href="https://www.speedrun.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600"
               >
                 speedrun.com
               </a>
