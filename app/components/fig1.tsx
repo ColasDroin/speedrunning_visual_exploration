@@ -313,7 +313,7 @@ const Page: React.FC = () => {
           ].join("<br/>");
         },
       },
-      grid: { left: 0 },
+      grid: { left: 10 },
       xAxis: {
         type: "value",
         name: "Submission count",
@@ -463,7 +463,7 @@ const Page: React.FC = () => {
             ].join("<br/>");
           },
         },
-        grid: { left: 200 },
+        grid: { left: 100 },
         xAxis: {
           type: "value",
           name: "Submission count per category",
@@ -550,7 +550,7 @@ const Page: React.FC = () => {
             ].join("<br/>");
           },
         },
-        grid: { left: 200 },
+        grid: { left: 100 },
         xAxis: {
           type: "value",
           name: "Submission count per category",
@@ -733,7 +733,7 @@ const Page: React.FC = () => {
               ].join("<br/>");
             },
           },
-          grid: { left: 200 },
+          grid: { left: 100 },
           yAxis: {
             type: "value",
             name: "Speedrun time",
@@ -781,16 +781,17 @@ const Page: React.FC = () => {
             },
             {
               type: "group",
-              right: "20%", // Position at the bottom left
-              top: "15%", // Adjust as needed
+              left: isSmallScreen ? "40%" : "20%", // Position at the right 20% if small screen
+              top: isSmallScreen ? "15%" : "auto", // Position at the top 15% if small screen
+              bottom: isSmallScreen ? "auto" : "15%", // Adjust as needed
               z: 100000, // Ensure it's above scatter points
               silent: true, // Make the graphic non-clickable
               children: [
                 {
                   type: "rect",
                   shape: {
-                    width: 200,
-                    height: 50,
+                    width: isSmallScreen ? 150 : 200,
+                    height: isSmallScreen ? 30 : 50,
                   },
                   style: {
                     fill: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
@@ -808,8 +809,8 @@ const Page: React.FC = () => {
                   type: "text",
                   style: {
                     text: `Best Time: ${formattedBestTime}`,
-                    x: 100, // Center the text within the rectangle
-                    y: 25, // Vertically center the text
+                    x: isSmallScreen ? 75 : 100, // Center the text
+                    y: isSmallScreen ? 15 : 25, // Center the text
                     textAlign: "center",
                     textVerticalAlign: "middle",
                     fill: "#00FF00", // Green text color
