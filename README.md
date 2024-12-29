@@ -4,16 +4,6 @@ A single-page application built with **React**, **Next.js**, and **ECharts.js** 
 
 The application is live and accessible at: [Speedrunning: A Visual Exploration](https://colasdroin.github.io/speedrunning_visual_exploration/).
 
-## Table of Contents
-
-- [Speedrunning: A Visual Exploration](#speedrunning-a-visual-exploration)
-  - [Table of Contents](#table-of-contents)
-  - [Installation and Setup](#installation-and-setup)
-    - [Prerequisites](#prerequisites)
-    - [Steps](#steps)
-  - [Contributing](#contributing)
-  - [License](#license)
-
 ## Installation and Setup
 
 ### Prerequisites
