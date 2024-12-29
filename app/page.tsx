@@ -333,13 +333,21 @@ export default function Home() {
             determines the score they contribute to their country. The scoring
             system assigns points as follows:
           </p>
-          <ul className="list-disc list-inside max-w-5xl mx-auto">
-            <li>1st place: 10 points</li>
-            <li>2nd place: 5 points</li>
-            <li>3rd place: 3 points</li>
-            <li>4th place: 2 points</li>
-            <li>5th place: 1 point</li>
-          </ul>
+          <div className="max-w-5xl mx-auto text-center mt-4 mb-4">
+            <BlockMath
+              math={`\\begin{array}{|c|c|}
+              \\hline
+              \\text{Position} & \\text{Points} \\\\
+              \\hline
+              1^{\\text{st}} & 10 \\\\
+              2^{\\text{nd}} & 5 \\\\
+              3^{\\text{rd}} & 3 \\\\
+              4^{\\text{th}} & 2 \\\\
+              5^{\\text{th}} & 1 \\\\
+              \\hline
+              \\end{array}`}
+            />
+          </div>
           <p className="max-w-5xl mx-auto">
             Scores are calculated monthly and summed across all games to give
             each country a total score. The scoring system can be formalized as:
@@ -379,7 +387,7 @@ export default function Home() {
             </li>
           </ul>
 
-          <p className="max-w-5xl mx-auto">
+          <p className="max-w-5xl mx-auto mt-5">
             The animated bar race below visualizes how country scores evolve
             over time, highlighting key shifts in competitiveness. Afterward,
             the colored world map shows the cumulative scores as of November
@@ -387,7 +395,7 @@ export default function Home() {
             scene.
           </p>
 
-          <div className="mx-auto w-full mt-5 mb-5">
+          <div className="mx-auto w-full mt-5 mb-5 lg:max-w-[80%]">
             <Fig4 />
           </div>
           <p className="max-w-5xl mx-auto">

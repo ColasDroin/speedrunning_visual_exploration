@@ -478,7 +478,7 @@ const Page: React.FC = () => {
           option={option || {}}
           style={{
             width: "100%",
-            height: isSmallScreen ? "800px" : "450px",
+            height: isSmallScreen ? "400px" : "700px",
           }}
           opts={{ renderer: "canvas" }}
           theme="dark"
@@ -510,7 +510,10 @@ const Page: React.FC = () => {
               {/* Title + tooltip if folded */}
               <div
                 className="game-tooltip"
-                style={{ fontWeight: "bold" }}
+                style={{
+                  fontWeight: "bold",
+                  marginTop: isSmallScreen ? "0.2rem" : "3rem",
+                }}
                 onMouseEnter={(e) => onTitleMouseEnter(e, idx)}
                 onMouseLeave={onTitleMouseLeave}
                 onMouseMove={onTitleMouseMove}

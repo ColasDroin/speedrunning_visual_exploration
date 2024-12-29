@@ -70,7 +70,7 @@ const Page: React.FC = () => {
       title: {
         text: "World map of scores in November 2023",
         left: "center",
-        top: 80,
+        top: 20,
         textStyle: { color: "white", fontSize: fontSize },
       },
       tooltip: {
@@ -132,7 +132,7 @@ const Page: React.FC = () => {
         elements: [
           {
             type: "group",
-            right: "10%",
+            right: "40%",
             bottom: "10%",
             z: 110,
             children: [
@@ -297,7 +297,7 @@ const Page: React.FC = () => {
           {
             type: "group",
             right: "10%",
-            bottom: "50%",
+            bottom: "30%",
             z: 110,
             zlevel: 10,
             children: [
@@ -370,7 +370,7 @@ const Page: React.FC = () => {
           {
             type: "group",
             right: "10%",
-            bottom: "30%",
+            bottom: "40%",
             z: 110,
             children: [
               {

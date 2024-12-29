@@ -639,6 +639,7 @@ const Fig2WithPortal: React.FC = () => {
                   fontWeight: "bold",
                   display: "inline-block",
                   fontSize: isSmallScreen ? "0.8rem" : "1.2rem",
+                  marginTop: isSmallScreen ? "0.1rem" : "1rem",
                 }}
                 onMouseEnter={(e) => onTitleMouseEnter(e, desc.id)}
                 onMouseLeave={onTitleMouseLeave}
@@ -676,7 +677,7 @@ const Fig2WithPortal: React.FC = () => {
           option={option || {}}
           style={{
             width: "100%",
-            height: isSmallScreen ? "800px" : "450px",
+            height: isSmallScreen ? "400px" : "700px",
           }}
           opts={{ renderer: "canvas" }}
           theme="dark"
