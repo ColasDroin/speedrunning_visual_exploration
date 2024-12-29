@@ -156,12 +156,13 @@ export default function Home() {
             </span>{" "}
             API to uncover the amazing feats of speedrunners.
             <div className="mt-5 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center break-words w-full max-w-5xl mx-auto">
-              <strong>Data disclaimer:</strong> This analysis focuses on the top
-              50 games with the most submissions, only considering verified runs
-              for full-game categories. Unfortunately, the dataset only goes up
-              to November 2023. While it misses speedrunning’s earlier history,
-              it highlights key trends from recent years. I plan to scrape and
-              update the data myself in the future!
+              <strong>Data disclaimer:</strong> This analysis focuses mostly on
+              the top 50 games (according to their submissions count), only
+              considering verified runs for full-game categories. Unfortunately,
+              the dataset only goes up to November 2023. While it misses
+              speedrunning’s earlier history, it highlights key trends from
+              recent years. I plan to scrape and update the data in the future
+              to provide a more recent and comprehensive view.
             </div>
           </div>
           <div
@@ -176,12 +177,12 @@ export default function Home() {
             category types include:
           </p>
           <ul className="list-disc list-inside max-w-5xl mx-auto">
-            <li>
-              <strong>Any%</strong>: The goal is to finish the game as fast as
+            <li className="mt-2">
+              <strong>Any%</strong> The goal is to finish the game as fast as
               possible, using any tricks, skips, or glitches allowed.
             </li>
-            <li>
-              <strong>100%</strong>: Players must complete every task or collect
+            <li className="mt-2">
+              <strong>100%</strong> Players must complete every task or collect
               every item, making it a more comprehensive and often lengthier
               challenge.
             </li>
@@ -193,18 +194,18 @@ export default function Home() {
           </p>
 
           <div className="mx-auto w-full mt-5">
-            <p className="max-w-5xl mx-auto">
-              <strong>Minecraft: Java Edition</strong> has a relatively simple
-              category tree, as the game is not divided into levels. Its
-              categories focus on goals like defeating the Ender Dragon as fast
-              as possible. Since there are no per-level runs, the tree is
+            <p className="max-w-5xl mx-auto mb-9">
+              In <strong>Minecraft: Java Edition</strong>, the tree has a
+              relatively simple shape, as the game is not divided into levels.
+              Its categories focus on goals like defeating the Ender Dragon as
+              fast as possible. Since there are no per-level runs, the tree is
               straightforward compared to other games.
             </p>
             <Fig0bis />
           </div>
 
           <div className="mx-auto w-full mt-5">
-            <p className="max-w-5xl mx-auto">
+            <p className="max-w-5xl mx-auto mb-9">
               In contrast, <strong>Portal</strong> has a much more complex
               category tree. The game features both full-game and per-level
               categories, which greatly expand its scope for speedrunners. While
@@ -227,14 +228,14 @@ export default function Home() {
           >
             THE MOST SPEEDRUNNED GAMES
           </div>
-          <p className="max-w-5xl mx-auto">
+          <p className="max-w-5xl mx-auto mb-5">
             Speedrunning popularity varies across games, with some titles
             standing out for their active communities and high submission
             counts. These games often feature unique mechanics, competitive
             leaderboards, or nostalgia that drives runners to perfect their
             craft.
           </p>
-          <div className="mx-auto w-full mt-5 mb-5">
+          <div className="mx-auto w-full mt-9 mb-9 lg:max-w-[80%]">
             <Fig05 />
           </div>
           <p className="max-w-5xl mx-auto">
@@ -253,7 +254,9 @@ export default function Home() {
               a try!
             </p>
           </div>
-          <div className="mx-auto  w-full mt-5 mb-5">{stableFig1}</div>
+          <div className="mx-auto w-full lg:max-w-[80%] mt-5 mb-5">
+            {stableFig1}
+          </div>
           <div
             className={`${styles.chrome} ${styles.titleDecorated} mt-9 mb-9`}
           >

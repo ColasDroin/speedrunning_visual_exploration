@@ -7,9 +7,28 @@ type EChartsOption = echarts.EChartsOption;
 
 const Page: React.FC = () => {
   const chartRef = useRef<ReactECharts | null>(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    // Check if running in the browser
+    if (typeof window !== "undefined") {
+      const handleResize = () => {
+        setIsSmallScreen(window.innerWidth < 768);
+      };
+
+      handleResize(); // Run initially to set the correct size
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+  }, []);
   const [showBestLine, setShowBestLine] = useState(false);
   const [showBestTimeBox, setShowBestTimeBox] = useState(false); // New state for Best Time box
   const [isPulsating, setIsPulsating] = useState(false);
+  const fontSize = isSmallScreen ? 12 : 16;
+  const heightGraph = isSmallScreen ? "500px" : "700px";
 
   const formatTime = (seconds: number): string => {
     const h = Math.floor(seconds / 3600);
@@ -98,8 +117,15 @@ const Page: React.FC = () => {
       id: optionId,
       backgroundColor: "transparent", // Changed to transparent for better integration
       title: {
-        text: "Speedrun times for category 100% of game The Legend of Zelda: Breath of the Wild",
-        textStyle: { color: "white" },
+        text: isSmallScreen
+          ? "Speedrun times for category 100% of game\nThe Legend of Zelda: Breath of the Wild"
+          : "Speedrun times for category 100% of game The Legend of Zelda: Breath of the Wild",
+        textStyle: {
+          color: "white",
+          width: "90%",
+          overflow: "break",
+          fontSize: fontSize,
+        },
         left: "center",
       },
       tooltip: {
@@ -114,7 +140,7 @@ const Page: React.FC = () => {
           ].join("<br/>");
         },
       },
-      grid: { left: 200 },
+      grid: { left: 120 },
       yAxis: {
         type: "value",
         name: "Speedrun time",
@@ -149,16 +175,17 @@ const Page: React.FC = () => {
         // Conditionally render the Best Time box
         showBestTimeBox && {
           type: "group",
-          left: "20%", // Position at the bottom left
-          bottom: "15%", // Adjust as needed
+          left: isSmallScreen ? "40%" : "20%", // Position at the right 20% if small screen
+          top: isSmallScreen ? "15%" : "auto", // Position at the top 15% if small screen
+          bottom: isSmallScreen ? "auto" : "15%", // Adjust as needed
           z: 10, // Ensure it's above scatter points
           silent: true, // Make the graphic non-clickable
           children: [
             {
               type: "rect",
               shape: {
-                width: 200,
-                height: 50,
+                width: isSmallScreen ? 150 : 200,
+                height: isSmallScreen ? 30 : 50,
               },
               style: {
                 fill: "rgba(0, 0, 0, 0.6)", // Semi-transparent background
@@ -176,8 +203,8 @@ const Page: React.FC = () => {
               type: "text",
               style: {
                 text: `Best Time: ${formattedBestTime}`,
-                x: 100, // Center the text within the rectangle
-                y: 25, // Vertically center the text
+                x: isSmallScreen ? 75 : 100, // Center the text
+                y: isSmallScreen ? 15 : 25, // Center the text
                 textAlign: "center",
                 textVerticalAlign: "middle",
                 fill: "#00FF00", // Green text color
@@ -288,7 +315,7 @@ const Page: React.FC = () => {
     <ReactECharts
       ref={chartRef}
       option={defaultZeldaOption}
-      style={{ height: "800px", width: "100%" }}
+      style={{ height: heightGraph, width: "100%" }}
       opts={{ renderer: "canvas" }}
       theme="dark" // Changed theme to dark for better contrast
     />

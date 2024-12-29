@@ -20,7 +20,7 @@ const Page: React.FC = () => {
       const newDepth = Math.min(
         maxDepth,
         Math.floor(
-          (scrollPosition / (documentHeight - windowHeight)) * maxDepth * 3
+          (scrollPosition / (documentHeight - windowHeight)) * maxDepth * 2.5
         )
       );
       // Update scrollDepth to the maximum of current and newDepth
