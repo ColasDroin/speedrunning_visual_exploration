@@ -306,7 +306,7 @@ const Page: React.FC = () => {
 
     const newOption: echarts.EChartsOption = {
       title: {
-        text: "Evolution of game popularity with time",
+        text: "Mensual run submissions per game",
         left: "center",
         textStyle: { color: "white", fontSize: fontSize },
       },
@@ -334,8 +334,8 @@ const Page: React.FC = () => {
             type: "solid",
           },
           label: {
-            show: true,
-            formatter: "{value|YYYY-MM}",
+            show: false,
+            // formatter: "{value|YYYY-MM (submissions/month)} ",
           },
         },
         position: function (point, params, dom, rect, size) {
@@ -478,7 +478,7 @@ const Page: React.FC = () => {
           option={option || {}}
           style={{
             width: "100%",
-            height: isSmallScreen ? "400px" : "700px",
+            height: isSmallScreen ? "400px" : "600px",
           }}
           opts={{ renderer: "canvas" }}
           theme="dark"

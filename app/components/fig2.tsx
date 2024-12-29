@@ -677,7 +677,7 @@ const Fig2WithPortal: React.FC = () => {
           option={option || {}}
           style={{
             width: "100%",
-            height: isSmallScreen ? "400px" : "700px",
+            height: isSmallScreen ? "400px" : "600px",
           }}
           opts={{ renderer: "canvas" }}
           theme="dark"

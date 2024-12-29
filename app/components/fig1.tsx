@@ -441,7 +441,6 @@ const Page: React.FC = () => {
     // Build options for submission types
     submissionTypes.forEach((dataSet: any[]) => {
       const optionId = dataSet[0]["identifier"];
-      console.log("dataSet", dataSet);
       allOptions[optionId] = {
         id: optionId,
         title: {
