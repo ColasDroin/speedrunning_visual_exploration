@@ -401,6 +401,12 @@ const Fig2WithPortal: React.FC = () => {
         (node) => node.category < usedCount
       );
 
+      // Create a map from node ID to category
+      const nodeIdToCategory = new Map<string, number>();
+      filteredNodes.forEach((node) => {
+        nodeIdToCategory.set(node.id, node.category);
+      });
+
       // Create custom images
       const customImages = await Promise.all(
         filteredNodes.map(async (node) => {
@@ -480,23 +486,31 @@ const Fig2WithPortal: React.FC = () => {
                 scale: 1.1,
               },
             })),
-            edges: filteredEdges.map((edge) => ({
-              source: edge.source,
-              target: edge.target,
-              lineStyle: {
-                width: Math.max(1, edge.scaled_edge_weight / 10),
-                curveness: 0.3,
-                opacity: 0.2,
-                color: "source",
-              },
-              value: edge.weight,
-              emphasis: {
+            edges: filteredEdges.map((edge) => {
+              const sourceCategory = nodeIdToCategory.get(edge.source);
+              const color =
+                sourceCategory !== undefined
+                  ? predefinedColors[sourceCategory % predefinedColors.length]
+                  : "#000"; // default color if not found
+
+              return {
+                source: edge.source,
+                target: edge.target,
                 lineStyle: {
-                  width: Math.max(10, edge.scaled_edge_weight / 10),
-                  opacity: 1,
+                  width: Math.max(1, edge.scaled_edge_weight / 10),
+                  curveness: 0.3,
+                  opacity: 0.2,
+                  color: color, // Set edge color based on source category
                 },
-              },
-            })),
+                value: edge.weight,
+                emphasis: {
+                  lineStyle: {
+                    width: Math.max(10, edge.scaled_edge_weight / 10),
+                    opacity: 1,
+                  },
+                },
+              };
+            }),
             emphasis: {
               focus: "adjacency",
               label: {
@@ -623,6 +637,10 @@ const Fig2WithPortal: React.FC = () => {
           const isExpanded = idx === expandedIndex;
           const hasAppeared = appeared[idx] || false;
 
+          // Determine the color for the current category
+          const color =
+            predefinedColors[desc.id % predefinedColors.length] || "#000";
+
           return (
             <div
               key={desc.id}
@@ -636,6 +654,7 @@ const Fig2WithPortal: React.FC = () => {
                   display: "inline-block",
                   fontSize: isSmallScreen ? "0.8rem" : "0.8rem",
                   marginTop: isSmallScreen ? "0.1rem" : "1rem",
+                  color: color, // Apply the category color here
                 }}
                 onMouseEnter={(e) => onTitleMouseEnter(e, desc.id)}
                 onMouseLeave={onTitleMouseLeave}
