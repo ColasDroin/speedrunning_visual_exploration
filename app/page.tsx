@@ -531,6 +531,9 @@ export default function Home() {
               immediately and and I will address the issue promptly.
             </p>
           </div>
+          <div className="text-center text-sm text-gray-200 mt-0 mb-4">
+            &copy; 2024 Colas Droin. All rights reserved.
+          </div>
         </div>
       </div>
     </div>
