@@ -427,7 +427,7 @@ export default function Home() {
             (and a lot of sweat).
           </p>
           <div className="mt-9 bg-gray-200 border border-gray-300 rounded-lg p-5 max-w-2xl mx-auto w-full relative">
-            {/* Content Section */}
+            {/* Content Container */}
             <div>
               <h2 className="text-xl font-bold text-teal-900">
                 Hi there, I'm Colas!
@@ -500,15 +500,16 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Profile Image Positioned at Bottom Right */}
-            <div className="absolute bottom-5 right-5">
+            {/* Profile Image Positioned Responsively */}
+            <div className="mt-4 md:absolute md:bottom-5 md:right-5">
               <img
                 src="images/my_photo.jpg" // Ensure this path is correct
                 alt="Picture of Colas"
-                className="w-36 h-36 rounded-full border border-gray-300 object-cover mr-9"
+                className="w-36 h-36 rounded-full border border-gray-300 object-cover"
               />
             </div>
           </div>
+
           {/* Disclaimer */}
           <div className="mt-9 mb-9 border border-gray-300 rounded-lg p-5 max-w-2xl mx-auto w-full">
             <p className="text-sm">
