@@ -12,7 +12,6 @@ const Banner = () => {
         <div className={styles.heroContent}>
           {/* Coin on the Left */}
           <div className={styles.coin}></div>
-
           {/* Text in the Center */}
           <div className={styles.heroText}>
             <div className={`${styles.chrome}`} data-text="SPEEDRUNNING">
@@ -22,9 +21,10 @@ const Banner = () => {
               How a community has kept pushing the limits of gaming
             </div>
           </div>
-
           {/* Star on the Right */}
-          <div className={styles.star}></div>
+          <div className={styles.starWrap}>
+            <div className={styles.star}></div>
+          </div>{" "}
         </div>
       </div>
     </div>
