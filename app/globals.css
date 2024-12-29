@@ -64,6 +64,16 @@ html {
     @apply text-2xl;
   }
 
+  a {
+    color: rgb(45 212 191);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  strong {
+    text-shadow: #d3e5ec 0px 0px 3px;
+  }
+
   /* category-wrapper: fade/slide in container */
   .category-wrapper {
     opacity: 0;

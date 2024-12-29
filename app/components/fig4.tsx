@@ -71,7 +71,7 @@ const Page: React.FC = () => {
         text: "World map of scores in November 2023",
         left: "center",
         top: 20,
-        textStyle: { color: "white", fontSize: fontSize },
+        textStyle: { color: "#CBE4DE", fontSize: fontSize },
       },
       tooltip: {
         trigger: "item",
@@ -208,7 +208,7 @@ const Page: React.FC = () => {
       title: {
         text: "Bar race of scores per country",
         left: "center",
-        textStyle: { color: "white", fontSize: fontSize },
+        textStyle: { color: "#CBE4DE", fontSize: fontSize },
       },
       grid: {
         left: 70,

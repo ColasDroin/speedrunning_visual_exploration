@@ -294,5 +294,7 @@
 .titleDecorated {
   font-size: 2.5rem;
   text-align: center;
-  -webkit-text-stroke-color: rgba(245, 242, 242, 0.79);
+  /* -webkit-text-stroke-color: rgba(255, 205, 131, 0.707); */
+  font-family: "Doto";
+  text-shadow: white 0 0 5px;
 }

@@ -296,7 +296,7 @@ const Page: React.FC = () => {
       title: {
         text: "Top 50 most speedrunned games",
         left: "center",
-        textStyle: { color: "white", fontSize: fontSize },
+        textStyle: { color: "#CBE4DE", fontSize: fontSize },
       },
       animation: true,
       tooltip: {
@@ -374,9 +374,9 @@ const Page: React.FC = () => {
               const { name, ID } = params.data;
               return `{img_${ID}|} ${name} {img_${ID}|}`;
             },
-            color: "#fff",
-            textShadowBlur: 3,
-            textShadowColor: "#000",
+            color: "#2C3333",
+            // textShadowBlur: 3,
+            // textShadowColor: "#000",
             rich: richStyles,
           },
           itemStyle: {
@@ -390,9 +390,9 @@ const Page: React.FC = () => {
               x2: 1,
               y2: 0,
               colorStops: [
-                { offset: 0, color: "#ff5733" },
-                { offset: 0.5, color: "#33c5ff" },
-                { offset: 1, color: "#ff33d4" },
+                { offset: 0, color: "#CBE4DE" },
+                { offset: 0.5, color: "white" },
+                { offset: 1, color: "#CBE4DE" },
               ],
             },
             shadowBlur: 10,
@@ -410,7 +410,7 @@ const Page: React.FC = () => {
                 r: 1,
                 colorStops: [
                   { offset: 0, color: "#ffcc33" },
-                  { offset: 1, color: "#ff5733" },
+                  { offset: 1, color: "rgb(180 83 9)" },
                 ],
               },
             },
@@ -446,7 +446,7 @@ const Page: React.FC = () => {
         title: {
           text: "Categories for " + dataSet[0]["name"],
           left: "center",
-          textStyle: { color: "white", fontSize: fontSize },
+          textStyle: { color: "#CBE4DE", fontSize: fontSize },
         },
         tooltip: {
           trigger: "axis",
@@ -456,9 +456,9 @@ const Page: React.FC = () => {
             return [
               "Category: " + item["name_category"],
               "Submissions: " + item["count"],
-              "% of submissions in 2023: " +
-                parseFloat(item["percent_2023"]).toFixed(1) +
-                "%",
+              // "% of submissions in 2023: " +
+              //   parseFloat(item["percent_2023"]).toFixed(1) +
+              //   "%",
             ].join("<br/>");
           },
         },
@@ -472,17 +472,17 @@ const Page: React.FC = () => {
           type: "category",
           inverse: true,
         },
-        visualMap: {
-          orient: "horizontal",
-          left: "center",
-          text: ["% of all submissions in 2023"],
-          dimension: "percent_2023",
-          inRange: {
-            color: ["#65B581", "#FFCE34", "#FD665F"],
-          },
-          min: 0,
-          max: 100,
-        },
+        // visualMap: {
+        //   orient: "horizontal",
+        //   left: "center",
+        //   text: ["% of all submissions in 2023"],
+        //   dimension: "percent_2023",
+        //   inRange: {
+        //     color: ["#65B581", "#FFCE34", "#FD665F"],
+        //   },
+        //   min: 0,
+        //   max: 100,
+        // },
         animationDurationUpdate: 500,
         dataset: {
           dimensions: [
@@ -503,7 +503,27 @@ const Page: React.FC = () => {
             itemChildGroupId: "child_identifier",
           },
           universalTransition: { enabled: true },
+          itemStyle: {
+            borderRadius: [0, 20, 20, 0],
+            borderWidth: 2,
+            borderColor: "#333",
+            color: {
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 1,
+              y2: 0,
+              colorStops: [
+                { offset: 0, color: "#CBE4DE" },
+                { offset: 0.5, color: "white" },
+                { offset: 1, color: "#CBE4DE" },
+              ],
+            },
+            shadowBlur: 10,
+            shadowColor: "rgba(0,0,0,0.5)",
+          },
         },
+
         graphic: [
           {
             type: "text",
@@ -532,7 +552,7 @@ const Page: React.FC = () => {
             " of game " +
             dataSet[0]["game"],
           left: "center",
-          textStyle: { color: "white", fontSize: fontSize },
+          textStyle: { color: "#CBE4DE", fontSize: fontSize },
         },
 
         tooltip: {
@@ -543,9 +563,6 @@ const Page: React.FC = () => {
             return [
               "Bin: " + item["bin_label"],
               "Submissions: " + item["count_all"],
-              "% of submissions in 2023: " +
-                parseFloat(item["percent_2023"]).toFixed(1) +
-                "%",
             ].join("<br/>");
           },
         },
@@ -583,17 +600,30 @@ const Page: React.FC = () => {
             universalTransition: { enabled: true },
             barGap: "0%",
             barCategoryGap: "0%",
-            itemStyle: {
-              borderWidth: 0,
-              borderColor: "#000",
-              color: "#3498db",
-            },
             emphasis: {
               focus: "series",
               itemStyle: {
                 borderColor: "#ff5733",
                 borderWidth: 3,
               },
+            },
+            itemStyle: {
+              borderWidth: 0,
+              borderColor: "#333",
+              color: {
+                type: "linear",
+                x: 0,
+                y: 0,
+                x2: 1,
+                y2: 0,
+                colorStops: [
+                  { offset: 0, color: "#CBE4DE" },
+                  { offset: 0.5, color: "white" },
+                  { offset: 1, color: "#CBE4DE" },
+                ],
+              },
+              shadowBlur: 10,
+              shadowColor: "rgba(0,0,0,0.5)",
             },
           },
         ],
@@ -701,7 +731,7 @@ const Page: React.FC = () => {
           title: {
             text:
               "Speedrun times for category " + category + " of game " + game,
-            textStyle: { color: "white", fontSize: fontSize },
+            textStyle: { color: "#CBE4DE", fontSize: fontSize },
             left: "center",
           },
           dataZoom: [

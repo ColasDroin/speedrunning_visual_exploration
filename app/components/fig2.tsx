@@ -430,7 +430,7 @@ const Fig2WithPortal: React.FC = () => {
         title: {
           text: "Game communities",
           left: "center",
-          textStyle: { color: "white", fontSize: fontSize },
+          textStyle: { color: "#CBE4DE", fontSize: fontSize },
         },
         backgroundColor: "transparent",
         animationDurationUpdate: 1500,

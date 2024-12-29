@@ -69,12 +69,15 @@ const Page: React.FC = () => {
             x: 0.5,
             y: 0.5,
             r: 0.8,
+
             colorStops: [
               { offset: 0, color: "rgba(255, 255, 255, 1)" }, // Bright center
-              { offset: 0.5, color: "rgba(216, 206, 146, 0.8)" }, // Golden glow
+              { offset: 0.5, color: "#CBE4DE" }, // Golden glow
               { offset: 1, color: "rgba(255, 215, 0, 0)" }, // Fade to transparent
             ],
           },
+          shadowBlur: 10,
+          shadowColor: "rgba(255, 255, 255, 1)",
         },
         emphasis: {
           itemStyle: {
@@ -92,7 +95,12 @@ const Page: React.FC = () => {
         type: "line",
         data: best_line,
         encode: { x: 0, y: 1 },
-        lineStyle: { color: "yellow", width: 2 },
+        lineStyle: {
+          color: "#CBE4DE",
+          width: 2,
+          shadowBlur: 10,
+          shadowColor: "#CBE4DE",
+        },
         animationDuration: 3000,
         symbol: "none",
         tooltip: { show: false },
@@ -121,7 +129,7 @@ const Page: React.FC = () => {
           ? "Speedrun times for category 100% of \nThe Legend of Zelda: Breath of the Wild"
           : "Speedrun times for category 100% of The Legend of Zelda: Breath of the Wild",
         textStyle: {
-          color: "white",
+          color: "#CBE4DE",
           width: "90%",
           overflow: "break",
           fontSize: fontSize,
@@ -167,18 +175,17 @@ const Page: React.FC = () => {
           z: 0, // Ensure it is behind all other elements
           style: {
             image: `images/${true_ID}_icon_rescaled.webp`,
-            width: 150,
-            height: 150,
+            width: 100,
+            height: 100,
             opacity: 0.3, // Makes it look subtle and carved
           },
         },
         // Conditionally render the Best Time box
         showBestTimeBox && {
           type: "group",
-          left: isSmallScreen ? "40%" : "20%", // Position at the right 20% if small screen
-          top: isSmallScreen ? "15%" : "auto", // Position at the top 15% if small screen
-          bottom: isSmallScreen ? "auto" : "15%", // Adjust as needed
-          z: 10, // Ensure it's above scatter points
+          left: isSmallScreen ? "40%" : "60%", // Position at the right 20% if small screen
+          top: isSmallScreen ? "15%" : "10%", // Position at the top 15% if small screen
+          z: 1000, // Ensure it's above scatter points
           silent: true, // Make the graphic non-clickable
           children: [
             {
@@ -188,16 +195,16 @@ const Page: React.FC = () => {
                 height: isSmallScreen ? 30 : 50,
               },
               style: {
-                fill: "rgba(0, 0, 0, 0.6)", // Semi-transparent background
-                stroke: "#00FF00", // Green border for video game feel
+                fill: "rgb(255, 255, 255)", // Semi-transparent background
+                stroke: "#CBE4DE", // Green border for video game feel
                 lineWidth: 2,
                 shadowBlur: 10,
-                shadowColor: "#00FF00",
+                shadowColor: "#CBE4DE",
                 // Optional: Add rounded corners
                 // Define borderRadius if desired
                 // borderRadius: [10, 10, 10, 10],
               },
-              z: 0,
+              z: 1000,
             },
             {
               type: "text",
@@ -207,15 +214,15 @@ const Page: React.FC = () => {
                 y: isSmallScreen ? 15 : 25, // Center the text
                 textAlign: "center",
                 textVerticalAlign: "middle",
-                fill: "#00FF00", // Green text color
-                font: 'bold 0.5em "Press Start 2P", cursive', // Pixel-style font
+                fill: "#2E4F4F", // Green text color
+                fontSize: isSmallScreen ? 8 : 12, // Adjust font size
                 // If "Press Start 2P" is not available, use a default monospace font
                 // font: 'bold 16px monospace',
                 // Add a glow effect using shadow
-                textShadowColor: "#00FF00",
-                textShadowBlur: 4,
+                //textShadowColor: "#CBE4DE",
+                //textShadowBlur: 4,
               },
-              z: 1,
+              z: 1001,
             },
           ],
         },

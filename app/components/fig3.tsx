@@ -308,7 +308,7 @@ const Page: React.FC = () => {
       title: {
         text: "Mensual run submissions per game",
         left: "center",
-        textStyle: { color: "white", fontSize: fontSize },
+        textStyle: { color: "#CBE4DE", fontSize: fontSize },
       },
       backgroundColor: "transparent",
       animation: "auto",

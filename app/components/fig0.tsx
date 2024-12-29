@@ -49,7 +49,7 @@ const Page: React.FC = () => {
       title: {
         text: "Tree of categories for Portal",
         left: "center",
-        textStyle: { color: "white", fontSize: fontSize },
+        textStyle: { color: "#CBE4DE", fontSize: fontSize },
       },
       tooltip: {
         trigger: "item",
@@ -122,12 +122,25 @@ const Page: React.FC = () => {
           left: "10%",
           right: "10%",
           // orient: "vertical",
-          symbol: "emptyCircle",
+          symbol: "circle",
           layout: "radial",
           symbolSize: 7,
           initialTreeDepth: scrollDepth, // Adjust depth dynamically
           animationDurationUpdate: 750,
           emphasis: { focus: "descendant" },
+          itemStyle: {
+            color: "#fff",
+            borderColor: "#fff",
+            shadowColor: "rgb(255, 255, 255)",
+            shadowBlur: 10,
+          },
+          label: {
+            color: "white",
+          },
+          lineStyle: {
+            shadowColor: "rgb(255, 255, 255)",
+            shadowBlur: 5,
+          },
           // label: {
           //   position: "top",
           //   rotate: -90,

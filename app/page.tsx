@@ -46,7 +46,7 @@ export default function Home() {
       <div className="container mx-auto px-4 overflow-x-hidden">
         <div className="grid mx-auto px-4 sm:px-6 lg:px-8 mt-9">
           {showSafariDisclaimer && (
-            <div className="mt-5 bg-yellow-100 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center break-words w-full max-w-5xl mx-auto">
+            <div className="mt-5 border border-yellow-600 rounded-lg p-5 text-center break-words w-full max-w-5xl mx-auto">
               <strong>Performance Notice:</strong> You are using Safari. For the
               best experience, we recommend using a Chromium-based browser
               (Chrome, Edge, etc.) or Firefox.
@@ -93,7 +93,6 @@ export default function Home() {
               href="https://www.twitch.tv"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600"
             >
               Twitch
             </a>{" "}
@@ -102,7 +101,6 @@ export default function Home() {
               href="https://gamesdonequick.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600"
             >
               Games Done Quick
             </a>
@@ -155,7 +153,7 @@ export default function Home() {
               </a>
             </span>{" "}
             API to uncover the amazing feats of speedrunners.
-            <div className="mt-5 border border-yellow-300 text-yellow-700 rounded-lg p-5 text-center break-words w-full max-w-5xl mx-auto">
+            <div className="mt-5 border border-amber-600 rounded-lg p-5 text-center break-words w-full max-w-5xl mx-auto">
               <strong>Data disclaimer:</strong> This analysis focuses mostly on
               the top 50 games (according to their submissions count), only
               considering verified runs for full-game categories. Unfortunately,
