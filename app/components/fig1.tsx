@@ -91,23 +91,12 @@ const Page: React.FC = () => {
     return chartId?.startsWith("scat_");
   };
 
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
-
-  useEffect(() => {
-    // Check if running in the browser
-    if (typeof window !== "undefined") {
-      const handleResize = () => {
-        setIsSmallScreen(window.innerWidth < 768);
-      };
-
-      handleResize(); // Run initially to set the correct size
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-      };
-    }
-  }, []);
+  let isSmallScreen = false;
+  if (typeof window !== "undefined") {
+    isSmallScreen = window.innerWidth < 768;
+  } else {
+    console.error("Window object is not available.");
+  }
   const fontSize = isSmallScreen ? 12 : 18;
 
   // =============================================================================
