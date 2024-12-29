@@ -309,7 +309,6 @@ export default function Home() {
               href="https://gamesdonequick.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600"
             >
               Games Done Quick
             </a>

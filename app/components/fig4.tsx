@@ -83,24 +83,12 @@ const Page: React.FC = () => {
         {
           type: "continuous",
           min: 0,
-          max: maxValue,
+          max: 15000,
           text: ["High", "Low"],
           orient: "horizontal",
           left: "center",
           inRange: {
-            color: [
-              "#313695",
-              "#4575b4",
-              "#74add1",
-              "#abd9e9",
-              "#e0f3f8",
-              "#ffffbf",
-              "#fee090",
-              "#fdae61",
-              "#f46d43",
-              "#d73027",
-              "#a50026",
-            ].reverse(),
+            color: ["#2E4F4F", "#0E8388", "#CBE4DE"], // Reverses the array to match the original order
           },
           calculable: false,
         },
