@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jersey+10&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap");
+
 .heroContent {
   display: flex;
   align-items: center;
@@ -11,7 +13,7 @@
 
 .grid {
   --grid-size: 30px;
-  --grid-color: rgb(164, 164, 164);
+  --grid-color: var(--secondary-color);
   --grid-blur: 1px;
   position: absolute;
   bottom: -30%;
@@ -22,19 +24,17 @@
   background-position: 0 0;
   background-image: repeating-linear-gradient(
       90deg,
-      var(--grid-color, black) 0%,
-      transparent calc(1px + var(--grid-blur, 0px)),
+      var(--grid-color) 0%,
+      transparent calc(1px + var(--grid-blur)),
       transparent var(--grid-size),
-      var(--grid-color, black)
-        calc(var(--grid-size) + 0px + var(--grid-blur, 0px))
+      var(--grid-color) calc(var(--grid-size) + var(--grid-blur))
     ),
     repeating-linear-gradient(
       180deg,
-      var(--grid-color, black) 0%,
-      transparent calc(1px + var(--grid-blur, 0px)),
+      var(--grid-color) 0%,
+      transparent calc(1px + var(--grid-blur)),
       transparent var(--grid-size),
-      var(--grid-color, black)
-        calc(var(--grid-size) + 0px + var(--grid-blur, 0px))
+      var(--grid-color) calc(var(--grid-size) + var(--grid-blur))
     );
   transform: perspective(50vh) rotateX(60deg) translateZ(10px);
   animation: moving-grid-diagonal 1s infinite linear;
@@ -50,6 +50,7 @@
   }
 }
 
+/* Coin and Star Styles */
 .coin,
 .star {
   width: clamp(50px, 10vw, 100px);
@@ -59,11 +60,14 @@
   justify-content: center;
   transform-origin: center center;
 }
+
 .star {
-  background-color: gold;
-  background-image: radial-gradient(circle, gold, darkgoldenrod);
+  background-color: var(--star-color);
+  background-image: radial-gradient(circle, var(--star-color), darkgoldenrod);
   border-radius: 50%;
-  filter: drop-shadow(0px 0 20px rgba(0, 255, 0, 0.7));
+  filter: drop-shadow(
+    0px 0 20px rgba(107, 203, 119, 0.7)
+  ); /* Mint Green Shadow */
   clip-path: polygon(
     50% 0%,
     61% 35%,
@@ -77,7 +81,6 @@
     39% 35%
   );
   animation: rotate-star 2s infinite linear;
-  /* center the 3D rotation pivot */
   transform-style: preserve-3d;
 }
 
@@ -91,18 +94,16 @@
 }
 
 .coin {
-  /* remove position: absolute; */
   position: relative;
-  background-color: gold;
-  background-image: radial-gradient(circle, gold, darkgoldenrod);
+  background-color: var(--coin-color);
+  background-image: radial-gradient(circle, var(--coin-color), darkgoldenrod);
   border-radius: 50%;
   box-shadow: rgba(255, 215, 0, 0.7) 0px 0 20px;
   animation: rotate-coin 2s infinite linear;
-  /* center the 3D rotation pivot */
   transform-style: preserve-3d;
 }
+
 .coin::before {
-  /* stays the same (centered within .coin) */
   content: "";
   position: absolute;
   top: 50%;
@@ -123,6 +124,7 @@
   }
 }
 
+/* Overlay */
 .overlay {
   width: 100%;
   height: 100%;
@@ -131,22 +133,23 @@
   left: 0;
   top: 0;
   background-image: repeating-linear-gradient(
-    rgba(0, 0, 0, 0.3) 0,
+    var(--overlay-color) 0,
     transparent 1px,
     transparent 2px,
-    rgba(0, 0, 0, 0.3) 3px
+    var(--overlay-color) 3px
   );
   pointer-events: none;
 }
 
+/* Background */
 .background80s {
   background: linear-gradient(
       to bottom,
-      #001f3f 0,
-      #0074d9 24%,
-      #7fdbff 45%,
-      #39cccc 60%,
-      #0074d9 70%,
+      var(--background-color) 0,
+      var(--primary-color) 24%,
+      var(--secondary-color) 45%,
+      var(--accent-color) 60%,
+      var(--primary-color) 70%,
       #343434 95%
     )
     fixed;
@@ -161,19 +164,15 @@
   mask-image: linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
 }
 
-.animatedclouds:before {
-  filter: url(#filter);
-}
-
 .background80s:before {
   content: "";
   background: linear-gradient(
       to bottom,
-      #001f3f 0,
-      #0074d9 24%,
-      #7fdbff 45%,
-      #39cccc 60%,
-      #3d9970 65%
+      var(--background-color) 0,
+      var(--primary-color) 24%,
+      var(--secondary-color) 45%,
+      var(--accent-color) 60%,
+      var(--primary-color) 65%
     )
     fixed;
   width: 100%;
@@ -185,7 +184,7 @@
   opacity: 0.2;
 }
 
-/*stars*/
+/* Stars */
 .stars:after {
   transform: translateY(-40%);
   content: " ";
@@ -196,14 +195,18 @@
   left: 0;
   top: 0;
   z-index: -1;
-  box-shadow: 5vw 15vh 2px white, 1vw 33vh 0px white, 2vw 25vh 2px white,
-    10vw 10vh 2px white, 12vw 20vh 0px white, 30vw 15vh 2px white,
-    16vw 5vh 2px white, 24vw 10vh 0px white, 32vw 40vh 0px white,
-    33vw 35vh 2px white, 12vw 38vh 2px white, 24vw 10vh 0px white,
-    33vw 5vh 2px white, 20vw 10vh 0px white, 80vw 10vh 2px white,
-    62vw 20vh 0px white, 60vw 15vh 2px white, 70vw 7vh 0px white,
-    65vw 35vh 2px white, 64vw 10vh 0px white, 85vw 2vh 0px white,
-    92vw 40vh 0px white, 75vw 35vh 2px white, 90vw 10vh 0px white;
+  box-shadow: 5vw 15vh 2px var(--text-color), 1vw 33vh 0px var(--text-color),
+    2vw 25vh 2px var(--text-color), 10vw 10vh 2px var(--text-color),
+    12vw 20vh 0px var(--text-color), 30vw 15vh 2px var(--text-color),
+    16vw 5vh 2px var(--text-color), 24vw 10vh 0px var(--text-color),
+    32vw 40vh 0px var(--text-color), 33vw 35vh 2px var(--text-color),
+    12vw 38vh 2px var(--text-color), 24vw 10vh 0px var(--text-color),
+    33vw 5vh 2px var(--text-color), 20vw 10vh 0px var(--text-color),
+    80vw 10vh 2px var(--text-color), 62vw 20vh 0px var(--text-color),
+    60vw 15vh 2px var(--text-color), 70vw 7vh 0px var(--text-color),
+    65vw 35vh 2px var(--text-color), 64vw 10vh 0px var(--text-color),
+    85vw 2vh 0px var(--text-color), 92vw 40vh 0px var(--text-color),
+    75vw 35vh 2px var(--text-color), 90vw 10vh 0px var(--text-color);
   opacity: 0.3;
   animation: glitter 2s infinite;
 }
@@ -215,12 +218,12 @@
   50% {
     opacity: 0.9;
   }
-
   100% {
     opacity: 0.5;
   }
 }
 
+/* Hero Text */
 .heroText {
   display: flex;
   flex-direction: column;
@@ -229,79 +232,65 @@
   margin: 0; /* Reset margins */
 }
 
-/* Optional: Ensure the text container doesn't have excessive padding/margin */
-.text {
-  margin: 0;
-  padding: 0;
-}
 .outrun {
-  font-family: "Road Rage";
+  font-family: "Play";
   font-weight: normal;
   font-size: clamp(9px, 3vw, 30px);
   margin-top: 0rem;
+  color: var(--text-color);
 }
 
 .glow {
-  color: #fff;
+  color: var(--text-color);
   text-align: center;
-  -webkit-animation: glow 1s ease-in-out infinite alternate;
-  -moz-animation: glow 1s ease-in-out infinite alternate;
   animation: glow 1s ease-in-out infinite alternate;
-}
-
-@-webkit-keyframes glow {
-  from {
-    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0074d9,
-      0 0 40px #0074d9, 0 0 50px #0074d9, 0 0 60px #0074d9, 0 0 70px #0074d9;
-  }
-  to {
-    text-shadow: 0 0 20px #fff, 0 0 30px #7fdbff, 0 0 40px #7fdbff,
-      0 0 50px #7fdbff, 0 0 60px #7fdbff, 0 0 70px #7fdbff, 0 0 80px #7fdbff;
-  }
 }
 
 @keyframes glow {
   from {
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0074d9, 0 0 20px #0074d9,
-      0 0 25px #0074d9, 0 0 30px #0074d9, 0 0 35px #0074d9;
+    text-shadow: 0 0 5px var(--text-color), 0 0 10px var(--text-color),
+      0 0 15px var(--primary-color), 0 0 20px var(--primary-color),
+      0 0 25px var(--primary-color), 0 0 30px var(--primary-color),
+      0 0 35px var(--primary-color);
   }
   to {
-    text-shadow: 0 0 10px #fff, 0 0 15px #7fdbff, 0 0 20px #7fdbff,
-      0 0 25px #7fdbff, 0 0 30px #7fdbff, 0 0 35px #7fdbff, 0 0 40px #7fdbff;
+    text-shadow: 0 0 10px var(--text-color), 0 0 15px var(--secondary-color),
+      0 0 20px var(--secondary-color), 0 0 25px var(--secondary-color),
+      0 0 30px var(--secondary-color), 0 0 35px var(--secondary-color),
+      0 0 40px var(--secondary-color);
   }
-}
-
-.subtleGlow {
-  color: #9ce3ff;
-  text-align: center;
-  animation: subtleGlow 1s ease-in-out infinite alternate;
 }
 
 .chrome {
   font-family: "Doto";
   font-weight: 900;
   font-size: clamp(20px, 5vw, 110px);
-  background-image: linear-gradient(#2989cc 0%, #d3e5ec 50%, #b3628d 100%);
+  background-image: linear-gradient(
+    var(--primary-color) 0%,
+    var(--secondary-color) 70%,
+    var(--accent-color) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke-color: rgba(255, 255, 255, 0.4);
+  -webkit-text-stroke-color: rgba(245, 242, 242, 0.551);
   -webkit-text-stroke-width: clamp(0.5px, 0.3vw, 1px);
   position: relative;
 }
 
 .chrome:before {
   content: attr(data-text);
-  text-shadow: -1px -1px 1px #2989cc, -2px -2px 1px #2989cc,
-    -3px -3px 1px #2989cc, 1px 1px 1px #000, 0px -1px 2px #000,
-    -1px -2px 2px #000, 0 0 5px rgba(255, 255, 255, 1);
+  text-shadow: -1px -1px 1px var(--primary-color),
+    -2px -2px 1px var(--primary-color), -3px -3px 1px var(--primary-color),
+    1px 1px 1px #989898, 0px -1px 2px #afaeae, -1px -2px 2px #868585,
+    0 0 5px rgba(255, 255, 255, 1);
   opacity: 1;
   position: absolute;
   z-index: -1;
 }
+
 .titleDecorated {
   font-size: 2.5rem;
-  /* text-decoration: underline dotted #d3e5ec; */
   text-align: center;
+  -webkit-text-stroke-color: rgba(245, 242, 242, 0.79);
 }
