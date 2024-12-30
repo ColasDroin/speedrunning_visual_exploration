@@ -8,7 +8,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
 
 export const metadata: Metadata = {
-  title: "Speedrun",
+  title: "Speedrunning: A visual Exploration",
   description: "A data viz short story",
 };
 export const viewport: Viewport = {
