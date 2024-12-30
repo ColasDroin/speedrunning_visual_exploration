@@ -17,6 +17,14 @@ function isSafari() {
   return ua.includes("safari") && !ua.includes("chrome");
 }
 
+// Helper function to truncate names longer than 40 characters
+const truncateName = (name: string, maxLength: number = 30): string => {
+  if (name.length > maxLength) {
+    return name.slice(0, maxLength - 3) + "...";
+  }
+  return name;
+};
+
 const Page: React.FC = () => {
   // =============================================================================
   // REFS & STATE
@@ -381,7 +389,8 @@ const Page: React.FC = () => {
             show: true,
             position: "inside",
             formatter: (params) => {
-              const { name, ID } = params.data;
+              let { name, ID } = params.data;
+              name = truncateName(name);
               return `{img_${ID}|} ${name} {img_${ID}|}`;
             },
             color: "#2C3333",
@@ -962,7 +971,7 @@ const Page: React.FC = () => {
                   type: "text",
                   style: {
                     text: `Go back`,
-                    x: isSmallScreen ? 37 : 50, // Center the text
+                    x: isSmallScreen ? 37.5 : 50, // Center the text
                     y: isSmallScreen ? 15 : 25, // Center the text
                     textAlign: "center",
                     textVerticalAlign: "middle",
@@ -975,8 +984,8 @@ const Page: React.FC = () => {
             },
             {
               type: "group",
-              left: isSmallScreen ? "40%" : "60%", // Position at the right 20% if small screen
-              top: isSmallScreen ? "15%" : "10%", // Position at the top 15% if small screen
+              left: isSmallScreen ? "40%" : "60%", // Position at the left 40% or 60%
+              top: isSmallScreen ? "15%" : "10%", // Position at the top 15% or 10%
               z: 1000, // Ensure it's above scatter points
               silent: true, // Make the graphic non-clickable
               children: [
