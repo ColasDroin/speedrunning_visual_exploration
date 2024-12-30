@@ -380,7 +380,8 @@ export default function Home() {
             over time, highlighting key shifts in competitiveness. Afterward,
             the colored world map shows the cumulative scores as of November
             2023, revealing which countries dominate the global speedrunning
-            scene.
+            scene. Click on the <strong>Start race</strong> button to begin the
+            animation.
           </p>
           <div className="mx-auto w-full mt-5 mb-5 lg:max-w-[80%]">
             <Fig4 />

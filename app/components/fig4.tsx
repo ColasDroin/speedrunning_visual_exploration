@@ -133,11 +133,11 @@ const Page: React.FC = () => {
                 left: "center",
                 top: "center",
                 style: {
-                  fill: "#28a745",
-                  stroke: "#19692c",
-                  lineWidth: 1,
-                  shadowBlur: 2,
-                  shadowColor: "rgba(0,0,0,0.3)",
+                  fill: "rgb(255, 255, 255)", // Semi-transparent background
+                  stroke: "#CBE4DE", // Green border for video game feel
+                  lineWidth: 2,
+                  shadowBlur: 10,
+                  shadowColor: "#CBE4DE",
                   shadowOffsetX: 1,
                   shadowOffsetY: 1,
                   cursor: "pointer",
@@ -150,7 +150,7 @@ const Page: React.FC = () => {
                   text: "Restart race",
                   fontSize: 14,
                   fontWeight: "bold",
-                  fill: "#FFFFFF",
+                  fill: "#2E4F4F", // Green text color
                   textAlign: "center",
                   textVerticalAlign: "middle",
                   cursor: "pointer",
@@ -273,11 +273,11 @@ const Page: React.FC = () => {
         elements: [
           {
             type: "text",
-            right: 160,
+            right: "10%",
             bottom: 60,
             style: {
               text: startMonth,
-              font: "bolder 80px monospace",
+              font: "bolder 40px monospace",
               fill: "rgba(100, 100, 100, 0.25)",
             },
             z: 100,
@@ -298,11 +298,11 @@ const Page: React.FC = () => {
                 left: "center",
                 top: "center",
                 style: {
-                  fill: "#007BFF",
-                  stroke: "#0056b3",
-                  lineWidth: 1,
-                  shadowBlur: 2,
-                  shadowColor: "rgba(0,0,0,0.3)",
+                  fill: "rgb(255, 255, 255)", // Semi-transparent background
+                  stroke: "#CBE4DE", // Green border for video game feel
+                  lineWidth: 2,
+                  shadowBlur: 10,
+                  shadowColor: "#CBE4DE",
                   shadowOffsetX: 1,
                   shadowOffsetY: 1,
                   cursor: "pointer",
@@ -315,7 +315,7 @@ const Page: React.FC = () => {
                   text: "Skip to Map",
                   fontSize: 14,
                   fontWeight: "bold",
-                  fill: "#FFFFFF",
+                  fill: "#2E4F4F", // Green text color
                   textAlign: "center",
                   textVerticalAlign: "middle",
                   cursor: "pointer",
@@ -370,11 +370,11 @@ const Page: React.FC = () => {
                 left: "center",
                 top: "center",
                 style: {
-                  fill: "#28a745",
-                  stroke: "#19692c",
-                  lineWidth: 1,
-                  shadowBlur: 2,
-                  shadowColor: "rgba(0,0,0,0.3)",
+                  fill: "rgb(255, 255, 255)", // Semi-transparent background
+                  stroke: "#CBE4DE", // Green border for video game feel
+                  lineWidth: 2,
+                  shadowBlur: 10,
+                  shadowColor: "#CBE4DE",
                   shadowOffsetX: 1,
                   shadowOffsetY: 1,
                   cursor: "pointer",
@@ -387,7 +387,7 @@ const Page: React.FC = () => {
                   text: "(Re-)start race",
                   fontSize: 14,
                   fontWeight: "bold",
-                  fill: "#FFFFFF",
+                  fill: "#2E4F4F",
                   textAlign: "center",
                   textVerticalAlign: "middle",
                   cursor: "pointer",
