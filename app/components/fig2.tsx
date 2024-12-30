@@ -207,8 +207,9 @@ const Fig2WithPortal: React.FC = () => {
       const viewportCenter = window.innerHeight / 2;
       const distance = Math.abs(chartCenter - viewportCenter);
 
+      // --- CHANGED HERE: less stringent check by multiplying the tolerance ---
       if (!scrollLocked) {
-        if (distance < CENTER_TOLERANCE) {
+        if (distance < CENTER_TOLERANCE * 2) {
           setScrollLocked(true);
           document.body.style.overflow = "hidden";
           e.preventDefault();
@@ -253,8 +254,9 @@ const Fig2WithPortal: React.FC = () => {
       const viewportCenter = window.innerHeight / 2;
       const distance = Math.abs(chartCenter - viewportCenter);
 
+      // --- CHANGED HERE: less stringent check by multiplying the tolerance ---
       if (!scrollLocked) {
-        if (distance < CENTER_TOLERANCE) {
+        if (distance < CENTER_TOLERANCE * 2) {
           setScrollLocked(true);
           document.body.style.overflow = "hidden";
           e.preventDefault();
@@ -525,9 +527,9 @@ const Fig2WithPortal: React.FC = () => {
                   const imageUrl =
                     "images/" + params.data.real_id + "_cover.webp";
                   return `<div style="text-align: center;">
-                            <img src="${imageUrl}"
-                                 style="width: 360px; height: 256px;" />
-                            <br><b>${params.data.name}</b>
+                      <img src="${imageUrl}"
+                           style="width: 360px; height: 256px;" />
+                      <br><b>${params.data.name}</b>
                           </div>`;
                 } else {
                   // Edge
@@ -683,7 +685,6 @@ const Fig2WithPortal: React.FC = () => {
         ref={chartContainerRef}
         style={{
           flex: "3",
-          //aspectRatio: "1.2 / 1",
           marginLeft: isSmallScreen ? "0.1rem" : "1rem",
         }}
       >
@@ -704,10 +705,10 @@ const Fig2WithPortal: React.FC = () => {
         {hoveringIndex !== null && (
           <div
             style={{
-              position: "fixed", // or 'absolute' if you prefer
+              position: "fixed",
               top: hoverCoords.y,
               left: hoverCoords.x,
-              zIndex: 999999, // ensure on top
+              zIndex: 999999,
               backgroundColor: "#000",
               color: "#fff",
               padding: "8px",

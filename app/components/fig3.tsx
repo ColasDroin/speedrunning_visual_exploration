@@ -277,7 +277,7 @@ const Page: React.FC = () => {
       const distance = Math.abs(chartCenter - viewportCenter);
 
       if (!scrollLocked) {
-        if (distance < CENTER_TOLERANCE) {
+        if (distance < CENTER_TOLERANCE * 2) {
           setScrollLocked(true);
           document.body.style.overflow = "hidden";
           e.preventDefault();
@@ -321,7 +321,7 @@ const Page: React.FC = () => {
       const distance = Math.abs(chartCenter - viewportCenter);
 
       if (!scrollLocked) {
-        if (distance < CENTER_TOLERANCE) {
+        if (distance < CENTER_TOLERANCE * 2) {
           setScrollLocked(true);
           document.body.style.overflow = "hidden";
           e.preventDefault();
