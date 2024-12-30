@@ -370,9 +370,6 @@ const Page: React.FC = () => {
       });
       const popularityData = JSON.parse(decompressed);
 
-      // If needed, ensure it's sorted by time (not mandatory if server is correct)
-      // popularityData.data.sort((a, b) => +new Date(a[0]) - +new Date(b[0]));
-
       setAllGames(popularityData.games || []);
       setRiverData(popularityData.data || []);
     } catch (error) {
@@ -415,10 +412,6 @@ const Page: React.FC = () => {
 
     const selectedMap = buildSelectedObject();
 
-    // Let's keep the original approach: we define a single "color" array of length 10
-    // and rely on colorBy: "seriesName" so that each category uses the correct index
-    // ECharts picks the color by matching the category's position in legend.data.
-    // We'll do legend.data = allGames, or everything
     const newOption: echarts.EChartsOption = {
       color: plotGradients,
       colorBy: "seriesName",
@@ -476,6 +469,19 @@ const Page: React.FC = () => {
 
           return [x, y];
         },
+        // Use YYYY-MM in the tooltip
+        formatter: (params) => {
+          // If multiple series, use the first for time
+          const dateStr = new Date(params[0].value[0])
+            .toISOString()
+            .slice(0, 7);
+          let html = `<div>${dateStr}</div>`;
+          for (const p of params) {
+            const val = p.value[1];
+            html += `<div><strong>${p.seriesName}:</strong> ${val}</div>`;
+          }
+          return html;
+        },
       },
 
       legend: [
@@ -503,22 +509,22 @@ const Page: React.FC = () => {
 
       singleAxis: {
         top: "20%",
-        bottom: "1%",
-        name: "Time", // Adds the x-axis label
-        nameLocation: "end", // Positions the label at the end of the axis
+        bottom: "5%",
+        name: "Time",
+        nameLocation: "end",
         nameTextStyle: {
-          color: "white", // Sets the label color
+          color: "white",
         },
-        axisTick: {
-          interval: 1, // Monthly ticks
-        },
-        axisLabel: {
-          show: true, // Ensures labels are visible
-          color: "white", // Sets the label text color
-          formatter: (value: string) =>
-            new Date(value).toISOString().slice(0, 7), // Formats the labels as YYYY-MM
-        },
+        // Force only yearly ticks
+        minInterval: 3600 * 24 * 365 * 1000,
         type: "time",
+        axisLabel: {
+          show: true,
+          color: "white",
+          // Same formatting as the tooltip => YYYY-MM
+          formatter: (value: string) =>
+            new Date(value).toISOString().slice(0, 4),
+        },
         axisPointer: {
           animation: true,
           label: {
