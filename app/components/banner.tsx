@@ -18,7 +18,7 @@ const Banner = () => {
               SPEEDRUNNING
             </div>
             <div className={`${styles.outrun} ${styles.glow}`}>
-              How a community has kept pushing the limits of gaming
+              How a community keeps pushing the limits of gaming
             </div>
           </div>
           {/* Star on the Right */}

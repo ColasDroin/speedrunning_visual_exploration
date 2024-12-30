@@ -116,7 +116,15 @@ const Page: React.FC = () => {
         {
           type: "tree",
           name: "MineCraft: Java Edition",
-          data: [dataCategories["minecraft"]],
+          data: [
+            {
+              ...dataCategories["minecraft"],
+              itemStyle: {
+                color: "orange", // Set the central node color
+                shadowColor: "orange",
+              },
+            },
+          ],
           top: "25%",
           bottom: "25%",
           left: "10%",

@@ -9,6 +9,7 @@
   justify-content: center;
   gap: clamp(1rem, 2vw, 3rem);
   flex-wrap: nowrap;
+  position: relative;
 }
 
 .grid {
@@ -237,8 +238,8 @@
 .outrun {
   font-family: "Play";
   font-weight: normal;
-  font-size: clamp(9px, 3vw, 30px);
-  margin-top: 1rem;
+  font-size: clamp(6px, 2.8vw, 30px);
+  margin-top: clamp(1.4rem, 3.5vw, 5.8rem);
   color: var(--text-color);
 }
 

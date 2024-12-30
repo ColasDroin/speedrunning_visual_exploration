@@ -46,10 +46,11 @@ export default function Home() {
       <div className="container mx-auto px-4 overflow-x-hidden">
         <div className="grid mx-auto px-4 sm:px-6 lg:px-8 mt-9">
           {showSafariDisclaimer && (
-            <div className="mt-5 border border-yellow-600 rounded-lg p-5 text-center break-words w-full max-w-5xl mx-auto">
-              <strong>Performance Notice:</strong> You are using Safari. For the
-              best experience, we recommend using a Chromium-based browser
-              (Chrome, Edge, etc.) or Firefox.
+            <div className="mt-5 border border-yellow-600 rounded-lg p-3 text-center break-words w-full max-w-5xl mx-auto text-sm">
+              <strong>Performance Notice:</strong> It appears you are using
+              Safari or browsing on mobile. For the best experience, we
+              recommend using a Chromium-based browser (Chrome, Edge, etc.) or
+              Firefox, on a bigger screen.
             </div>
           )}
           <div

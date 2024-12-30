@@ -314,11 +314,18 @@ const Page: React.FC = () => {
           ].join("<br/>");
         },
       },
-      grid: { left: 10 },
+      grid: { left: 10, right: 150 },
+
       xAxis: {
         type: "value",
         name: "Submission count",
         axisLabel: { formatter: "{value}", color: "white" },
+        nameTextStyle: {
+          color: "white",
+          verticalAlign: "top",
+          padding: [10, 0, 0, 0],
+        },
+        nameLocation: "middle",
       },
       yAxis: {
         type: "category",
@@ -466,11 +473,18 @@ const Page: React.FC = () => {
             ].join("<br/>");
           },
         },
-        grid: { left: 100 },
+        grid: { left: 150 },
+
         xAxis: {
           type: "value",
           name: "Submission count per category",
           axisLabel: { formatter: "{value}", color: "white" },
+          nameTextStyle: {
+            color: "white",
+            verticalAlign: "top",
+            padding: [10, 0, 0, 0],
+          },
+          nameLocation: "middle",
         },
         yAxis: {
           type: "category",
@@ -531,16 +545,56 @@ const Page: React.FC = () => {
         },
 
         graphic: [
+          // {
+          //   type: "text",
+          //   left: 50,
+          //   top: 20,
+          //   style: {
+          //     text: "Back",
+          //     fontSize: 18,
+          //     fill: "grey",
+          //   },
+          //   onclick: () => goBack(),
+          // },
           {
-            type: "text",
-            left: 50,
-            top: 20,
-            style: {
-              text: "Back",
-              fontSize: 18,
-              fill: "grey",
-            },
+            type: "group",
+            right: isSmallScreen ? "60%" : "70%", // Position at the right 20% if small screen
+            top: isSmallScreen ? "3%" : "3%", // Position at the top 15% if small screen
+            z: 1000, // Ensure it's above scatter points
             onclick: () => goBack(),
+            children: [
+              {
+                type: "rect",
+                shape: {
+                  width: isSmallScreen ? 75 : 100,
+                  height: isSmallScreen ? 20 : 40,
+                },
+                style: {
+                  fill: "rgb(255, 255, 255)", // Semi-transparent background
+                  stroke: "#CBE4DE", // Green border for video game feel
+                  lineWidth: 2,
+                  shadowBlur: 10,
+                  shadowColor: "#CBE4DE",
+                  // Optional: Add rounded corners
+                  // Define borderRadius if desired
+                  // borderRadius: [10, 10, 10, 10],
+                },
+                z: 1000,
+              },
+              {
+                type: "text",
+                style: {
+                  text: `Go back`,
+                  x: isSmallScreen ? 37 : 50, // Center the text
+                  y: isSmallScreen ? 10 : 20, // Center the text
+                  textAlign: "center",
+                  textVerticalAlign: "middle",
+                  fill: "#2E4F4F", // Green text color
+                  fontSize: isSmallScreen ? 8 : 12, // Adjust font size
+                },
+                z: 1001,
+              },
+            ],
           },
         ],
       };
@@ -576,8 +630,14 @@ const Page: React.FC = () => {
         grid: { left: 100 },
         xAxis: {
           type: "value",
-          name: "Submission count per category",
+          name: "Submission count per bin",
           axisLabel: { formatter: "{value}", color: "white" },
+          nameTextStyle: {
+            color: "white",
+            verticalAlign: "top",
+            padding: [10, 0, 0, 0],
+          },
+          nameLocation: "middle",
         },
         yAxis: {
           type: "category",
@@ -637,16 +697,56 @@ const Page: React.FC = () => {
           },
         ],
         graphic: [
+          // {
+          //   type: "text",
+          //   left: 50,
+          //   top: 20,
+          //   style: {
+          //     text: "Back",
+          //     fontSize: 18,
+          //     fill: "grey",
+          //   },
+          //   onclick: () => goBack(),
+          // },
           {
-            type: "text",
-            left: 50,
-            top: 20,
-            style: {
-              text: "Back",
-              fontSize: 18,
-              fill: "grey",
-            },
+            type: "group",
+            right: isSmallScreen ? "60%" : "70%", // Position at the right 20% if small screen
+            top: isSmallScreen ? "3%" : "3%", // Position at the top 15% if small screen
+            z: 1000, // Ensure it's above scatter points
             onclick: () => goBack(),
+            children: [
+              {
+                type: "rect",
+                shape: {
+                  width: isSmallScreen ? 75 : 100,
+                  height: isSmallScreen ? 20 : 40,
+                },
+                style: {
+                  fill: "rgb(255, 255, 255)", // Semi-transparent background
+                  stroke: "#CBE4DE", // Green border for video game feel
+                  lineWidth: 2,
+                  shadowBlur: 10,
+                  shadowColor: "#CBE4DE",
+                  // Optional: Add rounded corners
+                  // Define borderRadius if desired
+                  // borderRadius: [10, 10, 10, 10],
+                },
+                z: 1000,
+              },
+              {
+                type: "text",
+                style: {
+                  text: `Go back`,
+                  x: isSmallScreen ? 37 : 50, // Center the text
+                  y: isSmallScreen ? 10 : 20, // Center the text
+                  textAlign: "center",
+                  textVerticalAlign: "middle",
+                  fill: "#2E4F4F", // Green text color
+                  fontSize: isSmallScreen ? 8 : 12, // Adjust font size
+                },
+                z: 1001,
+              },
+            ],
           },
         ],
       };
@@ -785,13 +885,21 @@ const Page: React.FC = () => {
             name: "Speedrun time",
             axisLabel: {
               formatter: (value: number) => formatTime(value),
+              color: "white",
             },
             min: yMin,
-            max: yMax,
+            nameTextStyle: { color: "white" },
           },
           xAxis: {
             type: "time",
             name: "Date",
+            axisLabel: { color: "white" },
+            nameTextStyle: {
+              color: "white",
+              verticalAlign: "top",
+              padding: [10, 0, 0, 0],
+            },
+            nameLocation: "middle",
           },
           animationDurationUpdate: 500,
           animationThreshold: 20000,
@@ -814,16 +922,56 @@ const Page: React.FC = () => {
                 opacity: 0.4,
               },
             },
+            // {
+            //   type: "text",
+            //   left: 50,
+            //   top: 20,
+            //   style: {
+            //     text: "Back",
+            //     fontSize: 18,
+            //     fill: "grey",
+            //   },
+            //   onclick: () => goBack(),
+            // },
             {
-              type: "text",
-              left: 50,
-              top: 20,
-              style: {
-                text: "Back",
-                fontSize: 18,
-                fill: "grey",
-              },
+              type: "group",
+              right: isSmallScreen ? "60%" : "70%", // Position at the right 20% if small screen
+              top: isSmallScreen ? "15%" : "10%", // Position at the top 15% if small screen
+              z: 1000, // Ensure it's above scatter points
               onclick: () => goBack(),
+              children: [
+                {
+                  type: "rect",
+                  shape: {
+                    width: isSmallScreen ? 75 : 100,
+                    height: isSmallScreen ? 30 : 50,
+                  },
+                  style: {
+                    fill: "rgb(255, 255, 255)", // Semi-transparent background
+                    stroke: "#CBE4DE", // Green border for video game feel
+                    lineWidth: 2,
+                    shadowBlur: 10,
+                    shadowColor: "#CBE4DE",
+                    // Optional: Add rounded corners
+                    // Define borderRadius if desired
+                    // borderRadius: [10, 10, 10, 10],
+                  },
+                  z: 1000,
+                },
+                {
+                  type: "text",
+                  style: {
+                    text: `Go back`,
+                    x: isSmallScreen ? 37 : 50, // Center the text
+                    y: isSmallScreen ? 15 : 25, // Center the text
+                    textAlign: "center",
+                    textVerticalAlign: "middle",
+                    fill: "#2E4F4F", // Green text color
+                    fontSize: isSmallScreen ? 8 : 12, // Adjust font size
+                  },
+                  z: 1001,
+                },
+              ],
             },
             {
               type: "group",
@@ -860,11 +1008,6 @@ const Page: React.FC = () => {
                     textVerticalAlign: "middle",
                     fill: "#2E4F4F", // Green text color
                     fontSize: isSmallScreen ? 8 : 12, // Adjust font size
-                    // If "Press Start 2P" is not available, use a default monospace font
-                    // font: 'bold 16px monospace',
-                    // Add a glow effect using shadow
-                    //textShadowColor: "#CBE4DE",
-                    //textShadowBlur: 4,
                   },
                   z: 1001,
                 },

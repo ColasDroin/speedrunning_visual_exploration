@@ -116,7 +116,15 @@ const Page: React.FC = () => {
         {
           type: "tree",
           name: "Portal",
-          data: [dataCategories["portal"]],
+          data: [
+            {
+              ...dataCategories["portal"],
+              itemStyle: {
+                color: "orange", // Set the central node color
+                shadowColor: "orange",
+              },
+            },
+          ],
           top: "15%",
           bottom: "15%",
           left: "10%",
