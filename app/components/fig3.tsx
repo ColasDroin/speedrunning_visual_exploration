@@ -504,12 +504,19 @@ const Page: React.FC = () => {
       singleAxis: {
         top: "20%",
         bottom: "1%",
+        name: "Time", // Adds the x-axis label
+        nameLocation: "end", // Positions the label at the end of the axis
+        nameTextStyle: {
+          color: "white", // Sets the label color
+        },
         axisTick: {
-          interval: 1, // monthly
+          interval: 1, // Monthly ticks
         },
         axisLabel: {
+          show: true, // Ensures labels are visible
+          color: "white", // Sets the label text color
           formatter: (value: string) =>
-            new Date(value).toISOString().slice(0, 7),
+            new Date(value).toISOString().slice(0, 7), // Formats the labels as YYYY-MM
         },
         type: "time",
         axisPointer: {
