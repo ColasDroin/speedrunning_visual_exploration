@@ -322,7 +322,11 @@ const Page: React.FC = () => {
           ].join("<br/>");
         },
       },
-      grid: { left: 10, right: 150 },
+      grid: {
+        left: 10,
+        right: 150,
+        // Added splitLine styling for the grid
+      },
 
       xAxis: {
         type: "value",
@@ -334,6 +338,13 @@ const Page: React.FC = () => {
           padding: [10, 0, 0, 0],
         },
         nameLocation: "middle",
+        // Added splitLine styling
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: "rgba(255, 255, 255, 0.2)", // Lighter and transparent grid lines
+          },
+        },
       },
       yAxis: {
         type: "category",
@@ -341,6 +352,13 @@ const Page: React.FC = () => {
         show: false,
         nameTextStyle: { color: "white" },
         axisLabel: { color: "white" },
+        // Added splitLine styling
+        // splitLine: {
+        //   show: true,
+        //   lineStyle: {
+        //     color: "rgba(255, 255, 255, 0.2)", // Lighter and transparent grid lines
+        //   },
+        // },
       },
       animationDurationUpdate: 500,
       dataset: {
@@ -436,6 +454,8 @@ const Page: React.FC = () => {
           },
         },
       ],
+      // Ensure grid lines are lighter and transparent
+      // No need to modify graphic here
     };
   };
 
@@ -482,7 +502,9 @@ const Page: React.FC = () => {
             ].join("<br/>");
           },
         },
-        grid: { left: 150 },
+        grid: {
+          left: 150,
+        },
 
         xAxis: {
           type: "value",
@@ -494,12 +516,26 @@ const Page: React.FC = () => {
             padding: [10, 0, 0, 0],
           },
           nameLocation: "middle",
+          // Added splitLine styling
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: "rgba(255, 255, 255, 0.2)", // Lighter and transparent grid lines
+            },
+          },
         },
         yAxis: {
           type: "category",
           inverse: true,
           nameTextStyle: { color: "white" },
           axisLabel: { color: "white" },
+          // Added splitLine styling
+          // splitLine: {
+          //   show: true,
+          //   lineStyle: {
+          //     color: "rgba(255, 255, 255, 0.2)", // Lighter and transparent grid lines
+          //   },
+          // },
         },
         // visualMap: {
         //   orient: "horizontal",
@@ -636,7 +672,9 @@ const Page: React.FC = () => {
             ].join("<br/>");
           },
         },
-        grid: { left: 100 },
+        grid: {
+          left: 100,
+        },
         xAxis: {
           type: "value",
           name: "Submission count per bin",
@@ -647,11 +685,25 @@ const Page: React.FC = () => {
             padding: [10, 0, 0, 0],
           },
           nameLocation: "middle",
+          // Added splitLine styling
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: "rgba(255, 255, 255, 0.2)", // Lighter and transparent grid lines
+            },
+          },
         },
         yAxis: {
           type: "category",
           nameTextStyle: { color: "white" },
           axisLabel: { color: "white" },
+          // Added splitLine styling
+          // splitLine: {
+          //   show: true,
+          //   lineStyle: {
+          //     color: "rgba(255, 255, 255, 0.2)", // Lighter and transparent grid lines
+          //   },
+          // },
         },
         animationDurationUpdate: 500,
         dataset: {
@@ -888,7 +940,11 @@ const Page: React.FC = () => {
               ].join("<br/>");
             },
           },
-          grid: { left: 100 },
+          grid: {
+            left: 100,
+            // Added splitLine styling for the grid
+            // containLabel: true,
+          },
           yAxis: {
             type: "value",
             name: "Speedrun time",
@@ -898,6 +954,13 @@ const Page: React.FC = () => {
             },
             min: yMin,
             nameTextStyle: { color: "white" },
+            // Added splitLine styling
+            splitLine: {
+              show: true,
+              lineStyle: {
+                color: "rgba(255, 255, 255, 0.2)", // Lighter and transparent grid lines
+              },
+            },
           },
           xAxis: {
             type: "time",
@@ -909,6 +972,13 @@ const Page: React.FC = () => {
               padding: [10, 0, 0, 0],
             },
             nameLocation: "middle",
+            // Added splitLine styling
+            // splitLine: {
+            //   show: true,
+            //   lineStyle: {
+            //     color: "rgba(255, 255, 255, 0.2)", // Lighter and transparent grid lines
+            //   },
+            // },
           },
           animationDurationUpdate: 500,
           animationThreshold: 20000,
@@ -1027,6 +1097,9 @@ const Page: React.FC = () => {
         };
       }
     );
+
+    // Build scatter charts with flickering "stars" + a background logo
+    // Note: Split line styling is already included in yAxis and xAxis above
   };
 
   // =============================================================================
