@@ -522,7 +522,11 @@ const Page: React.FC = () => {
         },
         splitLine: {
           show: true,
-          lineStyle: { type: "dashed", opacity: 0.5 },
+          lineStyle: {
+            type: "dashed",
+            opacity: 0.5,
+            color: "rgba(255, 255, 255, 0.2)",
+          },
         },
       },
 
