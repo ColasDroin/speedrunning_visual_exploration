@@ -238,13 +238,13 @@ export default function Home() {
             shows how run times have evolved over time. Each point represents a
             completed run, with faster times indicating significant
             breakthroughs, new strategies, or the discovery of game-breaking
-            glitches.
+            glitches. Hover above the points to see the run’s details.
           </p>
           <div className="mx-auto max-w-5xl mt-5 mb-5">
             <p className="max-w-5xl mx-auto">
               The figure below is an interactive visualization that allows you
-              to explore the dataset of runs by game and category in depth. Have
-              a try!
+              to explore the dataset of runs by game and category in depth.
+              Click on a bar and start exploring!
             </p>
           </div>
           <div className="mx-auto w-full lg:max-w-[80%] mt-5 mb-5">
