@@ -1,4 +1,6 @@
-# Speedrunning: A Visual Exploration
+# Speedrunning: A Visual Exploration (deprecated)
+
+NOTE: This repo is archived as a pre-2025 version for the IIB awards. You're probably interested in the [newer version](https://github.com/ColasDroin/speedrunning_visual_exploration-v2) of the project.
 
 A single-page application built with **React**, **Next.js**, and **ECharts.js** to explore a dataset of speedrunning records scraped from the API of [speedrun.com](https://www.speedrun.com). This project is intended to provide an interactive and visual exploration of the data for the general public while serving as a private-use project for the developer.
 
